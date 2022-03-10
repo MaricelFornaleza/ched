@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="w-1/2 py-20 mx-auto">
+        <div class="w-full p-10 md:p-20 mx-auto xxl:w-1/2">
         <h2 class="text-brand-blue pb-5">Send a message</h2>
         <form action="">
-            <div class="flex gap-20 e">
-                <div class="w-1/2 space-y-5">
+            <div class="flex flex-col lg:flex-row gap-5 lg:gap-10">
+                <div class="w-full space-y-5">
                     <label class="block ">
                         <span class="after:content-['*'] after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200">
                             Province
@@ -31,7 +31,7 @@
                         <input type="email" name="email" class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1" placeholder="Enter text" />
                     </label>
                 </div>
-                <div class="w-1/2">
+                <div class="w-full">
                     <div class="mb-3 ">
                         <label class="after:content-['*'] after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200"
                         >Message</label

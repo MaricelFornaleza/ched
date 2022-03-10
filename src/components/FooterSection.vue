@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="h-[50px] flex items-center justify-between bg-dark-300 text-dark-100 px-20 ">
+        <div class="h-[50px] flex items-center justify-between bg-dark-300 text-dark-100 px-5 xxl:px-20 ">
             <p class="font-bold label-s">&copy; 2022 Copyright CHEDRO V</p>
-            <div class="flex gap-5">
+            <div class="flex gap-2">
                 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.5002 2.125C6.771 2.125 2.0835 6.80208 2.0835 12.5625C2.0835 17.7708 5.896 22.0937 10.8752 22.875V15.5833H8.22933V12.5625H10.8752V10.2604C10.8752 7.64583 12.4272 6.20833 14.8127 6.20833C15.9481 6.20833 17.1356 6.40625 17.1356 6.40625V8.97917H15.8231C14.5314 8.97917 14.1252 9.78125 14.1252 10.6042V12.5625H17.021L16.5522 15.5833H14.1252V22.875C16.5798 22.4873 18.815 21.2349 20.4272 19.3438C22.0394 17.4527 22.9224 15.0475 22.9168 12.5625C22.9168 6.80208 18.2293 2.125 12.5002 2.125Z" fill="#98A2B3"/>
                 </svg>
