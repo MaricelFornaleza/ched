@@ -5,19 +5,11 @@
       <router-link to="/about">About</router-link>
     </nav>
     <router-view/> -->
-    <LandingView />
+    <router-view />
   </div>
 </template>
 
 <script>
-import LandingView from "@/views/LandingView.vue";
-
-export default {
-  name: "App",
-  components: {
-    LandingView,
-  },
-};
 </script>
 
 <style>

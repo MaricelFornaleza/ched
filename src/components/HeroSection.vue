@@ -144,7 +144,9 @@
                       placeholder="Enter password"
                     />
                   </label>
+
                   <button
+                    @click="goToHome()"
                     class="
                       w-full
                       btn-sm
@@ -183,6 +185,9 @@ export default {
   methods: {
     toggle() {
       this.open = !this.open;
+    },
+    goToHome() {
+      this.$router.push("/home");
     },
   },
 };
