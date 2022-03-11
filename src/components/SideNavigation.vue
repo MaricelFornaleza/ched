@@ -10,10 +10,10 @@
         bg-dark-300
         text-light-100
       "
-      :class="open ? 'open' : ''"
+      :class="open ? 'open-side-bar' : ''"
       aria-label="Sidebar"
     >
-      <div class="py-4 pt-24 rounded">
+      <div class="py-4 px-3 pt-24 rounded">
         <div class="time text-center flex-col flex gap-2 mb-20">
           <div class="uppercase text-sm font-semibold tracking-wider">
             Philippine Standard Time
@@ -114,13 +114,13 @@ export default {
 };
 </script>
 <style>
-.open {
+.open-side-bar {
   width: auto;
   transition: all 0.5s ease-in-out;
 }
-.open .label,
-.open .time,
-.open .copyright {
+.open-side-bar .label,
+.open-side-bar .time,
+.open-side-bar .copyright {
   display: none;
 }
 </style>
