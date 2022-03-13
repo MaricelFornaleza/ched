@@ -3,7 +3,7 @@
     <TopNavigation @toggleSB="toggleSideBar" />
     <div class="flex">
       <SideNavigation ref="toggleSideNavigation" />
-      <div class="main-content"><slot /></div>
+      <div class="flex-auto main-content pt-20 px-20 bg-light-200" ><slot /></div>
     </div>
   </div>
 </template>
