@@ -5,6 +5,7 @@ import Parse from 'parse'
 import router from './router'
 
 
+
 Parse.initialize("cnmsp", "master");
 Parse.serverURL = 'http://localhost:1337/parse'
 

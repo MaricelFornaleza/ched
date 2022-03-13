@@ -2,7 +2,7 @@
   <view-layout>
     <div class="home">
       <div class="h-full w-full text-center p-10">
-        <div class="grid gap-10 lg:grid-cols-2 xl:grid-cols-3">
+        <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
           <advanced-widget bgColor="bg-info-light" textColor="text-info">
             <template v-slot:icon><LibraryIcon class="h-8" /></template>
             <template v-slot:count>123k</template>
@@ -48,6 +48,7 @@
 import ViewLayout from "@/layout/ViewLayout.vue";
 import AdvancedWidget from "@/partials/AdvancedWidget.vue";
 import DataCount from "@/partials/DataCount.vue";
+
 import {
   AcademicCapIcon,
   LibraryIcon,

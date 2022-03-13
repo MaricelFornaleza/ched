@@ -13,7 +13,7 @@
             <TimeDisplay />
           </div>
         </template>
-        <template v-slot:toggle-icon><MenuIcon class="h-6" /></template>
+        <template v-slot:toggle-icon><MenuIcon class="h-7" /></template>
         <template v-slot:footer
           ><div
             class="copyright p-5 bg-[#212837]"
@@ -39,7 +39,9 @@
         <div class="breadcrumbs mt-14 w-full bg-light-100 p-3 fixed shadow-sm">
           Breadcrumbs
         </div>
-        <div class="main-content pt-28"><slot /></div>
+        <div class="main-content h-screen pt-28">
+          <slot />
+        </div>
       </div>
     </div>
   </div>
@@ -59,8 +61,11 @@
   padding: 10px;
   right: 0;
   position: absolute;
-  top: 50px;
-  background-color: #212837;
+  top: 55px;
+  background-color: transparent;
+}
+.v-sidebar-menu.vsm_collapsed .vsm--toggle-btn {
+  left: 0;
 }
 .v-sidebar-menu .vsm--link {
   margin-top: 10px;

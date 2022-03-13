@@ -8,10 +8,6 @@ import GraduatesView from "../views/GraduatesView.vue"
 import SerialNumbersView from "../views/SerialNumbersView.vue"
 import ReportSummaryView from "../views/ReportSummaryView.vue"
 
-
-
-
-
 const routes = [
   {
     path: "/",

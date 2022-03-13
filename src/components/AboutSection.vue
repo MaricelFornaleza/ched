@@ -9,7 +9,6 @@
         lg:flex-row
         gap-5
         md:gap-10
-        lg:gap-10
         xxl:w-8/12 xxl:gap-20
       "
     >

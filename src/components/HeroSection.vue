@@ -1,11 +1,14 @@
 <template>
   <div>
-    <section class="w-full h-screen hero bg-cover bg-fixed bg-center">
+    <section class="h-screen hero bg-cover bg-fixed bg-center">
       <div
         class="bg-brand-blue bg-opacity-80 w-full h-screen text-light-100"
         :class="open ? 'xxl:text-left xxl:pl-32' : ' text-center'"
       >
-        <div class="pt-10 mb-20 xxl:mb-48 space-y-2 sm:pt-20 sm:mb-32 lg:pl-20">
+        <div
+          class="pt-10 mb-20 xxl:mb-48 space-y-2 sm:pt-20 sm:mb-32"
+          :class="open ? 'lg:pl-20' : ''"
+        >
           <img
             src="../assets/CHED_logo.svg"
             class="h-10 xs:h-14"
