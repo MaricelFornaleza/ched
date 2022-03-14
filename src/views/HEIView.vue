@@ -1,9 +1,9 @@
 <template>
   <view-layout>
-    <div class="hei h-full w-full flex flex-col justify-center">
+    <div class="hei h-full w-full flex flex-col">
       <!-- render empty state if there is no data found -->
       <!-- <EmptyState /> -->
-      <div class="h-full w-full text-center p-10">
+      <div class="w-full text-center p-10">
         <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
           <simple-widget bgColor="bg-warning-light" textColor="text-warning">
             <template v-slot:icon><LibraryIcon class="h-8" /></template>
@@ -29,7 +29,9 @@
       </div>
 
       <!-- dataTables  -->
-      <div></div>
+      <div>
+        <VueDataTable />
+      </div>
     </div>
   </view-layout>
 </template>
@@ -41,6 +43,7 @@ import ViewLayout from "@/layout/ViewLayout.vue";
 import SimpleWidget from "@/partials/SimpleWidget.vue";
 // import EmptyState from "@/components/EmptyState.vue";
 import { LibraryIcon } from "@heroicons/vue/solid";
+import VueDataTable from "@/partials/VueDataTable.vue";
 
 export default {
   name: "HEIView",
@@ -48,6 +51,7 @@ export default {
     ViewLayout,
     SimpleWidget,
     LibraryIcon,
+    VueDataTable,
   },
 };
 </script>
