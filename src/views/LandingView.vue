@@ -26,5 +26,6 @@ export default {
     ContactForm,
     FooterSection,
   },
+  methods: {},
 };
 </script>

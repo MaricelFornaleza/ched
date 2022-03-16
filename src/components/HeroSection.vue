@@ -149,7 +149,7 @@
                   </label>
 
                   <button
-                    @click="goToHome()"
+                    @click="login()"
                     class="
                       w-full
                       btn-sm
@@ -189,7 +189,7 @@ export default {
     toggle() {
       this.open = !this.open;
     },
-    goToHome() {
+    login() {
       this.$router.push("/home");
     },
   },
