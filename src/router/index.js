@@ -1,7 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import LandingView from "../views/LandingView.vue";
-import ApplicationView from "@/views/ApplicationView.vue";
+import HEIView from "../views/HEIView.vue"
+import ApplicationView from "../views/ApplicationView.vue"
+import EnrollmentView from "../views/EnrollmentView.vue"
+import GraduatesView from "../views/GraduatesView.vue"
+import SerialNumbersView from "../views/SerialNumbersView.vue"
+import ReportSummaryView from "../views/ReportSummaryView.vue"
 
 const routes = [
   {
@@ -13,10 +18,31 @@ const routes = [
     path: "/home",
     name: "home",
     component: HomeView,
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-  
+  },
+  {
+    path: "/hei",
+    name: "hei",
+    component: HEIView,
+  },
+  {
+    path: "/enrollment",
+    name: "enrollment",
+    component: EnrollmentView,
+  },
+  {
+    path: "/graduates",
+    name: "graduates",
+    component: GraduatesView,
+  },
+  {
+    path: "/serial-numbers",
+    name: "serial-numbers",
+    component: SerialNumbersView,
+  },
+  {
+    path: "/report-summary",
+    name: "report-summary",
+    component: ReportSummaryView,
   },
   {
     path: '/application',

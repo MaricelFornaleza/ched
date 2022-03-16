@@ -2,19 +2,27 @@
   <div>
     <aside
       class="
-        w-72
-        h-screen
+        w-screen
+        inset-y-0
+        xs:w-2/3
+        sm:w-1/2
+        lg:h-screen lg:w-72
         overflow-y-auto
-        sticky
+        fixed
+        lg:sticky
         top-0
         bg-dark-300
         text-light-100
+        transition-width
+        duration-500
       "
-      :class="open ? 'open-side-bar' : ''"
+      :class="open ? 'close-side-bar ' : 'open-side-bar'"
       aria-label="Sidebar"
     >
       <div class="py-4 px-3 pt-24 rounded">
-        <div class="time text-center flex-col flex gap-2 mb-20">
+        <div
+          class="time lg:block text-center flex-col flex gap-2 mb-10 lg:mb-20"
+        >
           <div class="uppercase text-sm font-semibold tracking-wider">
             Philippine Standard Time
           </div>
@@ -65,10 +73,10 @@
           bottom-0
           p-5
           bg-[#212837]
-          absolute
           w-full
           gap-2
           flex flex-col
+          lg:absolute
         "
       >
         <p class="text-sm text-gray-700 tracking-wider">
@@ -114,13 +122,44 @@ export default {
 };
 </script>
 <style>
-.open-side-bar {
-  width: auto;
-  transition: all 0.5s ease-in-out;
+.drawer {
+  width: 0px;
+  transition: width 0.5s ease-in-out;
 }
-.open-side-bar .label,
-.open-side-bar .time,
-.open-side-bar .copyright {
-  display: none;
+
+.open-side-bar {
+  width: 0px;
+  transition: width 0.5s ease-in-out;
+}
+@media (min-width: 640px) {
+  .open-side-bar {
+    width: 18rem;
+    transition: width 0.5s ease-in-out;
+  }
+  .close-side-bar {
+    width: 90px;
+  }
+  .close-side-bar .label,
+  .close-side-bar .time,
+  .close-side-bar .copyright {
+    opacity: 0;
+    display: none;
+    transition: all 0.5s ease-in-out;
+  }
+  .label,
+  .time,
+  .copyright {
+    transition: opacity 0.5s ease-in-out;
+    transition-delay: 100ms;
+  }
+}
+@media (max-width: 639px) {
+  .close-side-bar .label,
+  .close-side-bar .time,
+  .close-side-bar .copyright {
+    opacity: 100%;
+    display: block;
+    transition: all 0.5s ease-in-out;
+  }
 }
 </style>
