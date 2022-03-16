@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <TopNavigation @toggleSB="toggleSideBar" />
     <div class="flex">
       <SideNavigation ref="toggleSideNavigation" />
