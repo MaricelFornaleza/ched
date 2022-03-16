@@ -41,7 +41,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -61,7 +61,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -84,7 +84,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -108,7 +108,7 @@
             <input
               class="
                 appearance-none
-                border border-2
+                border-2
                 rounded
                 w-full
                 py-2
@@ -138,7 +138,7 @@
                 py-2
                 text-sm text-dark-100
                 bg-clip-padding
-                border border-2
+                border-2
                 rounded
                 transition
                 ease-in-out

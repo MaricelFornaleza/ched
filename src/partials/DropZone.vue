@@ -14,7 +14,7 @@
         justify-center
         items-center
         space-y-5
-        border border-2 border-dashed border-dark-100
+        border-2 border-dashed border-dark-100
         rounded-md
         transition
         duration-300
@@ -30,8 +30,7 @@
       </span>
       <span class="text-xs"
         >Must be .xlsx file using this
-        <button class="font-bold underline">template</button>.</span
-      >
+        <button class="font-bold underline">template</button>.</span>
 
       <input type="file" id="dropzoneFile" class="dropzoneFile" />
     </div>

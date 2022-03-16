@@ -10,6 +10,8 @@ import SerialNumbersView from "../views/SerialNumbersView.vue"
 import ReportSummaryView from "../views/ReportSummaryView.vue"
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
+import NewApplication from "../components/NewApplication.vue";
+
 const routes = [
   {
     path: "/",
@@ -46,6 +48,11 @@ const routes = [
         component: ApplicationView,
       },
       {
+        path: "/application/new",
+        name: "newApplication",
+        component: NewApplication,
+      },
+      {
         path: "/enrollment",
         name: "enrollment",
         component: EnrollmentView,
@@ -68,13 +75,6 @@ const routes = [
 
     ]
   },
-  {
-    path: '/application',
-    name: "application",
-    component: ApplicationView,
-  },
-  
-  
 ];
 
 const router = createRouter({
