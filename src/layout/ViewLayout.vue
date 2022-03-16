@@ -40,7 +40,7 @@
           Breadcrumbs
         </div>
         <div class="main-content h-screen pt-28">
-          <slot />
+          <router-view />
         </div>
       </div>
     </div>
@@ -120,6 +120,7 @@ export default {
   data() {
     return {
       collapsed: true,
+
       menu: [
         {
           href: "/home",

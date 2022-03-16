@@ -1,110 +1,71 @@
 <template>
   <div class="p-10">
-    <span class="flex absolute right-20 mt-5 z-20">
-      <button
-        id="dropdownButton"
-        data-dropdown-toggle="dropdown"
-        class="
-          mr-5
-          text-light-100
-          bg-brand-blue
-          hover:bg-blue-800
-          focus:ring-4 focus:ring-blue-300
-          font-medium
-          rounded-lg
-          text-sm
-          px-4
-          py-2.5
-          text-center
-          inline-flex
-          items-center
-          dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
-        "
-        type="button"
-      >
-        Dropdown button
-        <ChevronDownIcon class="h-5" />
-      </button>
+    <div class="flex space-x-5 absolute right-20 mt-5 z-20">
+      <div class="flex flex-col">
+        <button
+          id="dropdownButton"
+          @click="dropdownToggle()"
+          class="
+            w-fit
+            ml-auto
+            text-light-100
+            bg-brand-blue
+            hover:bg-blue-800
+            focus:ring-4 focus:ring-blue-300
+            font-medium
+            rounded-lg
+            text-sm
+            px-4
+            py-2.5
+            text-center
+            inline-flex
+            items-center
+            dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+          "
+          type="button"
+        >
+          Add HEI
+          <ChevronDownIcon class="ml-2 h-5" />
+        </button>
 
-      <!-- Dropdown menu -->
-      <div
-        id="dropdown"
-        class="
-          hidden
-          z-10
-          w-44
-          text-base
-          list-none
-          bg-white
-          rounded
-          divide-y divide-gray-100
-          shadow
-          dark:bg-gray-700
-        "
-      >
-        <ul class="py-1" aria-labelledby="dropdownButton">
-          <li>
-            <a
-              href="#"
-              class="
-                block
-                py-2
-                px-4
-                text-sm text-gray-700
-                hover:bg-gray-100
-                dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white
-              "
-              >Dashboard</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="
-                block
-                py-2
-                px-4
-                text-sm text-gray-700
-                hover:bg-gray-100
-                dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white
-              "
-              >Settings</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="
-                block
-                py-2
-                px-4
-                text-sm text-gray-700
-                hover:bg-gray-100
-                dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white
-              "
-              >Earnings</a
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="
-                block
-                py-2
-                px-4
-                text-sm text-gray-700
-                hover:bg-gray-100
-                dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white
-              "
-              >Sign out</a
-            >
-          </li>
-        </ul>
+        <!-- Dropdown menu -->
+        <div
+          v-show="dropdown"
+          class="
+            z-10
+            w-auto
+            text-base
+            list-none
+            bg-light-100
+            rounded
+            divide-y divide-gray-100
+            shadow
+            dark:bg-gray-700
+          "
+        >
+          <ul class="py-1" aria-labelledby="dropdownButton">
+            <li>
+              <router-link to="/hei/new"
+                ><p class="block py-2 px-4 text-sm hover:bg-light-300">
+                  New HEI
+                </p></router-link
+              >
+            </li>
+            <li>
+              <router-link to="/hei/upload"
+                ><p class="block py-2 px-4 text-sm hover:bg-light-300">
+                  Upload Excel File
+                </p></router-link
+              >
+            </li>
+          </ul>
+        </div>
       </div>
-      <button class="btn-sm px-4 bg-dark-100 text-light-100">
+
+      <button class="btn-sm h-fit px-4 bg-dark-100 text-light-100">
         <DownloadIcon class="h-5" />
       </button>
-    </span>
+    </div>
     <table id="dataTable" class="p-4 hover">
       <thead class="bg-gray-50">
         <tr>
@@ -347,7 +308,14 @@ export default {
     });
   },
   data: function () {
-    return {};
+    return {
+      dropdown: false,
+    };
+  },
+  methods: {
+    dropdownToggle() {
+      this.dropdown = !this.dropdown;
+    },
   },
 };
 </script>
