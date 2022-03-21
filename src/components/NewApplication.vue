@@ -97,9 +97,9 @@ export default {
 	color: white;
 	/*need more margin on the left of links to accomodate the numbers*/
 	padding: 0 10px 0 60px;
-	background: theme("colors.dark.100") !important;
-	/* background: linear-gradient(#333, #111); */
-  /* background-color: theme("colors.dark.100") !important; */
+	/* background: theme("colors.dark.100") !important; */
+	background: linear-gradient(#333, #111);
+	/* background-color: theme("colors.dark.100") !important; */
 	position: relative;
 }
 /*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
