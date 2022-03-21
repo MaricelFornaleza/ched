@@ -1,148 +1,192 @@
 <template>
-  <div class="relative items-center w-full">
-        <div 
-          class="
-            w-full 
-            py-12 
-            mx-auto 
-            bg-light-100 
-            rounded-xl
-          "
+  <div
+      class="
+        m-auto
+        mt-20
+        border border-1 border-light-300
+        shadow-sm
+        px-20
+        py-10
+        bg-light-100
+        w-4/5
+        flex flex-col
+        justify-center
+        items-center
+      "
+    >
+      <div class="breadcrumb flat">
+        <a href="#" class="active">STEP 1</a>
+        <a href="#">STEP 2</a>
+        <a href="#">STEP 3</a>
+        <a href="#">STEP 4</a>
+        <a href="#">STEP 5</a>
+      </div>
+
+      <div class="mt-10 w-full">
+        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
+      </div>
+      <div class="flex items-center justify-center space-x-5 mt-10">
+        <button class="
+          btn-sm 
+        bg-light-300 font-bold
+          hover:ring-4
+          focus:ring-blue-300" type="button"
         >
-          
-          <div 
-            class="
-              md:mx-12 
-              lg:mx-24 
-              space-y-2
+          Cancel
+        </button>
+        <button
+          class="
+            btn-sm 
+            bg-brand-blue 
+            font-semibold 
+            text-light-100 
+            outline outline-1 outline-brand-blue
+            hover:ring-4
+            focus:ring-blue-300
             "
-          >
-            <div 
-              class="
-                flex 
-                items-center 
-                justify-center 
-                w-full
-              "
-            >
-                <label 
-                  class="
-                    flex 
-                    flex-col 
-                    border-dark-100 rounded-lg border-4 border-dashed 
-                    w-full 
-                    h-60 
-                    p-10 
-                    group 
-                    text-center
-                  "
-                >
-                    <div 
-                      class="
-                        h-full 
-                        w-full 
-                        text-center 
-                        flex flex-col 
-                        items-center 
-                        justify-center
-                        cursor-pointer
-                      "
-                    >
-                        <DocumentAddIcon class="h-20 mb-5" />
-                        <p class="pointer-none text-2xl ">
-                          <!-- <span href="#" id="" class="font-bold underline hover:text-brand-blue">Browse</span> or drag and drop a file  -->
-                          <!-- <input id="hidden-input" type="file" class="hidden" /> -->
-                          <!-- <button id="button" class="font-bold underline hover:text-brand-blue outline-none">
-                            Browse
-                          </button> -->
-                          or drag and drop a file
-                          <br />
-                          <span class="text-dark-200 text-lg">Must be .xlsx file using the template provided.</span>
-                        </p>
-                    </div>
-                    <input type="file" class="hidden" @change="handleFileUpload($event)" >
-                </label>
-                <br />
-                <div class="mt-4">
-                  <button type="button"
-                    class="
-                      btn-sm
-                      border-2 
-                      border-dark-200 
-                      text-dark-200 
-                      font-semibold 
-                      leading-tight 
-                      uppercase
-                      rounded
-                      hover:bg-dark-400 
-                      hover:bg-opacity-5 
-                      focus:outline-none 
-                      focus:ring-0 
-                      transition 
-                      duration-150 
-                      ease-in-out
-                    "
-                  >
-                      Cancel
-                    </button>
+          type="submit"
+        >
+          Upload
+        </button>
+      </div>
 
-                    <button v-on:click="submitFile()" 
-                      class="
-                        btn-sm
-                        bg-brand-blue  
-                        text-light-100 
-                        font-medium  
-                        uppercase 
-                        rounded 
-                        shadow-md 
-                        hover:bg-brand-blue
-                        hover:bg-opacity-4 
-                        hover:shadow-lg 
-                        focus:bg-brand-blue  
-                        focus:shadow-lg 
-                        focus:outline-none 
-                        focus:ring-0 
-                        active:bg-blue-800 
-                        active:shadow-lg 
-                        transition 
-                        duration-150 
-                        ease-in-out
-                      "
-                    >
-                    Upload
-                  </button>
-                </div>
-            </div>
-          </div>
-
-        </div>
-    </div>
+  </div>
 </template>
+
 <script>
-import { DocumentAddIcon, } from "@heroicons/vue/outline";
+import DropZone from "@/partials/DropZone.vue";
+import { ref } from "vue";
 export default {
   components: {
-    DocumentAddIcon,
+    DropZone,
   },
-  methods: { 
-    handleFileUpload( event ){
-				this.file = event.target.files[0];
-        this.message= "IN!";
-		},
-    submitFile() {
-      alert(`Submitted Files:\n${this.file.name}`);
-      console.log(this.file);
-      
-      const Parse = require('parse');
-      const parseFile = new Parse.File(this.file.name.toString(), this.file);
-      parseFile.save().then(function() {
-        // The file has been saved to Parse.
-        console.log("File has been uploaded!");
-      }, function(error) {
-        // The file either could not be read, or could not be saved to Parse.
-        console.log("Error: " + error);
-      });
-    }
+  setup() {
+    let dropzoneFile = ref("");
+    const drop = (e) => {
+      dropzoneFile.value = e.dataTransfer.files[0];
+    };
+    const selectedFile = () => {
+      dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
+    };
+    return { dropzoneFile, drop, selectedFile };
   },
 };
 </script>
+
+<style scoped>
+
+.breadcrumb {
+	/*centering*/
+	display: inline-block;
+	/* box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.35); */
+	overflow: hidden;
+	border-radius: 5px;
+  border-color: theme("colors.light.100") !important;
+	/*Lets add the numbers for each link using CSS counters. flag is the name of the counter. to be defined using counter-reset in the parent element of the links*/
+	counter-reset: flag; 
+}
+
+.breadcrumb a {
+	text-decoration: none;
+	outline: none;
+	display: block;
+	float: left;
+	font-size: 12px;
+	line-height: 36px;
+	color: white;
+	/*need more margin on the left of links to accomodate the numbers*/
+	padding: 0 10px 0 60px;
+	background: theme("colors.dark.100") !important;
+	/* background: linear-gradient(#333, #111); */
+  /* background-color: theme("colors.dark.100") !important; */
+	position: relative;
+}
+/*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
+.breadcrumb a:first-child {
+	padding-left: 46px;
+	border-radius: 5px 0 0 5px; /*to match with the parent's radius*/
+}
+.breadcrumb a:first-child:before {
+	left: 14px;
+}
+.breadcrumb a:last-child {
+	border-radius: 0 5px 5px 0; /*this was to prevent glitches on hover*/
+	padding-right: 20px;
+}
+
+/*hover/active styles*/
+.breadcrumb a.active, .breadcrumb a:hover{
+	background: #111;
+	background: linear-gradient(#333, #111);
+}
+.breadcrumb a.active:after, .breadcrumb a:hover:after {
+	background: #222;
+	background: linear-gradient(145deg, #333, #222);
+}
+
+/*adding the arrows for the breadcrumbs using rotated pseudo elements*/
+.breadcrumb a:after {
+	content: '';
+	position: absolute;
+	top: 0; 
+	right: -18px; /*half of square's length*/
+	/*same dimension as the line-height of .breadcrumb a */
+	width: 36px; 
+	height: 36px;
+	/*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
+	length = 1; diagonal = (1^2 + 1^2)^0.5 = 1.414 (pythagoras theorem)
+	if diagonal required = 1; length = 1/1.414 = 0.707*/
+	transform: scale(0.707) rotate(45deg);
+	/*we need to prevent the arrows from getting buried under the next link*/
+	z-index: 1;
+	/*background same as links but the gradient will be rotated to compensate with the transform applied*/
+	background: #555;
+	background: linear-gradient(135deg, #777, #333);
+	/*stylish arrow design using box shadow*/
+	/* box-shadow: 
+		2px -2px 0 2px rgba(0, 0, 0, 0.4), 
+		3px -3px 0 2px rgba(255, 255, 255, 0.1); */
+	/*
+		5px - for rounded arrows and 
+		50px - to prevent hover glitches on the border created using shadows*/
+	border-radius: 0 5px 0 50px;
+}
+/*we dont need an arrow after the last link*/
+.breadcrumb a:last-child:after {
+	content: none;
+}
+/*we will use the :before element to show numbers*/
+.breadcrumb a:before {
+	content: counter(flag);
+	counter-increment: flag;
+	/*some styles now*/
+	border-radius: 100%;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	margin: 8px 0;
+	position: absolute;
+	top: 0;
+	left: 30px;
+	background: #333;
+	background: linear-gradient(#333, #300);
+	font-weight: bold;
+}
+
+
+.flat a, .flat a:after {
+	background: #333333;
+	color:#eee;
+	transition: all 0.7s;
+}
+.flat a:before {
+	background: #111;
+	box-shadow: 0 0 0 1px #00c;
+}
+.flat a:hover, .flat a.active, 
+.flat a:hover:after, .flat a.active:after{
+	background: #3b5998;
+}
+
+</style>
