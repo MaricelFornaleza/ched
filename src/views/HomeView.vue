@@ -33,22 +33,114 @@
           </template>
         </advanced-widget>
       </div>
+
+      <div class="mt-16 grid gap-10 md:grid-cols-1 xl:grid-cols-3">
+        <div
+          class="col-span-2 w-full bg-light-100 p-10 shadow-sm overflow-hidden"
+        >
+          <BarChart :chartData="testData" />
+          <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
+            <progress-bar
+              label="CWTS Graduates"
+              count="345"
+              percent="60%"
+              bgColor="bg-warning-dark"
+            />
+
+            <progress-bar
+              label="LTS Graduates"
+              count="123"
+              percent="40%"
+              bgColor="bg-error"
+            />
+          </div>
+        </div>
+        <div class="flex justify-center bg-light-100">
+          <ul class="list-group bg-white border border-light-300 w-full">
+            <li
+              class="
+                flex
+                justify-between
+                px-6
+                py-3
+                bg-brand-blue
+                text-light-100
+              "
+            >
+              <div class="flex">
+                <DocumentTextIcon class="h-5 mr-2" />Recent Applications
+              </div>
+              <button class="text-xs underline">View all</button>
+            </li>
+            <list-item
+              class="list-item"
+              school="Ateneo de Naga University"
+              graduates="673"
+              program="CWTS"
+              date="February 15, 2021"
+            ></list-item>
+            <list-item
+              class="list-item"
+              school="Naga College Foundation Inc."
+              graduates="123"
+              program="LTS"
+              date="February 15, 2021"
+            ></list-item>
+            <list-item
+              class="list-item"
+              school="University of Nueva Caceres"
+              graduates="67"
+              program="LTS"
+              date="February 15, 2021"
+            ></list-item>
+            <list-item
+              class="list-item"
+              school="ACLC College of Daet, Inc."
+              graduates="123"
+              program="LTS"
+              date="February 15, 2021"
+            ></list-item>
+            <list-item
+              class="list-item"
+              school="Universidad de Sta Isabel"
+              graduates="123"
+              program="LTS"
+              date="February 15, 2021"
+            ></list-item>
+            <list-item
+              class="list-item"
+              school="Bicol State Colege of Applied Sciences and Technology"
+              graduates="123"
+              program="LTS"
+              date="February 15, 2021"
+            ></list-item>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
+<style>
+.list-group .list-item:nth-child(odd) {
+  background-color: theme("colors.light.200");
+}
+</style>
 <script>
 // @ is an alias to /src
 
 import AdvancedWidget from "@/partials/AdvancedWidget.vue";
 import DataCount from "@/partials/DataCount.vue";
-
+import ProgressBar from "@/partials/ProgressBar.vue";
+import ListItem from "@/partials/ListItem.vue";
+import { BarChart } from "vue-chart-3";
+import { Chart, registerables } from "chart.js";
 import {
   AcademicCapIcon,
   LibraryIcon,
   DocumentTextIcon,
 } from "@heroicons/vue/solid";
 
+Chart.register(...registerables);
 export default {
   name: "HomeView",
   components: {
@@ -57,6 +149,28 @@ export default {
     LibraryIcon,
     DocumentTextIcon,
     DataCount,
+    BarChart,
+    ProgressBar,
+    ListItem,
+  },
+  setup() {
+    const testData = {
+      labels: ["2001-2002", "2002-2003", "2003-2004", "2004-2005", "2005-2006"],
+      datasets: [
+        {
+          label: "CWTS",
+          data: [130, 140, 160, 170, 15],
+          backgroundColor: ["#FECA84"],
+        },
+        {
+          label: "LTS",
+          data: [10, 40, 90, 123, 54],
+          backgroundColor: ["#E93B5A"],
+        },
+      ],
+    };
+
+    return { testData };
   },
 };
 </script>

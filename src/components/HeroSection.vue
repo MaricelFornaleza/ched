@@ -6,8 +6,8 @@
         :class="open ? 'xxl:text-left xxl:pl-32' : ' text-center'"
       >
         <div
-          class="pt-10 mb-20 xxl:mb-48 space-y-2 sm:pt-20 sm:mb-32"
-          :class="open ? 'lg:pl-20' : ''"
+          class="pt-10 mb-20 xxl:mb-32 space-y-2 sm:pt-20 sm:mb-28"
+          :class="open ? 'lg:pl-0' : ''"
         >
           <img
             src="../assets/CHED_logo.svg"
@@ -23,14 +23,7 @@
           :class="open ? 'xxl:pl-0' : 'mx-auto'"
         >
           <h1
-            class="
-              mb-10
-              xxl:mb-10
-              text-2xl
-              xs:text-4xl
-              sm:text-5xl
-              xxl:text-6xl
-            "
+            class="mb-10 xxl:mb-10 text-2xl xs:text-4xl sm:text-5xl xxl:text-6xl"
           >
             The 1st NSTP Serial Number Online Application & Issuance
           </h1>
@@ -56,16 +49,7 @@
         <button class="close-btn" @click="toggle"><XIcon class="h-8" /></button>
         <div class="h-full">
           <div
-            class="
-              h-2/3
-              xs:h-1/2
-              absolute
-              inset-0
-              m-auto
-              mx-14
-              md:mx-24
-              xxl:mx-28
-            "
+            class="h-2/3 xs:h-1/2 absolute inset-0 m-auto mx-14 md:mx-24 xxl:mx-28"
           >
             <h2 class="text-brand-blue font-bold">Sign In</h2>
             <p class="body-s">
@@ -77,87 +61,34 @@
                 <div class="w-full">
                   <label class="block mb-5">
                     <span
-                      class="
-                        after:ml-0.5 after:text-brand-red
-                        block
-                        label-text
-                        font-semibold
-                        text-dark-200
-                      "
+                      class="after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200"
                     >
                       Email Address
                     </span>
                     <input
                       type="email"
                       name="email"
-                      class="
-                        mt-1
-                        px-5
-                        py-3
-                        bg-light-100
-                        border
-                        shadow-sm
-                        border-dark-100
-                        placeholder-dark-100
-                        focus:outline-none
-                        focus:border-brand-blue
-                        focus:ring-brand-blue
-                        block
-                        w-full
-                        rounded-md
-                        sm:text-sm
-                        focus:ring-1
-                      "
+                      class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
                       placeholder="name@gmail.com"
                     />
                   </label>
                   <label class="block">
                     <span
-                      class="
-                        after:ml-0.5 after:text-brand-red
-                        block
-                        label-text
-                        font-semibold
-                        text-dark-200
-                      "
+                      class="after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200"
                     >
                       Password
                     </span>
                     <input
                       type="password"
                       name="password"
-                      class="
-                        mt-1
-                        px-5
-                        py-3
-                        bg-light-100
-                        border
-                        shadow-sm
-                        border-dark-100
-                        placeholder-dark-100
-                        focus:outline-none
-                        focus:border-brand-blue
-                        focus:ring-brand-blue
-                        block
-                        w-full
-                        rounded-md
-                        sm:text-sm
-                        focus:ring-1
-                      "
+                      class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
                       placeholder="Enter password"
                     />
                   </label>
 
                   <button
                     @click="login()"
-                    class="
-                      w-full
-                      btn-sm
-                      bg-brand-yellow
-                      mt-10
-                      text-light-100
-                      uppercase
-                    "
+                    class="w-full btn-sm bg-brand-yellow mt-10 text-light-100 uppercase"
                   >
                     Submit
                   </button>
