@@ -18,12 +18,12 @@
       <p class="text-4xl font-medium text-dark-300">No {{ title }} </p>
       <p class="body-l text-dark-200">{{ label }}</p>
       <div class="flex gap-10 pt-5">
-        <button class="btn-sm btn-default btn-outline">
-           New {{ title }}
-        </button>
-        <button class="btn-sm btn-default">
-          {{ rightBtnName }}
-        </button>
+        <a :href="leftBtn.link" class="btn-sm btn-default btn-outline" >
+          {{ leftBtn.name }}
+        </a>
+        <a :href="rightBtn.link" class="btn-sm btn-default">
+          {{ rightBtn.name }}
+        </a>
       </div>
     </div>
   </div>
@@ -36,8 +36,8 @@ export default {
   props: {
     title: String,
     label: String,
-    rightBtnName: String,
-    href: Object,
+    leftBtn: Object,
+    rightBtn: Object,
   },
   components: {
     DocumentAddIcon,

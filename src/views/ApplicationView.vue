@@ -33,6 +33,7 @@
       </div>
     </div> -->
 
+	<!-- v-if here -->
     <EmptyState v-bind="state"/>
 
   </div>
@@ -40,10 +41,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import {
-//   DocumentAddIcon,
-// } from "@heroicons/vue/outline";
 // import Parse from 'parse'; 
 import EmptyState from "@/components/EmptyState.vue";
 
@@ -54,8 +51,8 @@ export default {
       state: {
         title: "Applications",
         label: "Get started by creating a new application",
-        rightBtnName:"For Additional Graduates",
-        href: { link: "href"},
+        leftBtn: { name: "New Applications", link: "/application/new" },
+        rightBtn: { name: "For Additional Graduates", link: "/#" },
       },
       file: "",
       message: ""
@@ -82,13 +79,11 @@ export default {
     // }
   // },
   components: {
-    // DocumentAddIcon,
     EmptyState
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 body {
 	text-align: center;
