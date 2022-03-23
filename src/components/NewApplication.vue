@@ -1,192 +1,230 @@
 <template>
   <div
-      class="
-        m-auto
-        mt-20
-        border border-1 border-light-300
-        shadow-sm
-        px-20
-        py-10
-        bg-light-100
-        w-4/5
-        flex flex-col
-        justify-center
-        items-center
-      "
-    >
-      <div class="breadcrumb flat">
-        <a href="#" class="active">STEP 1</a>
-        <a href="#">STEP 2</a>
-        <a href="#">STEP 3</a>
-        <a href="#">STEP 4</a>
-        <a href="#">STEP 5</a>
+    class="
+      m-auto mt-20
+      border border-1 border-light-300
+      shadow-sm
+      px-10 py-10
+      bg-light-100
+      w-4/5
+      flex flex-col
+      justify-center
+    "
+  >
+    <!-- <div class="breadcrumb flat">
+			<a href="#" class="active">STEP 1</a>
+			<a href="#">STEP 2</a>
+			<a href="#">STEP 3</a>
+			<a href="#">STEP 4</a>
+			<a href="#">STEP 5</a>
+		</div>
+	</div> -->
+    
+	<div class="container mx-auto">
+      <div class="flex flex-wrap -m-4 text-center">
+        <div class="p-4 md:w-1/4 sm:w-1/2 w-full">
+			<div class="border-2 border-light-400 px-4 py-6 rounded-lg">
+				<div>STEP 1</div>
+			</div>
+          <!-- <div class="border-2 border-light-400 px-2 py-6 rounded-lg w-full">
+			<div class="flex flex-wrap">
+				<div class="flex-shrink-0 w-10 h-10 mr-2 rounded-full border border-1 border-brand-blue inline-flex items-center justify-center">
+					<span class="text-brand-blue font-medium">1</span>
+				</div>
+				<div class="flex flex-col">
+					<div class="font-bold text-xs text-brand-blue">STEP 1</div>
+					<div class="font-bold text-xs text-brand-blue">Enrollment for 1st Semester</div>
+				</div>
+				
+			</div>
+          </div> -->
+        </div>
+        <div class="p-4 md:w-1/4 sm:w-1/2 w-full">
+          <div class="border-2 border-light-400 px-4 py-6 rounded-lg">
+            <div>STEP 2</div>
+          </div>
+        </div>
+        <div class="p-4 md:w-1/4 sm:w-1/2 w-full">
+          <div class="border-2 border-light-400 px-4 py-6 rounded-lg">
+            <div>STEP 3</div>
+          </div>
+        </div>
+        <div class="p-4 md:w-1/4 sm:w-1/2 w-full">
+          <div class="border-2 border-light-400 px-4 py-6 rounded-lg">
+            <div>STEP 4</div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
-        <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
-      </div>
-      <div class="flex items-center justify-center space-x-5 mt-10">
-        <button class="
-          btn-sm 
-        bg-light-300 font-bold
-          hover:ring-4
-          focus:ring-blue-300" type="button"
-        >
-          Cancel
-        </button>
-        <button
-          class="
-            btn-sm 
-            bg-brand-blue 
-            font-semibold 
-            text-light-100 
-            outline outline-1 outline-brand-blue
-            hover:ring-4
-            focus:ring-blue-300
-            "
-          type="submit"
-        >
-          Upload
-        </button>
-      </div>
+	<div class="container w-fit mx-auto flex flex-col items-center justify-center">
+		<AlertWidget :msg="msg" :className="className" :href="href" />
+
+		<div class="mt-10 w-full">
+			<DropZone @drop.prevent="drop" @change="selectedFile" />
+			<span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
+		</div>
+		<div class="flex items-center justify-center space-x-5 mt-5">
+			<button class="btn-sm btn-default btn-outline" type="button">
+				Cancel
+			</button>
+			<button class="btn-sm btn-default" type="submit">
+				Upload
+			</button>
+		</div>
+	</div>
+
+	<!-- <div class="w-full arrow-steps">
+		<div class="step current"> <span> <a href="#" >1</a></span> </div>
+		<div class="step"> <span><a href="#" >2</a></span> </div>
+		<div class="step"> <span><a href="#" >3</a></span> </div>
+		<div class="step"> <span><a href="#" >4</a></span> </div>
+		<div class="step"> <span><a href="#" >5</a></span> </div>
+	</div> -->
 
   </div>
 </template>
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import { ref } from "vue";
 export default {
-  components: {
-    DropZone,
-  },
-  setup() {
-    let dropzoneFile = ref("");
-    const drop = (e) => {
-      dropzoneFile.value = e.dataTransfer.files[0];
-    };
-    const selectedFile = () => {
-      dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
-    };
-    return { dropzoneFile, drop, selectedFile };
-  },
+	data() {
+		return {
+			msg: "Please upload the List of Enrollment for 1st Semester. ",
+			className: "alert-info",
+			href: { link: "href"},
+		}
+	},
+	components: {
+		AlertWidget,
+		DropZone,
+	},
+	setup() {
+		let dropzoneFile = ref("");
+		const drop = (e) => {
+		dropzoneFile.value = e.dataTransfer.files[0];
+		};
+		const selectedFile = () => {
+		dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
+		};
+		return { dropzoneFile, drop, selectedFile };
+	},
+	methods: {
+		
+	},
 };
 </script>
 
 <style scoped>
 
-.breadcrumb {
-	/*centering*/
-	display: inline-block;
-	/* box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.35); */
-	overflow: hidden;
-	border-radius: 5px;
-  border-color: theme("colors.light.100") !important;
-	/*Lets add the numbers for each link using CSS counters. flag is the name of the counter. to be defined using counter-reset in the parent element of the links*/
-	counter-reset: flag; 
-}
-
-.breadcrumb a {
-	text-decoration: none;
-	outline: none;
+.clearfix:after {
+	clear: both;
+	content: "";
 	display: block;
+	height: 0;
+}
+.arrow-steps .step {
+	font-size: 14px;
+	text-align: center;
+	color: #777;
+	cursor: default;
+	margin: 0 1px 0 0;
+	padding: 10px 0px 10px 0px;
+	width: 15%;
 	float: left;
-	font-size: 12px;
-	line-height: 36px;
-	color: white;
-	/*need more margin on the left of links to accomodate the numbers*/
-	padding: 0 10px 0 60px;
-	/* background: theme("colors.dark.100") !important; */
-	background: linear-gradient(#333, #111);
-	/* background-color: theme("colors.dark.100") !important; */
 	position: relative;
-}
-/*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
-.breadcrumb a:first-child {
-	padding-left: 46px;
-	border-radius: 5px 0 0 5px; /*to match with the parent's radius*/
-}
-.breadcrumb a:first-child:before {
-	left: 14px;
-}
-.breadcrumb a:last-child {
-	border-radius: 0 5px 5px 0; /*this was to prevent glitches on hover*/
-	padding-right: 20px;
+	background-color: #ddd;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
-/*hover/active styles*/
-.breadcrumb a.active, .breadcrumb a:hover{
-	background: #111;
-	background: linear-gradient(#333, #111);
-}
-.breadcrumb a.active:after, .breadcrumb a:hover:after {
-	background: #222;
-	background: linear-gradient(145deg, #333, #222);
+.arrow-steps .step a {
+	color: #777;
+	text-decoration: none;
 }
 
-/*adding the arrows for the breadcrumbs using rotated pseudo elements*/
-.breadcrumb a:after {
-	content: '';
-	position: absolute;
-	top: 0; 
-	right: -18px; /*half of square's length*/
-	/*same dimension as the line-height of .breadcrumb a */
-	width: 36px; 
-	height: 36px;
-	/*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
-	length = 1; diagonal = (1^2 + 1^2)^0.5 = 1.414 (pythagoras theorem)
-	if diagonal required = 1; length = 1/1.414 = 0.707*/
-	transform: scale(0.707) rotate(45deg);
-	/*we need to prevent the arrows from getting buried under the next link*/
-	z-index: 1;
-	/*background same as links but the gradient will be rotated to compensate with the transform applied*/
-	background: #555;
-	background: linear-gradient(135deg, #777, #333);
-	/*stylish arrow design using box shadow*/
-	/* box-shadow: 
-		2px -2px 0 2px rgba(0, 0, 0, 0.4), 
-		3px -3px 0 2px rgba(255, 255, 255, 0.1); */
-	/*
-		5px - for rounded arrows and 
-		50px - to prevent hover glitches on the border created using shadows*/
-	border-radius: 0 5px 0 50px;
-}
-/*we dont need an arrow after the last link*/
-.breadcrumb a:last-child:after {
-	content: none;
-}
-/*we will use the :before element to show numbers*/
-.breadcrumb a:before {
-	content: counter(flag);
-	counter-increment: flag;
-	/*some styles now*/
-	border-radius: 100%;
-	width: 20px;
-	height: 20px;
-	line-height: 20px;
-	margin: 8px 0;
+.arrow-steps .step:after,
+.arrow-steps .step:before {
+	content: "";
 	position: absolute;
 	top: 0;
-	left: 30px;
-	background: #333;
-	background: linear-gradient(#333, #300);
-	font-weight: bold;
+	right: -17px;
+	width: 0;
+	height: 0;
+	border-top: 21px solid transparent;
+	border-bottom: 20px solid transparent;
+	border-left: 17px solid #ddd;
+	z-index: 2;
 }
 
-
-.flat a, .flat a:after {
-	background: #333333;
-	color:#eee;
-	transition: all 0.7s;
-}
-.flat a:before {
-	background: #111;
-	box-shadow: 0 0 0 1px #00c;
-}
-.flat a:hover, .flat a.active, 
-.flat a:hover:after, .flat a.active:after{
-	background: #3b5998;
+.arrow-steps .step:before {
+	right: auto;
+	left: 0;
+	border-left: 17px solid #fff;
+	z-index: 0;
 }
 
+.arrow-steps .step:first-child:before {
+	border: none;
+}
+
+.arrow-steps .step:last-child:after {
+	border: none;
+}
+
+.arrow-steps .step:first-child {
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+.arrow-steps .step:last-child {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.arrow-steps .step span {
+	position: relative;
+}
+
+*.arrow-steps .step.done span:before {
+	opacity: 1;
+	content: "";
+	position: absolute;
+	top: -2px;
+	left: -10px;
+	font-size: 11px;
+	line-height: 21px;
+}
+
+.arrow-steps .step.current {
+	color: #fff;
+	background-color: #5599e5;
+}
+
+.arrow-steps .step.current a {
+	color: #fff;
+	text-decoration: none;
+}
+
+.arrow-steps .step.current:after {
+	border-left: 17px solid #5599e5;
+}
+
+.arrow-steps .step.done {
+	color: #173352;
+	background-color: #2f69aa;
+}
+
+.arrow-steps .step.done a {
+	color: #173352;
+	text-decoration: none;
+}
+
+.arrow-steps .step.done:after {
+	border-left: 17px solid #2f69aa;
+}
 </style>

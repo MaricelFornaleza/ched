@@ -10,7 +10,7 @@
         justify-center
         items-center
         space-y-5
-        border border-4 border-dashed border-dark-100
+        border-4 border-dashed border-dark-100
         rounded-md
       "
     >
@@ -18,28 +18,10 @@
       <p class="text-4xl font-medium text-dark-300">No {{ title }} </p>
       <p class="body-l text-dark-200">{{ label }}</p>
       <div class="flex gap-10 pt-5">
-        <button 
-          class="
-            btn-sm 
-            font-semibold 
-            outline outline-1 active:outline-2 outline-brand-blue 
-            hover:ring-4 
-            focus:ring-blue-300
-            "
-          >
+        <button class="btn-sm btn-default btn-outline">
            New {{ title }}
         </button>
-        <button
-          class="
-            btn-sm 
-            bg-brand-blue 
-            font-semibold 
-            text-light-100 
-            outline outline-1 outline-brand-blue
-            hover:ring-4
-            focus:ring-blue-300
-            "
-          >
+        <button class="btn-sm btn-default">
           {{ rightBtnName }}
         </button>
       </div>
@@ -55,7 +37,7 @@ export default {
     title: String,
     label: String,
     rightBtnName: String,
-    href: String,
+    href: Object,
   },
   components: {
     DocumentAddIcon,

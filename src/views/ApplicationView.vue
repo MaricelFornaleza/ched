@@ -55,7 +55,7 @@ export default {
         title: "Applications",
         label: "Get started by creating a new application",
         rightBtnName:"For Additional Graduates",
-        href:"#"
+        href: { link: "href"},
       },
       file: "",
       message: ""
