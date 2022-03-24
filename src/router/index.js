@@ -11,6 +11,7 @@ import ReportSummaryView from "../views/ReportSummaryView.vue"
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
 import NewApplication from "../components/NewApplication.vue";
+import NewAppCopy from "../components/NewAppCopy.vue";
 
 const routes = [
   {
@@ -51,6 +52,11 @@ const routes = [
         path: "/application/new",
         name: "newApplication",
         component: NewApplication,
+      },
+      {
+        path: "/application/copy",
+        name: "Copy app",
+        component: NewAppCopy,
       },
       {
         path: "/enrollment",
