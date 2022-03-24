@@ -14,7 +14,7 @@
         justify-center
         items-center
         space-y-5
-        border border-2 border-dashed border-dark-100
+        border-4 border-dashed border-dark-100
         rounded-md
         transition
         duration-300
@@ -22,16 +22,15 @@
       "
     >
       <span><DocumentAddIcon class="h-14 text-dark-100 icon" /></span>
-      <span>
+      <span class="lead-paragraph">
         <label for="dropzoneFile" class="font-bold underline cursor-pointer"
           >Browse</label
         >
         or drag and drop a file
       </span>
-      <span class="text-xs"
+      <span class="body-m"
         >Must be .xlsx file using this
-        <button class="font-bold underline">template</button>.</span
-      >
+        <button class="font-bold underline">template</button>.</span>
 
       <input type="file" id="dropzoneFile" class="dropzoneFile" />
     </div>

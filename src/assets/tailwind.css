@@ -87,6 +87,81 @@
     font-size: 18px;
     border-radius: 5px;
   }
+  
+  .btn-default {
+    @apply 
+      hover:ring-4
+      outline-brand-blue 
+      font-semibold 
+      bg-brand-blue 
+      text-light-100;
+  }
+  .btn-warning {
+    @apply 
+      hover:ring-4 hover:ring-brand-yellow 
+      outline-brand-yellow 
+      font-semibold 
+      bg-brand-yellow 
+      text-light-100; 
+  }
+  .btn-error {
+    @apply 
+      hover:ring-4 hover:ring-brand-red
+      outline-brand-red 
+      font-semibold 
+      bg-brand-red 
+      text-light-100; 
+  }
+  .btn-outline {
+      @apply 
+        outline 
+        outline-1 
+        outline-dark-200 
+        hover:ring-4 hover:ring-light-400 
+        text-dark-200;
+      background: transparent;
+  }
+  .alert-info {
+    @apply
+      flex
+      mt-8 mb-4
+      px-4 py-3
+      body-text items-center justify-center
+      bg-info-light 
+      rounded-md 
+      outline outline-1 outline-info-dark
+  }
+  .alert-success {
+    @apply
+      flex
+      mt-8 mb-4
+      px-4 py-3
+      body-text items-center justify-center
+      bg-success-light 
+      rounded-md 
+      outline outline-1 outline-info-dark
+  }
+  .alert-warning {
+    @apply
+      flex
+      mt-8 mb-4
+      px-4 py-3
+      body-text items-center justify-center
+      bg-warning-light 
+      rounded-md 
+      outline outline-1 outline-info-dark
+  }
+  .alert-error {
+    @apply
+      flex
+      mt-8 mb-4
+      px-4 py-3
+      body-text items-center justify-center
+      bg-error-light 
+      rounded-md 
+      outline outline-1 outline-info-dark
+  }
+
   .widget-simple {
     background-color: theme("colors.light.100");
     display: flex;
