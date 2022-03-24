@@ -53,11 +53,67 @@
 
     <!-- dataTables  -->
     <div>
-      <EnrollmentDataTable
+      <summary-data-table :objects="objects">
+        <template v-slot:button>
+          <select
+            @change="setYear($event)"
+            name="acadyear"
+            id="acadyear"
+            class="
+              text-light-100
+              w-full
+              px-3
+              py-3
+              block
+              w-full
+              rounded-md
+              sm:text-sm
+              bg-brand-blue
+            "
+          >
+            <option value="2021-22" class="bg-light-100 text-dark-300">
+              2021-22
+            </option>
+            <option value="2020-21" class="bg-light-100 text-dark-300">
+              2020-21
+            </option>
+            <option value="2019-20" class="bg-light-100 text-dark-300">
+              2019-20
+            </option>
+            <option value="2018-19" class="bg-light-100 text-dark-300">
+              2018-19
+            </option>
+          </select>
+          <select
+            @change="setSem"
+            name="semester"
+            id="semester"
+            class="
+              text-light-100
+              w-full
+              px-3
+              py-3
+              block
+              w-full
+              rounded-md
+              sm:text-sm
+              bg-brand-blue
+            "
+          >
+            <option value="1st Sem" class="bg-light-100 text-dark-300">
+              1st Semester
+            </option>
+            <option value="2nd Sem" class="bg-light-100 text-dark-300">
+              2nd Semester
+            </option>
+          </select>
+        </template>
+      </summary-data-table>
+      <!-- <EnrollmentDataTable
         :_selected_year="year"
         @setSemester="setSem($event)"
         @setAcadYear="setYear($event)"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -69,31 +125,109 @@ import AdvancedWidget from "@/partials/AdvancedWidget.vue";
 import DataCount from "@/partials/DataCount.vue";
 // import EmptyState from "@/components/EmptyState.vue";
 import { AcademicCapIcon } from "@heroicons/vue/solid";
-import EnrollmentDataTable from "@/partials/EnrollmentDataTable.vue";
+import SummaryDataTable from "@/partials/SummaryDataTable.vue";
 
 export default {
   name: "EnrollmentView",
   components: {
     AdvancedWidget,
     AcademicCapIcon,
-    EnrollmentDataTable,
+    SummaryDataTable,
     DataCount,
   },
   data() {
     return {
       year: "2021-22",
       sem: "1st Sem",
+      objects: [
+        {
+          id: 1,
+          hei_name: "Ateneo de Naga University",
+          cwts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          lts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          rotc: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+        },
+        {
+          id: 2,
+          hei_name: "Bicol State College of Applied Sciences and Technology",
+          cwts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          lts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          rotc: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+        },
+        {
+          id: 3,
+          hei_name: "University of Nueva Caceres",
+          cwts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          lts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          rotc: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+        },
+        {
+          id: 4,
+          hei_name: "Naga College Foundation, Inc.",
+          cwts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          lts: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+          rotc: {
+            male: 50,
+            female: 60,
+            total: 110,
+          },
+        },
+      ],
     };
   },
-  mounted() {
-    this.setYear(this.year);
-  },
   methods: {
-    setSem(value) {
-      this.sem = value;
+    dropdownToggle() {
+      this.dropdown = !this.dropdown;
     },
-    setYear(value) {
-      this.year = value;
+    setYear(e) {
+      this.year = e.target.value;
+    },
+    setSem(e) {
+      this.sem = e.target.value;
     },
   },
 };

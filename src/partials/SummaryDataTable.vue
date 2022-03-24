@@ -2,36 +2,7 @@
   <div class="p-10">
     <div class="overflow-x-auto">
       <div class="flex space-x-5 absolute right-20 mt-5 z-20">
-        <select
-          @change="setYear($event)"
-          v-model="selected_year"
-          name="acadyear"
-          id="acadyear"
-          class="
-            text-light-100
-            w-full
-            px-3
-            py-3
-            block
-            w-full
-            rounded-md
-            sm:text-sm
-            bg-brand-blue
-          "
-        >
-          <option value="2021-22" selected class="bg-light-100 text-dark-300">
-            2021-22
-          </option>
-          <option value="2020-21" class="bg-light-100 text-dark-300">
-            2020-21
-          </option>
-          <option value="2019-20" class="bg-light-100 text-dark-300">
-            2019-20
-          </option>
-          <option value="2018-19" class="bg-light-100 text-dark-300">
-            2018-19
-          </option>
-        </select>
+        <slot name="button"></slot>
 
         <button class="btn-sm h-fit px-4 bg-dark-100 text-light-100">
           <DownloadIcon class="h-5" />
@@ -60,56 +31,56 @@
         </thead>
         <tbody class="bg-white text-sm">
           <tr
-            v-for="Enrollment in Enrollments"
-            :key="Enrollment.id"
+            v-for="object in objects"
+            :key="object.id"
             class="whitespace-nowrap text-center"
           >
             <td class="px-6 py-4 text-left">
               <div class="text-gray-900 font-bold">
-                {{ Enrollment.hei_name }}
+                {{ object.hei_name }}
               </div>
             </td>
             <td class="px-6 py-4 border-l border-light-400">
               <div class="">
-                {{ Enrollment.cwts.male }}
+                {{ object.cwts.male }}
               </div>
             </td>
             <td class="px-6 py-4">
               <div class="">
-                {{ Enrollment.cwts.female }}
+                {{ object.cwts.female }}
               </div>
             </td>
             <td class="px-6 py-4">
               <div class="">
-                {{ Enrollment.cwts.total }}
+                {{ object.cwts.total }}
               </div>
             </td>
             <td class="px-6 py-4 border-l border-light-400">
-              <div class="">{{ Enrollment.lts.male }}</div>
+              <div class="">{{ object.lts.male }}</div>
             </td>
             <td class="px-6 py-4">
               <div class="">
-                {{ Enrollment.lts.female }}
+                {{ object.lts.female }}
               </div>
             </td>
             <td class="px-6 py-4">
               <div class="">
-                {{ Enrollment.lts.total }}
+                {{ object.lts.total }}
               </div>
             </td>
             <td class="px-6 py-4 border-l border-light-400">
               <div class="">
-                {{ Enrollment.rotc.male }}
+                {{ object.rotc.male }}
               </div>
             </td>
             <td class="px-6 py-4">
               <div class="">
-                {{ Enrollment.rotc.female }}
+                {{ object.rotc.female }}
               </div>
             </td>
             <td class="px-6 py-4 border-r border-light-400">
               <div class="">
-                {{ Enrollment.rotc.total }}
+                {{ object.rotc.total }}
               </div>
             </td>
             <td class="px-6 py-4">
@@ -142,7 +113,7 @@ import $ from "jquery";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 export default {
   name: "EnrollmentDataTable",
-  props: ["_selected_year"],
+  props: { objects: Object, table_headers: Array },
   components: {
     DownloadIcon,
     EyeIcon,
@@ -150,95 +121,9 @@ export default {
   data: function () {
     return {
       dropdown: false,
-      selected_year: this._selected_year,
-      Enrollments: [
-        {
-          id: 1,
-          hei_name: "Ateneo de Naga University",
-          cwts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          lts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          rotc: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-        },
-        {
-          id: 2,
-          hei_name: "Bicol State College of Applied Sciences and Technology",
-          cwts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          lts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          rotc: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-        },
-        {
-          id: 3,
-          hei_name: "University of Nueva Caceres",
-          cwts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          lts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          rotc: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-        },
-        {
-          id: 4,
-          hei_name: "Naga College Foundation, Inc.",
-          cwts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          lts: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-          rotc: {
-            male: 50,
-            female: 60,
-            total: 110,
-          },
-        },
-      ],
     };
   },
-  methods: {
-    dropdownToggle() {
-      this.dropdown = !this.dropdown;
-    },
-    setYear(e) {
-      this.$emit("setAcadYear", e.target.value);
-    },
-  },
+
   mounted() {
     $(document).ready(function () {
       $("#dataTable").DataTable({
