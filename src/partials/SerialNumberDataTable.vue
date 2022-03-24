@@ -27,7 +27,7 @@
           >
             <td class="px-6 py-4 text-left">{{ Application.hei_name }}</td>
             <td class="px-6 py-4">
-              <div class="text-gray-900">
+              <div class="">
                 {{ Application.application_type }}
               </div>
             </td>
