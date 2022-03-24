@@ -2,7 +2,7 @@
   <div class="p-10">
     <div class="font-bold uppercase mb-3">Ateneo de Naga University</div>
     <div class="bg-light-100 h-full w-full p-5 text-center">
-      <div class="flex border border-light-300 border-2">
+      <div class="flex border border-light-200 border-2">
         <div
           v-for="step in steps"
           :key="step.no"
@@ -111,7 +111,7 @@ export default {
   height: 100px;
   margin-left: 0;
   color: theme("colors.dark.300");
-  background-color: theme("colors.light.300");
+  background-color: theme("colors.light.200");
   text-align: center;
 }
 
@@ -123,7 +123,7 @@ export default {
   width: 0px;
   height: 0px;
   border-top: 50px solid transparent;
-  border-left: 20px solid theme("colors.light.300");
+  border-left: 20px solid theme("colors.light.200");
   border-bottom: 50px solid transparent;
 }
 .step:nth-of-type(1) {
