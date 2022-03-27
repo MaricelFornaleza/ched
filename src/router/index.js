@@ -10,7 +10,8 @@ import SerialNumbersView from "../views/SerialNumbersView.vue"
 import ReportSummaryView from "../views/ReportSummaryView.vue"
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
-import NewApplication from "../components/NewApplication.vue";
+import NewApplication1 from "../components/NewApplication-1.vue";
+import NewApplication2 from "../components/NewApplication-2.vue";
 
 const routes = [
   {
@@ -49,8 +50,13 @@ const routes = [
       },
       {
         path: "/application/new",
-        name: "newApplication",
-        component: NewApplication,
+        name: "newApplication1",
+        component: NewApplication1,
+      },
+      {
+        path: "/application/new/2",
+        name: "newApplication2",
+        component: NewApplication2,
       },
       {
         path: "/enrollment",
