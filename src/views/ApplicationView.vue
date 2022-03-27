@@ -10,15 +10,11 @@
 				<button typ="button" @click="toggleModal()" class="inline-flex btn-sm btn-outline w-full justify-center items-center sm:mb-0 mb-4">
 					New Application
 				</button>
-				<router-link to="/#">
-					<p class="inline-flex btn-sm btn-default w-full justify-center items-center">
-						For Additional Graduates
-					</p>
-				</router-link>
+				<button typ="button" @click="toggleModal()" class="inline-flex btn-sm btn-default w-full justify-center items-center">
+					For Additional Graduates
+				</button>
 			</div>
 		</EmptyState>
-
-		<ModalHei v-show="visible" :lists="lists" @close="toggleModal()" /> 
 	</div>
 
 	<!-- When application is not empty -->
@@ -52,9 +48,25 @@
 
 		<!-- dataTables  -->
 		<div>
-			<ApplicationDataTable />
+			<ApplicationDataTable>
+				<ul class="py-1" aria-labelledby="dropdownButton">
+					<li>
+						<div @click="toggleModal()" class="block cursor-pointer py-2 px-4 text-sm hover:bg-light-300">
+							New Application
+						</div>
+					</li>
+					<li>
+						<div @click="toggleModal()" class="block cursor-pointer py-2 px-4 text-sm hover:bg-light-300">
+							For Additional Graduates
+						</div>
+					</li>
+				</ul>
+			</ApplicationDataTable>
+
 		</div>
 	</div>
+
+	<ModalHei v-show="visible" :lists="lists" @close="toggleModal()" /> 
 	
   </div>
 </template>
@@ -74,7 +86,7 @@ export default {
 		return {
 			empty: true,
 			visible: false,
-			lists: ["ADNU", "BU", "USI", "UNC"]
+			lists: ["Ateneo de Naga University (ADNU)", "Bicol University (BU)", "University de Santa Isabel (USI)", "University of Nueve Caceres (UNC)"]
 			// file: "",
 			// message: "",
 		}

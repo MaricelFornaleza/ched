@@ -52,6 +52,7 @@ const routes = [
         path: "/application/new",
         name: "newApplication1",
         component: NewApplication1,
+        props: true,
       },
       {
         path: "/application/new/2",

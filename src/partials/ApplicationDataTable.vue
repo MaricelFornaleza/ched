@@ -32,26 +32,28 @@
               dark:bg-gray-700
             "
           >
-            <ul class="py-1" aria-labelledby="dropdownButton">
-              <li>
-                <router-link to="/application/new"
-                  ><p class="block py-2 px-4 text-sm hover:bg-light-300">
-                    New Application
-                  </p></router-link
-                >
-              </li>
-              <li>
-                <router-link to="/application/#"
-                  ><p class="block py-2 px-4 text-sm hover:bg-light-300">
-                    For Additional Graduates
-                  </p></router-link
-                >
-              </li>
-            </ul>
+            <slot>
+               <ul class="py-1" aria-labelledby="dropdownButton">
+                <li>
+                  <router-link to="/application/new"
+                    ><p class="block py-2 px-4 text-sm hover:bg-light-300">
+                      New Application
+                    </p></router-link
+                  >
+                </li>
+                <li>
+                  <router-link to="/application/#"
+                    ><p class="block py-2 px-4 text-sm hover:bg-light-300">
+                      For Additional Graduates
+                    </p></router-link
+                  >
+                </li>
+              </ul>
+            </slot>
           </div>
       </div>
         <div class="flex flex-col">
-          <button class="btn-sm h-fit px-4 bg-dark-100 text-light-100 hover:ring-4 hover:ring-dark-100">
+          <button class="btn-sm h-fit px-4 border-dark-100 bg-dark-100 text-light-100 hover:ring-4 hover:ring-light-400">
             <CloudDownloadIcon class="h-5" />
           </button>
         </div>

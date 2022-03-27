@@ -1,8 +1,11 @@
 <template>
 	<div class="p-10">
+		<span class="font-medium mt-10 px-2 text-left">
+			{{hei}}
+		</span>
 		<div
 			class="
-			mt-10
+			mt-2
 			border border-1 border-light-300
 			shadow-sm
 			p-10
@@ -78,8 +81,11 @@ import { ref } from "vue";
 export default {
 	data() {
 		return {
-	
+			hei: '',
 		}
+	},
+	created() {
+		this.hei = this.$route.query.hei;
 	},
 	components: {
 		AlertWidget,

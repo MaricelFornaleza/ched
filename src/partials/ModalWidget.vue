@@ -30,6 +30,7 @@ export default {
   methods: {
     closeModal () {
       // Do what needs to be done to close the modal... and maybe remove it from the DOM
+      
     }
   }
 }
