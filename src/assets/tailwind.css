@@ -90,7 +90,7 @@
     border-width: var(--border-btn, 1px);
     border-radius: 6px;
   }
-  
+
   .btn-default {
     @apply 
     border-brand-blue
@@ -101,69 +101,69 @@
       text-light-100;
   }
   .btn-warning {
-    @apply 
-      hover:ring-4 hover:ring-brand-yellow 
+    @apply hover:ring-4 hover:ring-brand-yellow 
       outline-brand-yellow 
       font-semibold 
       bg-brand-yellow 
-      text-light-100; 
+      text-light-100;
   }
   .btn-error {
-    @apply 
-      hover:ring-4 hover:ring-brand-red
+    @apply hover:ring-4 hover:ring-brand-red
       outline-brand-red 
       font-semibold 
       bg-brand-red 
-      text-light-100; 
+      text-light-100;
   }
   .btn-outline {
+<<<<<<< HEAD
       @apply 
       border-dark-100 
+=======
+    @apply outline 
+        outline-1 
+        outline-dark-200 
+>>>>>>> 418d8c713a0bafa22760bbb4998dbe00107d756e
         hover:ring-4 hover:ring-light-400 
         text-dark-200;
-      background: transparent;
+    background: transparent;
   }
 
 
   .alert-info {
-    @apply
-      flex
+    @apply flex
       mt-8 mb-4
       px-4 py-3
       body-text items-center justify-center
       bg-info-light 
       rounded-md 
-      outline outline-1 outline-info-dark
+      outline outline-1 outline-info-dark;
   }
   .alert-success {
-    @apply
-      flex
+    @apply flex
       mt-8 mb-4
       px-4 py-3
       body-text items-center justify-center
       bg-success-light 
       rounded-md 
-      outline outline-1 outline-info-dark
+      outline outline-1 outline-info-dark;
   }
   .alert-warning {
-    @apply
-      flex
+    @apply flex
       mt-8 mb-4
       px-4 py-3
       body-text items-center justify-center
       bg-warning-light 
       rounded-md 
-      outline outline-1 outline-info-dark
+      outline outline-1 outline-info-dark;
   }
   .alert-error {
-    @apply
-      flex
+    @apply flex
       mt-8 mb-4
       px-4 py-3
       body-text items-center justify-center
       bg-error-light 
       rounded-md 
-      outline outline-1 outline-info-dark
+      outline outline-1 outline-info-dark;
   }
 
   .badge {
@@ -236,63 +236,4 @@
   }
 }
 @layer utilities {
-  .dataTables_wrapper {
-    box-shadow: 0 3px 5px rgb(0 0 0 / 0.1);
-    padding: 0px;
-    border-radius: 5px;
-    border: 1px solid theme("colors.light.300");
-  }
-
-  .dataTable {
-    padding: 0px;
-    padding-top: 20px !important;
-  }
-  .dataTables_length {
-    margin-left: 20px;
-    margin-top: 20px;
-  }
-  .dataTables_filter {
-    margin-left: 20px;
-    margin-top: 20px;
-    float: left !important;
-  }
-  table.dataTable thead th,
-  table.dataTable.no-footer {
-    border-bottom: 1px solid theme("colors.light.300");
-  }
-
-  th {
-    text-transform: uppercase;
-  }
-  table.dataTable tbody td {
-    padding: 10px;
-  }
-  table.dataTable tbody .even {
-    background-color: transparent;
-  }
-  .dataTables_wrapper .dataTables_info {
-    padding: 20px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .dataTables_wrapper .dataTables_paginate {
-    padding-top: 7px;
-    padding-right: 20px;
-  }
-  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: theme("colors.brand.blue") !important;
-    background: none;
-    border: none;
-    color: white !important;
-  }
-  .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background-color: white !important;
-    background: none;
-    border: 1px solid theme("colors.light.300") !important;
-  }
-  .dataTables_wrapper .dataTables_filter input {
-    background-color: white;
-    border: 1px solid theme("colors.light.300") !important;
-    padding: 5px 20px;
-  }
 }
