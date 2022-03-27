@@ -115,14 +115,8 @@
       text-light-100;
   }
   .btn-outline {
-<<<<<<< HEAD
       @apply 
       border-dark-100 
-=======
-    @apply outline 
-        outline-1 
-        outline-dark-200 
->>>>>>> 418d8c713a0bafa22760bbb4998dbe00107d756e
         hover:ring-4 hover:ring-light-400 
         text-dark-200;
     background: transparent;
