@@ -12,6 +12,14 @@ import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
 import NewApplication1 from "../components/NewApplication-1.vue";
 import NewApplication2 from "../components/NewApplication-2.vue";
+import ApplicationSteps from "../layout/ApplicationSteps.vue"
+import StepOne from '../components/additionalApplication/StepOne.vue'
+import StepTwo from '../components/additionalApplication/StepTwo.vue'
+import StepThree from '../components/additionalApplication/StepThree.vue'
+import StepFour from '../components/additionalApplication/StepFour.vue'
+import StepFive from '../components/additionalApplication/StepFive.vue'
+
+
 
 const routes = [
   {
@@ -60,9 +68,40 @@ const routes = [
         component: NewApplication2,
       },
       {
-        path: "/application/copy",
-        name: "Copy app",
-        component: NewAppCopy,
+        path: "/application/additional",
+        component: ApplicationSteps,
+        children: [
+          {
+            path: "/application/additional/1/:hei",
+            name: "Step1",
+            component: StepOne,
+            props: true,
+          },
+          {
+            path: "/application/additional/2/:hei",
+            name: "Step2",
+            component: StepTwo,
+            props: true,
+          },
+          {
+            path: "/application/additional/3/:hei",
+            name: "Step3",
+            component: StepThree,
+            props: true,
+          },
+          {
+            path: "/application/additional/4/:hei",
+            name: "Step4",
+            component: StepFour,
+            props: true,
+          },
+          {
+            path: "/application/additional/5/:hei",
+            name: "Step5",
+            component: StepFive,
+            props: true,
+          },
+        ]
       },
       {
         path: "/enrollment",

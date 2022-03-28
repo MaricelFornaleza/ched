@@ -136,7 +136,7 @@
       body-text items-center justify-center
       bg-success-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-success-dark;
   }
   .alert-warning {
     @apply flex
