@@ -20,6 +20,7 @@
               <select
                 name="province"
                 id="province"
+                v-model="province"
                 class="
                   text-dark-200
                   w-full
@@ -61,6 +62,7 @@
               <input
                 type="text"
                 name="name"
+                v-model="name"
                 class="
                   mt-1
                   px-5
@@ -95,6 +97,7 @@
                 Email Address
               </span>
               <input
+                v-model="email"
                 type="email"
                 name="email"
                 class="
@@ -132,6 +135,7 @@
                 >Message</label
               >
               <textarea
+                v-model="message"
                 class="
                   my-1
                   form-control
@@ -157,6 +161,7 @@
                 placeholder="Your message"
               ></textarea>
               <button
+                @click="sendEmail()"
                 class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
               >
                 Submit
@@ -168,3 +173,43 @@
     </div>
   </div>
 </template>
+<script>
+export default {
+  mounted() {
+    let externalScript = document.createElement("script");
+    externalScript.setAttribute("src", "https://smtpjs.com/v3/smtp.js");
+    document.head.appendChild(externalScript);
+  },
+  data() {
+    return {
+      province: "",
+      name: "",
+      email: "",
+      message: "",
+    };
+  },
+  methods: {
+    sendEmail() {
+      // this.$loadScript("https://smtpjs.com/v3/smtp.js")
+      //   .then(() => {
+      //     window.Email.send({
+      //       Host: "smtp.mailtrap.io",
+      //       Username: "549ff22556db2e",
+      //       Password: "5e912b7305c72b",
+      //       To: this.email,
+      //       From: "ched.nstp@gmail.com",
+      //       Subject: "Test email",
+      //       Body: "<html><h2>Header</h2><strong>Bold text</strong><br></br><em>Italic</em></html>",
+      //     }).then((message) => alert(message));
+      //   })
+      //   .catch(() => {
+      //     alert("failed");
+      //   });
+      this.province = "";
+      this.name = "";
+      this.email = "";
+      this.message = "";
+    },
+  },
+};
+</script>
