@@ -78,7 +78,7 @@ import { ref } from "vue";
 export default {
 	data() {
 		return {
-	
+			currentStep: 1,
 		}
 	},
 	components: {

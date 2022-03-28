@@ -12,7 +12,6 @@ import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
 import NewApplication1 from "../components/NewApplication-1.vue";
 import NewApplication2 from "../components/NewApplication-2.vue";
-import NewAppCopy from "../components/NewAppCopy.vue";
 
 const routes = [
   {
@@ -59,11 +58,6 @@ const routes = [
         path: "/application/new/2",
         name: "newApplication2",
         component: NewApplication2,
-      },
-      {
-        path: "/application/copy",
-        name: "Copy app",
-        component: NewAppCopy,
       },
       {
         path: "/enrollment",

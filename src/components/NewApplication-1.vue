@@ -1,6 +1,6 @@
 <template>
-	<div class="p-10">
-		<span class="font-medium mt-10 px-2 text-left">
+	<div class="px-10 py-5">
+		<span class="font-medium mt-10 px-1 text-left uppercase">
 			{{hei}}
 		</span>
 		<div
@@ -8,48 +8,13 @@
 			mt-2
 			border border-1 border-light-300
 			shadow-sm
-			p-10
+			p-5
 			bg-light-100
 			w-full
 			flex flex-col
 			justify-center"
 		>
-			<div class="container mx-auto">
-			<div class="flex flex-wrap -m-4 text-center">
-				<div class="p-4 md:w-1/4 sm:w-1/2 w-full">
-					<div class="border-2 border-light-400 px-4 py-6 rounded-lg">
-						<div>STEP 1</div>
-					</div>
-				<!-- <div class="border-2 border-light-400 px-2 py-6 rounded-lg w-full">
-					<div class="flex flex-wrap">
-						<div class="flex-shrink-0 w-10 h-10 mr-2 rounded-full border border-1 border-brand-blue inline-flex items-center justify-center">
-							<span class="text-brand-blue font-medium">1</span>
-						</div>
-						<div class="flex flex-col">
-							<div class="font-bold text-xs text-brand-blue">STEP 1</div>
-							<div class="font-bold text-xs text-brand-blue">Enrollment for 1st Semester</div>
-						</div>
-						
-					</div>
-				</div> -->
-				</div>
-				<div class="p-4 md:w-1/4 sm:w-1/2 w-full">
-				<div class="border-2 border-light-400 px-4 py-6 rounded-lg">
-					<div>STEP 2</div>
-				</div>
-				</div>
-				<div class="p-4 md:w-1/4 sm:w-1/2 w-full">
-				<div class="border-2 border-light-400 px-4 py-6 rounded-lg">
-					<div>STEP 3</div>
-				</div>
-				</div>
-				<div class="p-4 md:w-1/4 sm:w-1/2 w-full">
-				<div class="border-2 border-light-400 px-4 py-6 rounded-lg">
-					<div>STEP 4</div>
-				</div>
-				</div>
-			</div>
-			</div>
+			<StepperWidget :steps="steps" :current="currentStep" />
 
 			<div class="container w-fit mx-auto flex flex-col items-center justify-center">
 				<AlertWidget className="alert-info">
@@ -77,11 +42,22 @@
 <script>
 import DropZone from "@/partials/DropZone.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
+import StepperWidget from "@/partials/StepperWidget.vue";
+import router from '../router'
 import { ref } from "vue";
+
 export default {
 	data() {
 		return {
 			hei: '',
+			currentStep: 1,
+			steps: [
+				{ no: 1, title: "Enrollment for 1st Semester", completed: false },
+				{ no: 2, title: "Enrollment for 2nd Semester", completed: false },
+				{ no: 3, title: "List of Graduates", completed: false },
+				{ no: 4, title: "Application for Approval", completed: false },
+				{ no: 5, title: "Application Complete", completed: false },
+			],
 		}
 	},
 	created() {
@@ -90,6 +66,7 @@ export default {
 	components: {
 		AlertWidget,
 		DropZone,
+		StepperWidget
 	},
 	setup() {
 		let dropzoneFile = ref("");
@@ -102,7 +79,9 @@ export default {
 		return { dropzoneFile, drop, selectedFile };
 	},
 	methods: {
-		
+		update(step) {
+			// router.push({ name: "newApplication2", query: { hei: this.value, step: step } });
+		}
 	},
 };
 </script>

@@ -33,13 +33,14 @@
                         <h3 class="h1 leading-6 font-bold text-dark-400" id="modal-title">Select HEI</h3>
                         <div class="mt-8">
                             <Select2 v-model="value" :options="lists" 
-                                :settings="{ width: '100%', placeholder: 'Select' }" /> 
+                                :settings="{ width: '100%', placeholder: 'Select', required: true }" /> 
                                 <!-- @change="myChangeEvent($event)" @select="mySelectEvent($event)" -->
+                            <!-- <span class="text-xs font-medium italic text-error text-left" v-show="this.value === ''" > Please select HEI</span> -->
                         </div>
                     </div>
                 </div>
                 <div class="bg-light-100 px-4 mb-4 py-4 sm:px-6">
-                    <button type="button" @click="nextPage()" class="w-full inline-flex justify-center btn-sm btn-default sm:ml-3 sm:w-auto sm:text-sm">Select</button>
+                    <button type="button" @click="nextPage()" :class="this.value === '' ? 'cursor-not-allowed' : 'cursor-pointer'" class="w-full inline-flex justify-center btn-sm btn-default sm:ml-3 sm:w-auto sm:text-sm">Select</button>
                     <button type="button"  @click="$emit('close')" class="mt-3 w-full justify-center inline-flex btn-sm btn-outline sm:mt-0 sm:ml-4 sm:w-auto sm:text-sm">Cancel</button>
                 </div>
 			</div>
@@ -56,7 +57,6 @@ export default {
     name: "ModalHei",
     data () {
         return {
-            results: false,
             value: '',
             placeholder: "Select"
         }
@@ -70,6 +70,8 @@ export default {
     },
     methods: {
         nextPage() {
+            if(this.value === '') return;
+            
             router.push({ name: "newApplication1", query: { hei: this.value } });
         },
         myChangeEvent(val){
