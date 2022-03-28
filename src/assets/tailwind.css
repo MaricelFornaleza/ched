@@ -75,21 +75,25 @@
   .btn-sm {
     padding: 12px 24px;
     font-size: 14px;
-    border-radius: 5px;
+    border-width: var(--border-btn, 1px);
+    border-radius: 6px;
   }
   .btn-m {
     padding: 14px 32px;
     font-size: 16px;
-    border-radius: 5px;
+    border-width: var(--border-btn, 1px);
+    border-radius: 6px;
   }
   .btn-l {
     padding: 16px 48px;
     font-size: 18px;
-    border-radius: 5px;
+    border-width: var(--border-btn, 1px);
+    border-radius: 6px;
   }
 
   .btn-default {
-    @apply hover:ring-4
+    @apply border-brand-blue
+      hover:ring-4 focus:ring-4
       outline-brand-blue 
       font-semibold 
       bg-brand-blue 
@@ -110,13 +114,12 @@
       text-light-100;
   }
   .btn-outline {
-    @apply outline 
-        outline-1 
-        outline-dark-200 
+    @apply border-dark-100 
         hover:ring-4 hover:ring-light-400 
         text-dark-200;
     background: transparent;
   }
+
   .alert-info {
     @apply flex
       mt-8 mb-4
@@ -152,6 +155,59 @@
       bg-error-light 
       rounded-md 
       outline outline-1 outline-info-dark;
+  }
+
+  .badge {
+    @apply uppercase 
+    inline-flex 
+    items-center 
+    justify-center 
+    px-3 py-1 
+    text-xs 
+    font-semibold 
+    leading-none 
+    text-light-100 
+    bg-info-dark 
+    rounded-full;
+  }
+  .badge-success {
+    @apply uppercase
+    inline-flex 
+    items-center 
+    justify-center 
+    px-2 py-1 
+    text-xs 
+    font-semibold 
+    leading-none 
+    text-light-100 
+    bg-success-dark 
+    rounded-full;
+  }
+  .badge-warning {
+    @apply uppercase
+    inline-flex 
+    items-center 
+    justify-center 
+    px-2 py-1 
+    text-xs 
+    font-semibold 
+    leading-none 
+    text-light-100 
+    bg-warning 
+    rounded-full;
+  }
+  .badge-error {
+    @apply uppercase
+    inline-flex 
+    items-center 
+    justify-center 
+    px-2 py-1 
+    text-xs 
+    font-semibold 
+    leading-none 
+    text-light-100 
+    bg-error-dark 
+    rounded-full;
   }
 
   .widget-simple {
