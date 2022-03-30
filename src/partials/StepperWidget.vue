@@ -1,8 +1,5 @@
 <template>
-  <div class="p-10">
-    <div class="font-bold uppercase mb-3">Ateneo de Naga University</div>
-    <div class="bg-light-100 h-full w-full p-5 text-center">
-      <div class="flex border border-light-200 border-2">
+  <div class="flex border border-light-200 border-2">
         <div
           v-for="step in steps"
           :key="step.no"
@@ -39,8 +36,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="flex my-10 justify-center space-x-5">
+  </div>
+  <!-- <div class="flex my-10 justify-center space-x-5">
         <button
           @click="previousStep"
           class="btn-sm border border-2 border-light-300"
@@ -56,27 +53,20 @@
         >
           Complete this step
         </button>
-      </div>
-    </div>
-  </div>
+  </div> -->
 </template>
 <script>
 export default {
   data() {
     return {
-      currentStep: 1,
-      steps: [
-        { no: 1, title: "Enrollment for 1st Semester", completed: false },
-        { no: 2, title: "Enrollment for 2nd Semester", completed: false },
-        { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
-      ],
+      currentStep: this.current,
     };
   },
+  props: ['current','steps'],
   methods: {
     activeStep(step) {
       this.currentStep = step;
+      // this.$emit("update-step", step);
     },
     completeStep(currentStep) {
       this.steps.forEach((step) => {

@@ -156,7 +156,7 @@ export default {
   },
   data() {
     return {
-      empty: true,
+      empty: false,
       dropdown: false,
       table_headers: [
         { title: "Institutional Code" },

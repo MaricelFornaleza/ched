@@ -9,7 +9,7 @@
           @click="activeStep(step.no)"
           class="step z-50 flex items-center pl-3 cursor-pointer"
           :class="[
-            currentStep == step.no ? 'active' : '',
+            currentStep === step.no ? 'active' : '',
             step.completed ? 'completed' : '',
           ]"
         >
@@ -40,11 +40,7 @@
           </div>
         </div>
       </div>
-      <router-view
-        @complete="completeStep"
-        @nextStep="nextStep"
-        @previousStep="previousStep"
-      ></router-view>
+      <router-view @complete="completeStep" @nextStep="nextStep"></router-view>
     </div>
   </div>
 </template>
@@ -54,26 +50,24 @@ export default {
   data() {
     return {
       hei: "",
-      currentStep: 0,
+      currentStep: 1,
       steps: [
-        { no: 1, title: "Notarized Transmittal Letter", completed: false },
-        { no: 2, title: "Proof", completed: false },
-        { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
-      ],
+				{ no: 1, title: "Enrollment for 1st Semester", completed: false },
+				{ no: 2, title: "Enrollment for 2nd Semester", completed: false },
+				{ no: 3, title: "List of Graduates", completed: false },
+				{ no: 4, title: "Application for Approval", completed: false },
+				{ no: 5, title: "Application Complete", completed: false },
+			],
     };
   },
   created() {
     this.hei = this.$route.params.hei;
-    this.currentStep = this.$route.params.step;
   },
   methods: {
     activeStep(step) {
       this.currentStep = step;
       router.push({
-        name: "Step" + this.currentStep,
-        params: { step: this.currentStep, hei: this.hei },
+        path: `/application/new/${this.currentStep}/${this.hei}`,
       });
     },
     completeStep(currentStep) {
@@ -87,8 +81,7 @@ export default {
       if (this.currentStep < 5) {
         this.currentStep++;
         router.push({
-          name: "Step" + this.currentStep,
-          params: { step: this.currentStep, hei: this.hei },
+          path: `/application/new/${this.currentStep}/${this.hei}`,
         });
       }
     },
@@ -96,8 +89,7 @@ export default {
       if (this.currentStep > 1) {
         this.currentStep--;
         router.push({
-          name: "Step" + this.currentStep,
-          params: { step: this.currentStep, hei: this.hei },
+          path: `/application/new/${this.currentStep}/${this.hei}`,
         });
       }
     },

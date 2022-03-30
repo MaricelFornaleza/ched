@@ -10,7 +10,7 @@
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
         <DropZone @drop.prevent="drop" @change="selectedFile" />
-        <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
+        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
       </div>
       <div
         v-else
@@ -122,6 +122,20 @@ export default {
   },
   methods: {
     upload(step) {
+      // const Parse = require('parse');
+				// const parseFile = new Parse.File("file.pdf", this.dropzoneFile);
+				// parseFile.save().then(function() {
+				// 	// The file has been saved to Parse.
+				// 	var Application = new Parse.Object("Application");
+				// 	Application.set("user", "Joe Smith");
+				// 	Application.set("ApplicationFile", parseFile);
+				// 	Application.save();
+
+				// 	console.log("File has been uploaded!");
+				// }, function(error) {
+				// 	// The file either could not be read, or could not be saved to Parse.
+				// 	console.log("Error: " + error);
+				// });
       this.$emit("complete", step);
       this.completed = !this.completed;
     },
@@ -131,6 +145,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

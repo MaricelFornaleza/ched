@@ -139,9 +139,12 @@ export default {
   },
   methods: {
     nextPage(application_type) {
-      if (application_type == "new") {
-        router.push({ name: "newApplication1", query: { hei: this.value } });
-      } else if (application_type == "additional") {
+      if (application_type == "new") {  //new application
+        router.push({ 
+          name: "1stStep", 
+          params: { step: 1, hei: this.value },
+        });
+      } else if (application_type == "additional") {  //for additional graduates
         router.push({
           name: "Step1",
           params: { step: 1, hei: this.value },

@@ -10,15 +10,22 @@ import SerialNumbersView from "../views/SerialNumbersView.vue"
 import ReportSummaryView from "../views/ReportSummaryView.vue"
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
-import NewApplication1 from "../components/NewApplication-1.vue";
-import NewApplication2 from "../components/NewApplication-2.vue";
+
 import ApplicationSteps from "../layout/ApplicationSteps.vue"
+import NewApplicationSteps from "../layout/NewApplicationSteps.vue"
+
+import FirstStep from "../components/newApplication/FirstStep.vue";
+import SecondStep from "../components/newApplication/SecondStep.vue";
+import ThirdStep from "../components/newApplication/ThirdStep.vue";
+import FourthStep from "../components/newApplication/FourthStep.vue";
+import FifthStep from "../components/newApplication/FifthStep.vue";
+
+
 import StepOne from '../components/additionalApplication/StepOne.vue'
 import StepTwo from '../components/additionalApplication/StepTwo.vue'
 import StepThree from '../components/additionalApplication/StepThree.vue'
 import StepFour from '../components/additionalApplication/StepFour.vue'
 import StepFive from '../components/additionalApplication/StepFive.vue'
-
 
 
 const routes = [
@@ -58,14 +65,39 @@ const routes = [
       },
       {
         path: "/application/new",
-        name: "newApplication1",
-        component: NewApplication1,
-        props: true,
-      },
-      {
-        path: "/application/new/2",
-        name: "newApplication2",
-        component: NewApplication2,
+        component: NewApplicationSteps,
+        children: [
+          {
+            path: "/application/new/1/:hei",
+            name: "1stStep",
+            component: FirstStep,
+            props: true,
+          },
+          {
+            path: "/application/new/2/:hei",
+            name: "2ndStep",
+            component: SecondStep,
+            props: true,
+          },
+          {
+            path: "/application/new/3/:hei",
+            name: "3rdStep",
+            component: ThirdStep,
+            props: true,
+          },
+          {
+            path: "/application/new/4/:hei",
+            name: "4thStep",
+            component: FourthStep,
+            props: true,
+          },
+          {
+            path: "/application/new/5/:hei",
+            name: "5thStep",
+            component: FifthStep,
+            props: true,
+          },
+        ]
       },
       {
         path: "/application/additional",

@@ -145,7 +145,7 @@
       body-text items-center justify-center
       bg-warning-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-warning-dark;
   }
   .alert-error {
     @apply flex
@@ -154,7 +154,7 @@
       body-text items-center justify-center
       bg-error-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-error-dark;
   }
 
   .badge {
