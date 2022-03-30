@@ -1,13 +1,8 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import './assets/tailwind.css'
-import Parse from 'parse'
-import router from './router'
-import LoadScript from 'vue-plugin-load-script';
+import { createApp } from "vue";
+import App from "./App.vue";
+import "./registerServiceWorker";
+import router from "./router";
+import store from "./store";
+import "./assets/tailwind.css";
 
-
-
-Parse.initialize("cnmsp", "master");
-Parse.serverURL = 'http://localhost:1337/parse'
-
-createApp(App).use(router, LoadScript).mount('#app')
+createApp(App).use(store).use(router).mount("#app");

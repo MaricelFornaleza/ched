@@ -68,6 +68,7 @@
                     <input
                       type="email"
                       name="email"
+                      v-model="email"
                       class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
                       placeholder="name@gmail.com"
                     />
@@ -81,6 +82,7 @@
                     <input
                       type="password"
                       name="password"
+                      v-model="password"
                       class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
                       placeholder="Enter password"
                     />
@@ -104,6 +106,7 @@
 
 <script>
 import { XIcon } from "@heroicons/vue/outline";
+import Parse from 'parse';
 
 export default {
   name: "HeroSection",
@@ -113,6 +116,8 @@ export default {
   data() {
     return {
       open: false,
+      email: "",
+      password: "",
     };
   },
 
@@ -121,10 +126,23 @@ export default {
       this.open = !this.open;
     },
     login() {
-      this.$router.push("/home");
+      if (this.email.length === 0) {
+        alert("Please enter an email")
+         return
+      }
+       if (this.password.length === 0) {
+         alert("Please enter a password")
+         return
+       }
+       Parse.User.logIn(this.email, this.password).then((user) => {
+        console.log("success", user.id);
+        this.$router.push("/home");
+       }).catch((err) => {
+        console.log("error" +err.message)
+       })
     },
   },
-};
+}; 
 </script>
 
 <style>

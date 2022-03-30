@@ -11,6 +11,6 @@
 <script>
 import Parse from "parse";
 Parse.serverURL = "http://localhost:1337/api";
-Parse.initialize("myAppId", "jskey", "masterKey");
+Parse.initialize("myAppId", "jsKey", "masterKey");
 export default {};
 </script>
