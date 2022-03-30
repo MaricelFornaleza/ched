@@ -1,23 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-<<<<<<< HEAD
-
-const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: HomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
-=======
 import ViewLayout from "../layout/ViewLayout.vue";
 import LandingView from "../views/LandingView.vue";
 import HEIView from "../views/HEIView.vue"
@@ -88,7 +70,6 @@ const routes = [
   },
   
   
->>>>>>> f4d48e83982bc2872ada99abb37290858786a83e
 ];
 
 const router = createRouter({

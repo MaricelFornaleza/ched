@@ -1,20 +1,5 @@
 <template>
   <div class="home">
-<<<<<<< HEAD
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
-</template>
-
-<script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-
-export default {
-  name: "HomeView",
-  components: {
-    HelloWorld,
-=======
     <div class="h-full w-full text-center p-10">
       <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
         <advanced-widget bgColor="bg-info-light" textColor="text-info">
@@ -219,7 +204,6 @@ export default {
     });
 
     return { testData, options };
->>>>>>> f4d48e83982bc2872ada99abb37290858786a83e
   },
 };
 </script>

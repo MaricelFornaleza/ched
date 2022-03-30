@@ -33,7 +33,7 @@
         <p class="uppercase font-bold label-sm">Higher Education Institution</p>
       </div>
 
-      <form>
+      <form ref="form" @submit.prevent="addHei">
         <div class="mb-4">
           <label class="block text-dark-200 text-sm font-bold mb-2" for="name">
             Name
@@ -49,8 +49,10 @@
               text-dark-100 text-sm
               focus:outline-none focus:ring
             "
+            name="name"
             id="name"
             type="text"
+            v-model="name"
             placeholder="Enter HEI's name"
           />
         </div>
@@ -69,8 +71,10 @@
               text-dark-100 text-sm
               focus:outline-none focus:ring
             "
+            name="email"
             id="email"
             type="email"
+            v-model="email"
             placeholder="name@gmail.com"
           />
         </div>
@@ -92,7 +96,9 @@
               text-dark-100 text-sm
               focus:outline-none focus:ring
             "
+            name="contact_number"
             id="contact_number"
+            v-model="contact_number"
             type="text"
             placeholder="09********"
           />
@@ -116,7 +122,9 @@
                 text-dark-100 text-sm
                 focus:outline-none focus:ring
               "
+              name="institutional_code"
               id="institutional_code"
+              v-model="institutional_code"
               type="text"
               placeholder="Enter Code"
             />
@@ -144,7 +152,9 @@
                 ease-in-out
                 m-0
                 focus:outline-none
-              "
+              " 
+              v-model="hei_type"
+              name="hei_type"
             >
               <option selected>Select</option>
               <option value="LUC">Local Universities and Colleges</option>
@@ -152,9 +162,13 @@
               <option value="Private">Private</option>
               <option value="OGS">Other GOvernment Schools</option>
             </select>
-          </div>
         </div>
-
+          <input
+            name="password"
+            id="password"
+            type="hidden"
+            value="password"
+          />
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button class="btn-sm bg-light-300 font-bold" type="button">
             Cancel
@@ -172,9 +186,50 @@
 </template>
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
+import Parse from 'parse';
+import emailjs from '@emailjs/browser';
+
 export default {
   components: {
     LibraryIcon,
   },
+  data() {
+    return {
+      open: true,
+      name: "", 
+      email: "",
+      contact_number: "",
+      institutional_code: "",
+      hei_type: "",
+    };
+  },
+  methods: {
+    addHei() {
+      var password = Math.random().toString(36).slice(-8);
+      const Hei = Parse.Object.extend("Hei");
+      const hei = new Hei();
+      hei.set("name", this.name);
+      hei.set("email", this.email);
+      hei.set("contact_number", this.contact_number);
+      hei.set("institutional_code", this.institutional_code);
+      hei.set("hei_type", this.hei_type);
+      hei.set("password", password);
+      hei.save()
+      .then(function(hei) {
+        // any logic to be executed after the object is saved.
+        
+        alert('New object created with objectId: ' + hei.id);
+        emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.$refs.form, 'jTSIh7CnjU-vTFAm4')
+      .then((result) => {
+        console.log('SUCCESS', result.text);
+      }, (error) => {
+        console.log('FAILED', error.text);
+      });
+      }).catch(function (error){
+        alert('Failed to create new object, with error code: ' + error.message);
+      });
+      
+    }
+  }
 };
 </script>

@@ -1,14 +1,4 @@
 module.exports = {
-<<<<<<< HEAD
-  content: ["./public/**/*.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-	require('daisyui'),
-	],
-};
-=======
   content: ['./public/**/*.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     colors: {
@@ -69,4 +59,3 @@ module.exports = {
   },
   plugins: [],
 }
->>>>>>> f4d48e83982bc2872ada99abb37290858786a83e
