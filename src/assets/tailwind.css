@@ -92,8 +92,7 @@
   }
 
   .btn-default {
-    @apply 
-    border-brand-blue
+    @apply border-brand-blue
       hover:ring-4 focus:ring-4
       outline-brand-blue 
       font-semibold 
@@ -115,13 +114,11 @@
       text-light-100;
   }
   .btn-outline {
-      @apply 
-      border-dark-100 
+    @apply border-dark-100 
         hover:ring-4 hover:ring-light-400 
         text-dark-200;
     background: transparent;
   }
-
 
   .alert-info {
     @apply flex
@@ -139,7 +136,7 @@
       body-text items-center justify-center
       bg-success-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-success-dark;
   }
   .alert-warning {
     @apply flex
@@ -148,7 +145,7 @@
       body-text items-center justify-center
       bg-warning-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-warning-dark;
   }
   .alert-error {
     @apply flex
@@ -157,12 +154,11 @@
       body-text items-center justify-center
       bg-error-light 
       rounded-md 
-      outline outline-1 outline-info-dark;
+      outline outline-1 outline-error-dark;
   }
 
   .badge {
-    @apply
-    uppercase 
+    @apply uppercase 
     inline-flex 
     items-center 
     justify-center 
@@ -172,11 +168,10 @@
     leading-none 
     text-light-100 
     bg-info-dark 
-    rounded-full
+    rounded-full;
   }
   .badge-success {
-    @apply 
-    uppercase
+    @apply uppercase
     inline-flex 
     items-center 
     justify-center 
@@ -186,11 +181,10 @@
     leading-none 
     text-light-100 
     bg-success-dark 
-    rounded-full
+    rounded-full;
   }
   .badge-warning {
-    @apply 
-    uppercase
+    @apply uppercase
     inline-flex 
     items-center 
     justify-center 
@@ -200,11 +194,10 @@
     leading-none 
     text-light-100 
     bg-warning 
-    rounded-full
+    rounded-full;
   }
   .badge-error {
-    @apply 
-    uppercase
+    @apply uppercase
     inline-flex 
     items-center 
     justify-center 
@@ -214,7 +207,7 @@
     leading-none 
     text-light-100 
     bg-error-dark 
-    rounded-full
+    rounded-full;
   }
 
   .widget-simple {

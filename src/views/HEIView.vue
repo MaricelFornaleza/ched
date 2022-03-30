@@ -1,24 +1,41 @@
 <template>
   <!-- When hei is empty -->
-	<div v-if="empty == true">
-		<EmptyState>
-			<p class="text-4xl font-medium text-dark-300">No Heis</p>
-			<p class="body-l text-dark-200">Get started by creating a new hei</p>
-			<div class="px-4 mb-4 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
-				<router-link to="/hei/new">
-          <p class="inline-flex btn-sm btn-outline w-full justify-center items-center sm:mb-0 mb-4">
+  <div v-if="empty == true">
+    <EmptyState>
+      <p class="text-4xl font-medium text-dark-300">No Heis</p>
+      <p class="body-l text-dark-200">Get started by creating a new hei</p>
+      <div class="px-4 mb-4 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
+        <router-link to="/hei/new">
+          <p
+            class="
+              inline-flex
+              btn-sm btn-outline
+              w-full
+              justify-center
+              items-center
+              sm:mb-0
+              mb-4
+            "
+          >
             New Hei
           </p>
-				</router-link>
-				<router-link to="/hei/upload">
-					<p class="inline-flex btn-sm btn-default w-full justify-center items-center">
-						Upload Hei
-					</p>
-				</router-link>
-			</div>
-		</EmptyState>
-	</div>
-
+        </router-link>
+        <router-link to="/hei/upload">
+          <p
+            class="
+              inline-flex
+              btn-sm btn-default
+              w-full
+              justify-center
+              items-center
+            "
+          >
+            Upload Hei
+          </p>
+        </router-link>
+      </div>
+    </EmptyState>
+  </div>
 
   <!-- When hei is not empty -->
   <div class="hei h-full w-full flex flex-col" v-else>
@@ -129,11 +146,6 @@ import VueDataTable from "@/partials/VueDataTable.vue";
 import { ChevronDownIcon } from "@heroicons/vue/outline";
 export default {
   name: "HEIView",
-  data () {
-    return  {
-      empty: true,
-    }
-  },
   components: {
     EmptyState,
     SimpleWidget,
@@ -144,6 +156,7 @@ export default {
   },
   data() {
     return {
+      empty: false,
       dropdown: false,
       table_headers: [
         { title: "Institutional Code" },
