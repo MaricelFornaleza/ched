@@ -50,7 +50,8 @@
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
       <SuccessAlert className="alert-success">
-        The Proof that the student/s Completed NSTP 1 and 2 was successfully uploaded. 
+        The Proof that the student/s Completed NSTP 1 and 2 was successfully
+        uploaded.
       </SuccessAlert>
 
       <div
