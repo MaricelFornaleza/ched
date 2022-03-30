@@ -9,7 +9,7 @@
           @click="activeStep(step.no)"
           class="step z-50 flex items-center pl-3 cursor-pointer"
           :class="[
-            currentStep === step.no ? 'active' : '',
+            currentStep == step.no ? 'active' : '',
             step.completed ? 'completed' : '',
           ]"
         >
@@ -40,7 +40,11 @@
           </div>
         </div>
       </div>
-      <router-view @complete="completeStep" @nextStep="nextStep"></router-view>
+      <router-view
+        @complete="completeStep"
+        @nextStep="nextStep"
+        @previousStep="previousStep"
+      ></router-view>
     </div>
   </div>
 </template>
@@ -50,8 +54,7 @@ export default {
   data() {
     return {
       hei: "",
-      currentStep: 1,
-
+      currentStep: 0,
       steps: [
         { no: 1, title: "Notarized Transmittal Letter", completed: false },
         { no: 2, title: "Proof", completed: false },
@@ -63,6 +66,8 @@ export default {
   },
   created() {
     this.hei = this.$route.params.hei;
+    this.currentStep = this.$route.params.step;
+    alert(this.currentStep);
   },
   methods: {
     activeStep(step) {
