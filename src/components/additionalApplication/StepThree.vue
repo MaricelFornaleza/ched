@@ -84,7 +84,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 
 import studentsData from "@/assets/json/students.json";
-import StudentsDatatable from "@/partials/StudentsDatatable.vue";
+import StudentsDatatable from "@/partials/StudentsDataTable.vue";
 import { ref } from "vue";
 export default {
   data() {

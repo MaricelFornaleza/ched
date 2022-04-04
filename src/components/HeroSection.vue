@@ -23,7 +23,14 @@
           :class="open ? 'xxl:pl-0' : 'mx-auto'"
         >
           <h1
-            class="mb-10 xxl:mb-10 text-2xl xs:text-4xl sm:text-5xl xxl:text-6xl"
+            class="
+              mb-10
+              xxl:mb-10
+              text-2xl
+              xs:text-4xl
+              sm:text-5xl
+              xxl:text-6xl
+            "
           >
             The 1st NSTP Serial Number Online Application & Issuance
           </h1>
@@ -49,7 +56,16 @@
         <button class="close-btn" @click="toggle"><XIcon class="h-8" /></button>
         <div class="h-full">
           <div
-            class="h-2/3 xs:h-1/2 absolute inset-0 m-auto mx-14 md:mx-24 xxl:mx-28"
+            class="
+              h-2/3
+              xs:h-1/2
+              absolute
+              inset-0
+              m-auto
+              mx-14
+              md:mx-24
+              xxl:mx-28
+            "
           >
             <h2 class="text-brand-blue font-bold">Sign In</h2>
             <p class="body-s">
@@ -61,36 +77,97 @@
                 <div class="w-full">
                   <label class="block mb-5">
                     <span
-                      class="after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200"
+                      class="
+                        after:ml-0.5 after:text-brand-red
+                        block
+                        label-text
+                        font-semibold
+                        text-dark-200
+                      "
                     >
                       Email Address
                     </span>
                     <input
+                      required
                       type="email"
                       name="email"
                       v-model="email"
-                      class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
+                      class="
+                        mt-1
+                        px-5
+                        py-3
+                        bg-light-100
+                        border
+                        shadow-sm
+                        border-dark-100
+                        placeholder-dark-100
+                        focus:outline-none
+                        focus:border-brand-blue
+                        focus:ring-brand-blue
+                        block
+                        w-full
+                        rounded-md
+                        sm:text-sm
+                        focus:ring-1
+                      "
                       placeholder="name@gmail.com"
                     />
+                    <span class="text-xs text-error" id="email-error">{{
+                      emailError
+                    }}</span>
                   </label>
                   <label class="block">
                     <span
-                      class="after:ml-0.5 after:text-brand-red block label-text font-semibold text-dark-200"
+                      class="
+                        after:ml-0.5 after:text-brand-red
+                        block
+                        label-text
+                        font-semibold
+                        text-dark-200
+                      "
                     >
                       Password
                     </span>
                     <input
+                      required
                       type="password"
                       name="password"
                       v-model="password"
-                      class="mt-1 px-5 py-3 bg-light-100 border shadow-sm border-dark-100 placeholder-dark-100 focus:outline-none focus:border-brand-blue focus:ring-brand-blue block w-full rounded-md sm:text-sm focus:ring-1"
+                      class="
+                        mt-1
+                        px-5
+                        py-3
+                        bg-light-100
+                        border
+                        shadow-sm
+                        border-dark-100
+                        placeholder-dark-100
+                        focus:outline-none
+                        focus:border-brand-blue
+                        focus:ring-brand-blue
+                        block
+                        w-full
+                        rounded-md
+                        sm:text-sm
+                        focus:ring-1
+                      "
                       placeholder="Enter password"
                     />
+                    <span class="text-xs text-error" id="password-error">{{
+                      passwordError
+                    }}</span>
                   </label>
 
                   <button
                     @click="login()"
-                    class="w-full btn-sm bg-brand-yellow mt-10 text-light-100 uppercase"
+                    class="
+                      w-full
+                      btn-sm
+                      bg-brand-yellow
+                      mt-10
+                      text-light-100
+                      uppercase
+                    "
                   >
                     Submit
                   </button>
@@ -106,7 +183,7 @@
 
 <script>
 import { XIcon } from "@heroicons/vue/outline";
-import Parse from 'parse';
+import Parse from "parse";
 
 export default {
   name: "HeroSection",
@@ -118,6 +195,8 @@ export default {
       open: false,
       email: "",
       password: "",
+      emailError: "",
+      passwordError: "",
     };
   },
 
@@ -125,24 +204,26 @@ export default {
     toggle() {
       this.open = !this.open;
     },
-    login() {
-      if (this.email.length === 0) {
-        alert("Please enter an email")
-         return
-      }
-       if (this.password.length === 0) {
-         alert("Please enter a password")
-         return
-       }
-       Parse.User.logIn(this.email, this.password).then((user) => {
-        console.log("success", user.id);
-        this.$router.push("/home");
-       }).catch((err) => {
-        console.log("error" +err.message)
-       })
+    async login() {
+      // if (this.email.length === 0) {
+      //   this.emailError = "Please enter an email";
+      //   return;
+      // }
+      // if (this.password.length === 0) {
+      //   alert("Please enter a password");
+      //   return;
+      // }
+      await Parse.User.logIn(this.email, this.password)
+        .then((user) => {
+          console.log("success", user.id);
+          this.$router.push("/home");
+        })
+        .catch((err) => {
+          console.log("error" + err.message);
+        });
     },
   },
-}; 
+};
 </script>
 
 <style>

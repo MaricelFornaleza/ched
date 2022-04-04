@@ -44,62 +44,132 @@
         @complete="completeStep"
         @nextStep="nextStep"
         @previousStep="previousStep"
+        @goToApplication="goToApplication"
+        @setStatus="setStatus"
+        v-model:isCompleted="isCompleted"
+        :appId="application_id"
       ></router-view>
     </div>
   </div>
 </template>
 <script>
 import router from "../router";
+import Parse from "parse";
 export default {
   data() {
     return {
       hei: "",
+      application_id: "",
       currentStep: 0,
-      steps: [
-        { no: 1, title: "Notarized Transmittal Letter", completed: false },
-        { no: 2, title: "Proof", completed: false },
-        { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
-      ],
+      steps: [],
+      isCompleted: false,
     };
   },
-  created() {
-    this.hei = this.$route.params.hei;
+  async created() {
+    this.application_id = this.$route.params.application;
     this.currentStep = this.$route.params.step;
+    const Application = Parse.Object.extend("Application");
+    const query = new Parse.Query(Application);
+    query.equalTo("objectId", this.application_id);
+    var results = await query.first();
+    this.hei = results.get("hei");
+
+    this.steps = results.get("steps");
+    this.currentStep = results.get("status");
+    this.isCompleted = this.findStep(this.currentStep);
+
+    // this.hei = this.$route.params.hei;
+    // this.currentStep = this.$route.params.step;
+    // this.hei_id = this.$route.params.application;
+
+    // const ApplicationSteps = Parse.Object.extend("ApplicationSteps");
+    // const query = new Parse.Query(ApplicationSteps);
+    // query.find("parent", this.hei_id);
+    // const result = await query.first();
+    // this.steps = result.get("steps");
+    // console.log(this.hei_id);
+    // console.log(result.get("steps"));
   },
   methods: {
     activeStep(step) {
       this.currentStep = step;
+      this.isCompleted = this.findStep(step);
       router.push({
         name: "Step" + this.currentStep,
-        params: { step: this.currentStep, hei: this.hei },
+        params: { application: this.application_id },
       });
     },
-    completeStep(currentStep) {
-      this.steps.forEach((step) => {
-        if (step.no === currentStep) {
-          step.completed = true;
+
+    findStep(step) {
+      for (var i in this.steps) {
+        if (this.steps[i].no == step) {
+          return this.steps[i].completed;
         }
-      });
+      }
+    },
+    completeStep(currentStep) {
+      // console.log(currentStep);
+      for (var i in this.steps) {
+        if (this.steps[i].no == currentStep) {
+          this.steps[i].completed = true;
+          this.isCompleted = this.findStep(currentStep);
+        }
+      }
+      this.saveSteps();
+    },
+    async saveSteps() {
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.application_id);
+      var results = await query.first();
+      results.set("steps", this.steps);
+      results.save().then(
+        () => {
+          console.log("steps saved!");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    },
+    async setStatus(data) {
+      const status = data;
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.application_id);
+      var results = await query.first();
+      results.set("status", status);
+      results.save().then(
+        () => {
+          console.log("status saved!");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     },
     nextStep() {
       if (this.currentStep < 5) {
         this.currentStep++;
+        this.isCompleted = this.findStep(this.currentStep);
         router.push({
           name: "Step" + this.currentStep,
-          params: { step: this.currentStep, hei: this.hei },
+          params: { step: this.currentStep, application: this.application_id },
         });
       }
     },
     previousStep() {
       if (this.currentStep > 1) {
         this.currentStep--;
+        this.isCompleted = this.findStep(this.currentStep);
         router.push({
           name: "Step" + this.currentStep,
-          params: { step: this.currentStep, hei: this.hei },
+          params: { step: this.currentStep, application: this.application_id },
         });
       }
+    },
+    goToApplication() {
+      this.$router.push({ name: "application" });
     },
   },
   components: {},

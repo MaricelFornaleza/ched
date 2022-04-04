@@ -152,7 +152,7 @@
                 ease-in-out
                 m-0
                 focus:outline-none
-              " 
+              "
               v-model="hei_type"
               name="hei_type"
             >
@@ -162,13 +162,9 @@
               <option value="Private">Private</option>
               <option value="OGS">Other GOvernment Schools</option>
             </select>
+          </div>
         </div>
-          <input
-            name="password"
-            id="password"
-            type="hidden"
-            value="password"
-          />
+        <input name="password" id="password" type="hidden" value="password" />
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button class="btn-sm bg-light-300 font-bold" type="button">
             Cancel
@@ -186,8 +182,8 @@
 </template>
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
-import Parse from 'parse';
-import emailjs from '@emailjs/browser';
+import Parse from "parse";
+import emailjs from "@emailjs/browser";
 
 export default {
   components: {
@@ -196,7 +192,7 @@ export default {
   data() {
     return {
       open: true,
-      name: "", 
+      name: "",
       email: "",
       contact_number: "",
       institutional_code: "",
@@ -214,22 +210,34 @@ export default {
       hei.set("institutional_code", this.institutional_code);
       hei.set("hei_type", this.hei_type);
       hei.set("password", password);
-      hei.save()
-      .then(function(hei) {
-        // any logic to be executed after the object is saved.
-        
-        alert('New object created with objectId: ' + hei.id);
-        emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.$refs.form, 'jTSIh7CnjU-vTFAm4')
-      .then((result) => {
-        console.log('SUCCESS', result.text);
-      }, (error) => {
-        console.log('FAILED', error.text);
-      });
-      }).catch(function (error){
-        alert('Failed to create new object, with error code: ' + error.message);
-      });
-      
-    }
-  }
+      hei
+        .save()
+        .then(function (hei) {
+          // any logic to be executed after the object is saved.
+
+          alert("New object created with objectId: " + hei.id);
+          emailjs
+            .sendForm(
+              "service_0ftc4vc",
+              "template_gmz4sqi",
+              this.$refs.form,
+              "jTSIh7CnjU-vTFAm4"
+            )
+            .then(
+              (result) => {
+                console.log("SUCCESS", result.text);
+              },
+              (error) => {
+                console.log("FAILED", error.text);
+              }
+            );
+        })
+        .catch(function (error) {
+          alert(
+            "Failed to create new object, with error code: " + error.message
+          );
+        });
+    },
+  },
 };
 </script>
