@@ -118,11 +118,13 @@ export default {
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
     };
+
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {
     uploadxl() {
-      var data = XLSX.utils.sheet_to_json(this.dropzoneFile, {
+      var workbook = XLSX.read(this.dropzoneFile);
+      var data = XLSX.utils.sheet_to_json(workbook, {
         header: 1,
       });
       console.log(data);
