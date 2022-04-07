@@ -145,7 +145,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 // import * as XLSX from "xlsx";
 import studentsData from "@/assets/json/students.json";
-import StudentsDataTable from "@/partials/StudentsDatatable.vue";
+import StudentsDataTable from "@/partials/StudentsDataTable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 
 import { ref } from "vue";
