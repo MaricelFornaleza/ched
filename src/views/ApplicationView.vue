@@ -123,7 +123,6 @@
 
 
 <script>
-// import Parse from 'parse';
 import SimpleWidget from "@/partials/SimpleWidget.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import { DocumentTextIcon } from "@heroicons/vue/solid";
