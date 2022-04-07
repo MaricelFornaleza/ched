@@ -1,4 +1,5 @@
 <template>
+<div>
 	<div v-if="!completed" class="container w-fit mx-auto flex flex-col items-center justify-center">
 		<AlertWidget :className="className">
 			Please Upload the List of Enrollment for First Semester. Follow the format provided in the Template.&nbsp;
@@ -13,9 +14,9 @@
 		<div v-else class="my-20 w-fit flex justify-between p-5 border border-light-300">
 			<div class="flex space-x-5">
 			<img
-				src="@/assets/img/pdf.png"
+				src="@/assets/img/xls.png"
 				class="h-8"
-				alt="PDF Icon by Dimitry Miroliubov"
+				alt="XLS Icon by Dimitry Miroliubov"
 			/>
 			<div class="text-base">{{ dropzoneFile.name }}</div>
 			</div>
@@ -27,7 +28,7 @@
 			class="btn-sm btn-default btn-outline"
 			type="button"
 			>
-			Cancel
+				Cancel
 			</button>
 			<button
 			v-if="!completed"
@@ -35,7 +36,7 @@
 			class="btn-sm btn-default"
 			type="submit"
 			>
-			Upload
+				Upload
 			</button>
 		</div>
 	</div>
@@ -47,21 +48,24 @@
 		
 		<div class="grid grid-cols-3 gap-20 mt-6 mb-4">
 			<div class="flex flex-col items-center">
-				<h2 class="">68</h2>
+				<h2 class="">{{ female_num }}</h2>
 				<p class="uppercase">female</p>
 			</div>
 			<div class="flex flex-col items-center">
-				<h2 class="">120</h2>
+				<h2 class="">{{ male_num }}</h2>
 				<p class="uppercase">male</p>
 			</div>
 			<div class="flex flex-col items-center">
-				<h2 class="">188</h2>
+				<h2 class="">{{ male_num + female_num }}</h2>
 				<p class="uppercase">total</p>
 			</div>
 		</div>
 
 		<!-- pass props lists -->
-		<StudentsDataTable />
+		<StudentsDataTable
+			:students="students"
+			:table_headers="table_headers"
+		></StudentsDataTable>
 
 		<div class="flex items-center justify-center space-x-5 mt-5">
 			<button
@@ -77,29 +81,51 @@
 			</button>
 		</div>
     </div>
+	
+	<ModalWidget v-show="visible">
+		<template #body>
+			<div class="inline-flex items-center px-4 py-4 font-semibold leading-6 text-sm shadow rounded-md text-light-100 bg-brand-blue hover:bg-brand-blue transition ease-in-out duration-150 cursor-progress" disabled>
+				<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-light-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+				</svg>
+				Processing...
+			</div>
+		</template>
+	</ModalWidget>
+</div>
 </template>
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
-// import { EyeIcon, DownloadIcon } from "@heroicons/vue/outline";
-import { ref } from "vue";
-// import Parse from 'parse';
+import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDataTable.vue";
+import ModalWidget from "@/partials/ModalWidget.vue";
+import { ref } from "vue";
+import Worker from "@/assets/js/parseFile.worker.js";
+// import Parse from 'parse';
 
 export default {
+	// inheritAttrs: false,
 	data() {
 		return {
+			visible: false,
 			completed: false,
 			className: 'alert-info',
+			table_headers: {A: "NO.", B: "NAME"},
+			students: studentsData,
+			male_num: 0,
+			female_num: 0,
+			excelData: [],
+			worker: undefined
 		}
 	},
 	components: {
 		AlertWidget,
 		DropZone,
-		StudentsDataTable
-		// EyeIcon,
-		// DownloadIcon
+		StudentsDataTable,
+		ModalWidget
 	},
 	setup() {
 		let dropzoneFile = ref("");
@@ -113,32 +139,52 @@ export default {
 	},
 	methods: {
 		upload(step) {
+			var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+
 			if(this.dropzoneFile === '') {
 				this.className = "alert-error";
-			} else {
-				alert(`Submitted Files:\n${this.dropzoneFile.name}`);
-				// console.log(this.dropzoneFile);
+			} 
+			else if(regex.test(this.dropzoneFile.name)) {
+				// alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+				this.visible = true;
+				let _this = this;
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var data = e.target.result;
 
-				// // const Parse = require('parse');
-				// const parseFile = new Parse.File(this.dropzoneFile.name.toString().toTrim(), this.dropzoneFile);
-				// parseFile.save().then(function() {
-				// 	// The file has been saved to Parse.
-				// 	var Application = new Parse.Object("Application");
-				// 	Application.set("user", "Joe Smith");
-				// 	Application.set("applicantResumeFile", parseFile);
-				// 	Application.save();
+					if (typeof(Worker) !== "undefined") {
+						if (typeof(_this.worker) == "undefined") {
+							_this.worker = new Worker();
+						}
+						_this.worker.postMessage({
+							d: data
+						});
 
-				// 	console.log("File has been uploaded!");
-				// }, function(error) {
-				// 	// The file either could not be read, or could not be saved to Parse.
-				// 	console.log("Error: " + error);
-				// });
+						//can be improved by abstraction
+						_this.worker.onmessage = function(event) {
+							_this.table_headers = event.data.headers;
+							_this.students = event.data.rows;
+							_this.male_num =  event.data.male;
+							_this.female_num = event.data.female;
 
-				this.$emit("complete", step);
-				this.completed = !this.completed;
+							if(event.data.complete) {
+								_this.visible = false;
+								_this.$emit("complete", step);
+								_this.completed = !_this.completed;
+							}
+						};
+					}
+				};
+				reader.readAsArrayBuffer(this.dropzoneFile);
+			}
+			else {
+				alert("Please upload a .xlsx file!");
 			}
 		},
 		nextStep() {
+			this.worker.terminate();
+			this.worker = undefined;
+
 			this.$emit("nextStep");
 		},
 	},

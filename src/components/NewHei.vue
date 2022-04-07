@@ -162,23 +162,24 @@
               <option value="Private">Private</option>
               <option value="OGS">Other GOvernment Schools</option>
             </select>
-        </div>
+          </div>
           <input
             name="password"
             id="password"
             type="hidden"
             value="password"
           />
-        <div class="flex items-center justify-center space-x-5 mt-10">
-          <button class="btn-sm bg-light-300 font-bold" type="button">
-            Cancel
-          </button>
-          <button
-            class="btn-sm bg-brand-blue text-light-100 font-bold"
-            type="submit"
-          >
-            Submit
-          </button>
+          <div class="flex items-center justify-center space-x-5 mt-10">
+            <button class="btn-sm bg-light-300 font-bold" type="button">
+              Cancel
+            </button>
+            <button
+              class="btn-sm bg-brand-blue text-light-100 font-bold"
+              type="submit"
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </form>
     </div>

@@ -56,10 +56,10 @@
         The list of graduates was successfully uploaded. A transmittal letter
         was sent to Ateneo de Naga University’s email address.
       </SuccessAlert>
-      <students-datatable
+      <StudentsDataTable
         :students="students"
         :table_headers="table_headers"
-      ></students-datatable>
+      ></StudentsDataTable>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
         <button
@@ -84,7 +84,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 
 import studentsData from "@/assets/json/students.json";
-import StudentsDatatable from "@/partials/StudentsDatatable.vue";
+import StudentsDataTable from "@/partials/StudentsDataTable.vue";
 import { ref } from "vue";
 export default {
   data() {
@@ -108,7 +108,7 @@ export default {
     SuccessAlert,
     AlertWidget,
     DropZone,
-    StudentsDatatable,
+    StudentsDataTable,
   },
   setup() {
     let dropzoneFile = ref("");

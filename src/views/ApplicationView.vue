@@ -115,6 +115,7 @@
       @close="toggleModal('')"
     />
   </div>
+
 </template>
 
 
@@ -138,8 +139,6 @@ export default {
         "University de Santa Isabel (USI)",
         "University of Nueve Caceres (UNC)",
       ],
-      // file: "",
-      // message: "",
       application_type: "",
     };
   },
