@@ -129,6 +129,7 @@ import { DocumentTextIcon } from "@heroicons/vue/solid";
 import ApplicationDataTable from "@/partials/ApplicationDataTable.vue";
 import ModalHei from "@/partials/ModalHei.vue";
 import Parse from "parse";
+// import * as XLSX from "xlsx";
 export default {
   name: "ApplicationView",
   data() {
@@ -146,18 +147,20 @@ export default {
       application_type: "",
       applications: [],
       table_headers: [
-        { title: "HEI Name" },
-        { title: "Application Type" },
-        { title: "NSTP Program" },
-        { title: "Graduates" },
-        { title: "Date Applied" },
-        { title: "Date Approved" },
-        { title: "Status" },
+        { title: "HEI Name", key: 0 },
+        { title: "Application Type", key: 1 },
+        { title: "NSTP Program", key: 2 },
+        { title: "Graduates", key: 3 },
+        { title: "Date Applied", key: 4 },
+        { title: "Date Approved", key: 5 },
+        { title: "Status", key: 6 },
       ],
       for_approval: 0,
       approved: 0,
       for_revision: 0,
       total_applications: 0,
+      status: "",
+      message: "",
     };
   },
 
@@ -166,15 +169,18 @@ export default {
       this.visible = !this.visible;
       this.application_type = type;
     },
-    async getApplications() {
-      const Applications = Parse.Object.extend("Application");
-      const query = new Parse.Query(Applications);
-      const results = await query.find();
-      for (let i = 0; i < results.length; i++) {
-        const object = results[i];
-        console.log(object.id);
-      }
-    },
+
+    // exportToExcel() {
+    //   var datatoExcel = [];
+    //   datatoExcel.push({
+    //     cols: this.table_headers,
+    //     data: this.applications,
+    //   });
+    //   var worksheet = XLSX.utils.json_to_sheet(this.datatoExcel);
+    //   var new_workbook = XLSX.utils.book_new();
+    //   XLSX.utils.book_append_sheet(new_workbook, worksheet, "SheetJS");
+    //   console.log(datatoExcel);
+    // },
   },
   async mounted() {
     var data = [];
@@ -208,6 +214,7 @@ export default {
     this.for_revision = count3.length;
 
     this.applications = data;
+    // this.exportToExcel();
     console.log(this.applications);
   },
   // methods: {

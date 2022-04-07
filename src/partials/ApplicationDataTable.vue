@@ -57,6 +57,7 @@
         </div>
         <div class="flex flex-col">
           <button
+            @click="exportToExcel()"
             class="
               btn-sm
               h-fit
@@ -93,14 +94,18 @@
                 {{ application.application_type }}
               </div>
             </td>
-            <td class="px-6 py-4">
+            <td v-if="application.program == ''" class="px-6 py-4">
+              <div class="">Not Indicated</div>
+            </td>
+            <td v-else class="px-6 py-4">
               <div class="">{{ application.program }}</div>
             </td>
             <td class="px-6 py-4">{{ application.no_of_graduates }}</td>
             <td class="px-6 py-4">
               {{ application.date_applied }}
             </td>
-            <td class="px-6 py-4">{{ application.date_approved }}</td>
+            <td v-if="application.date_approved == ''" class="px-6 py-4">NA</td>
+            <td v-else class="px-6 py-4">{{ application.date_approved }}</td>
             <td class="px-6 py-4">
               <span :class="variant(application.status)">{{
                 application.status
@@ -130,6 +135,8 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
+import * as XLSX from "xlsx";
+
 import router from "../router";
 import {
   CloudDownloadIcon,
@@ -175,6 +182,23 @@ export default {
         name: "Step1",
         params: { application: app_id },
       });
+    },
+    exportToExcel() {
+      var currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      var workbook = XLSX.utils.book_new();
+
+      var sheet1 = XLSX.utils.table_to_sheet(
+        document.getElementById("dataTable")
+      );
+
+      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
+      var filename = "List-of-Applications-" + currentDate + ".xlsx";
+      XLSX.writeFileXLSX(workbook, filename);
+    },
+    displayMsg() {
+      this.$emit("displayMsg", "success", "Download successful!");
     },
     variant(stats) {
       if (stats == "APPROVED") {
