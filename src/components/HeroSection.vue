@@ -56,7 +56,7 @@
               Welcome back! Please provide the HEI's credentials.
             </p>
 
-            <form action="">
+            <form @submit.prevent="login">
               <div class="mt-10">
                 <div class="w-full">
                   <label class="block mb-5">
@@ -89,7 +89,7 @@
                   </label>
 
                   <button
-                    @click="login()"
+                    type="submit"
                     class="w-full btn-sm bg-brand-yellow mt-10 text-light-100 uppercase"
                   >
                     Submit
@@ -116,16 +116,15 @@ export default {
   data() {
     return {
       open: false,
-      email: "",
-      password: "",
-    };
+      email: '',
+      password: ''
+    }
   },
-
   methods: {
     toggle() {
       this.open = !this.open;
     },
-    login() {
+    async login() {
       if (this.email.length === 0) {
         alert("Please enter an email")
          return
@@ -134,14 +133,14 @@ export default {
          alert("Please enter a password")
          return
        }
-       Parse.User.logIn(this.email, this.password).then((user) => {
-        console.log("success", user.id);
-        this.$router.push("/home");
-       }).catch((err) => {
-        console.log("error" +err.message)
+      Parse.User.logIn(this.email, this.password).then(() => {
+        alert("success" );
+        this.$router.push({ name: 'home'});
+       }).catch(function(err) {
+        alert("error" + err.message);
        })
-    },
-  },
+    }
+  }
 }; 
 </script>
 

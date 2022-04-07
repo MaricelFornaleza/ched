@@ -10,20 +10,25 @@ import SerialNumbersView from "../views/SerialNumbersView.vue"
 import ReportSummaryView from "../views/ReportSummaryView.vue"
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
+
+
 const routes = [
   {
     path: "/",
     name: "landing",
     component: LandingView,
+    meta:{requiresVisitor: true},
   },
   {
     path: "/nstp",
     component: ViewLayout,
+    
     children: [
       {
         path: "/home",
         name: "home",
         component: HomeView,
+        meta:{requiresVisitor: false},
       },
       {
         path: "/hei",
@@ -76,5 +81,15 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach((to, from, next) => {
+  console.log(JSON.parse(localStorage.getItem('Parse/myAppId/currentUser[username]')));
+  const isLogged = JSON.parse(localStorage.getItem('Parse/myAppId/currentUser'));
+    if (isLogged) next()
+    else{
+      if(to.meta.requiresVisitor) next()
+      else next('/')
+    }
+})
 
 export default router;
