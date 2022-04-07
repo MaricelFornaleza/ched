@@ -37,7 +37,17 @@
         "
       >
         <div class="breadcrumbs mt-14 w-full bg-light-100 p-3 fixed shadow-sm">
-          Breadcrumbs
+          <ul class="flex space-x-3 text-sm">
+            <li
+              class="list space-x-3 cursor-pointer"
+              v-for="(breadcrumb, idx) in breadcrumbs"
+              :key="idx"
+              @click="routeTo(idx)"
+            >
+              <span class="name">{{ breadcrumb.name }}</span>
+              <span class="separator">/</span>
+            </li>
+          </ul>
         </div>
         <div class="main-content h-screen pt-28">
           <router-view />
@@ -47,6 +57,16 @@
   </div>
 </template>
 <style>
+.list {
+  color: theme("colors.dark.100");
+}
+.list:last-child .name {
+  font-weight: 600;
+  color: theme("colors.dark.300");
+}
+.list:last-child .separator {
+  display: none;
+}
 .v-sidebar-menu {
   z-index: 10;
   padding-top: 100px;
@@ -111,15 +131,10 @@ export default {
     TimeDisplay,
   },
 
-  methods: {
-    toggle() {
-      this.collapsed = !this.collapsed;
-    },
-  },
-
   data() {
     return {
       collapsed: true,
+      breadcrumbs: [],
 
       menu: [
         {
@@ -185,6 +200,28 @@ export default {
         },
       ],
     };
+  },
+  watch: {
+    $route() {
+      this.updateList();
+    },
+  },
+  mounted() {
+    this.updateList();
+  },
+
+  methods: {
+    updateList() {
+      this.breadcrumbs = this.$route.meta.breadcrumb;
+    },
+    toggle() {
+      this.collapsed = !this.collapsed;
+    },
+    routeTo(pRouteTo) {
+      if (this.breadcrumbs[pRouteTo].link) {
+        this.$router.push(this.breadcrumbs[pRouteTo].link);
+      }
+    },
   },
 };
 </script>
