@@ -1,40 +1,48 @@
 <template>
   <div class="py-5">
-    <div class="overflow-x-auto bg-light-200">
+    <div class="overflow-x-auto inline-block bg-light-200">
       
-      <table id="dataTable" class="p-4 hover text-center w-full">
+      <table id="dataTable" class="p-4 hover text-center table-hover table-light table-striped" style="width: 100%;">
         <thead class="bg-gray-50 text-xs uppercase">
           <tr>
-            <th class="p-8 text-left">Name</th>
-            <th class="p-8">Birthdate</th>
-            <th class="p-8">Sex</th>
-            <th class="p-8">Address</th>
-            <th class="p-8">Email Address</th>
-            <th class="p-8">Contact Number</th>
-            <th class="p-8">Main Program Name</th>
+            <th class="p-8">
+              {{ table_headers.A }}
+            </th>
+            <th class="text-left">{{ table_headers.F }}</th>
+            <th>{{ table_headers.G }}</th>
+            <th>{{ table_headers.I }}</th>
+            <th>{{ table_headers.H }}</th>
+            <th>{{ table_headers.J }}</th>
+            <th>{{ table_headers.K }}</th>
+            <th>{{ table_headers.T }}</th>
+            <th>{{ table_headers.U }}</th>
+            <th>{{ table_headers.S }}</th>
           </tr>
         </thead>
         <tbody class="bg-white text-sm">
           <tr
-            v-for="student in students"
-            :key="student.id"
+            v-for="(student, index) in students"
+            :key="index"
             class="whitespace-nowrap"
           >
-            <td class="px-6 py-4 text-left">{{ student.name }}</td>
+            <td class="px-6 py-4 ">{{ student.A }}</td>
+            <td class="px-6 py-4 text-left">{{ student.F }}</td>
             <td class="px-6 py-4">
               <div class="text-gray-900">
-                {{ student.birthdate }}
+                {{ student.G }}
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="">{{ student.sex }}</div>
+              <div class="">{{ student.I }}</div>
             </td>
-            <td class="px-6 py-4">{{ student.address }}</td>
+            <td class="px-6 py-4">{{ student.H }}</td>
             <td class="px-6 py-4">
-              {{ student.email }}
+              {{ student.J }}
             </td>
-            <td class="px-6 py-4">{{ student.contact_num }}</td>
-            <td class="px-6 py-4">{{ student.program }}</td>
+            <td class="px-6 py-4">{{ student.K }}</td>
+            <td class="px-6 py-4">{{ student.T }}</td>
+            <td class="px-6 py-4">{{ student.U }}</td>
+            <td class="px-6 py-4">{{ student.S }}</td>
           </tr>
         </tbody>
       </table>
@@ -62,96 +70,20 @@ export default {
           search: "",
           sLengthMenu: "_MENU_",
         },
+        "scrollX": true
       });
     });
+
+    // console.log(JSON.parse(JSON.stringify(this.table_headers)));
   },
   data: function () {
     return {
-      students: [
-        {
-          id: 1,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 2,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 3,
-         name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 4,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 5,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 6,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 7,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-        {
-          id: 8,
-          name: "Juan Dela Cruz",
-          birthdate: "January 1, 2000",
-          sex: "Male",
-          address: "Naga City",
-          email: "juan@gmail.com",
-          contact_num: "09123456789",
-          program: "BS IT",
-        },
-      ],
+      example: {A: "Hi", B: "Hey"}
     };
   },
-  methods: {
-  },
+  props: {
+    table_headers: Object,
+    students: Array
+  }
 };
 </script>
