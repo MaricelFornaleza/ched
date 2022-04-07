@@ -129,7 +129,7 @@ import { DocumentTextIcon } from "@heroicons/vue/solid";
 import ApplicationDataTable from "@/partials/ApplicationDataTable.vue";
 import ModalHei from "@/partials/ModalHei.vue";
 import Parse from "parse";
-// import * as XLSX from "xlsx";
+
 export default {
   name: "ApplicationView",
   data() {
@@ -142,8 +142,7 @@ export default {
         "University de Santa Isabel (USI)",
         "University of Nueve Caceres (UNC)",
       ],
-      // file: "",
-      // message: "",
+
       application_type: "",
       applications: [],
       table_headers: [
@@ -169,18 +168,6 @@ export default {
       this.visible = !this.visible;
       this.application_type = type;
     },
-
-    // exportToExcel() {
-    //   var datatoExcel = [];
-    //   datatoExcel.push({
-    //     cols: this.table_headers,
-    //     data: this.applications,
-    //   });
-    //   var worksheet = XLSX.utils.json_to_sheet(this.datatoExcel);
-    //   var new_workbook = XLSX.utils.book_new();
-    //   XLSX.utils.book_append_sheet(new_workbook, worksheet, "SheetJS");
-    //   console.log(datatoExcel);
-    // },
   },
   async mounted() {
     var data = [];
@@ -214,29 +201,8 @@ export default {
     this.for_revision = count3.length;
 
     this.applications = data;
-    // this.exportToExcel();
-    console.log(this.applications);
   },
-  // methods: {
-  // handleFileUpload( event ){
-  // 		this.file = event.target.files[0];
-  //     this.message= "IN!";
-  // },
-  // submitFile() {
-  //   alert(`Submitted Files:\n${this.file.name}`);
-  //   console.log(this.file);
 
-  //   const Parse = require('parse');
-  //   const parseFile = new Parse.File(this.file.name.toString(), this.file);
-  //   parseFile.save().then(function() {
-  //     // The file has been saved to Parse.
-  //     console.log("File has been uploaded!");
-  //   }, function(error) {
-  //     // The file either could not be read, or could not be saved to Parse.
-  //     console.log("Error: " + error);
-  //   });
-  // }
-  // },
   components: {
     EmptyState,
     SimpleWidget,
