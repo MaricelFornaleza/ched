@@ -182,7 +182,7 @@
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
 import Parse from 'parse';
-//import emailjs from '@emailjs/browser';
+import emailjs from '@emailjs/browser';
 
 export default {
   auth: true,
@@ -212,21 +212,19 @@ export default {
       hei.set("hei_type", this.hei_type);
       hei.set("password", this.password);
       hei.save()
-      // .then(function(hei) {
-      //   // any logic to be executed after the object is saved.
+      .then(function(hei) {
+      // any logic to be executed after the object is saved.
         
-      //   alert('New object created with objectId: ' + hei.id);
-      //   emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
-      // .then((result) => {
-      //   console.log('SUCCESS', result.text);
-      // }, (error) => {
-      //   console.log('FAILED', error.text);
-      // });
-      // }).catch(function (error){
-      //   alert('Failed to create new object, with error code: ' + error.message);
-      // });
-
-    
+      alert('New object created with objectId: ' + hei.id);
+      emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
+      .then((result) => {
+      console.log('SUCCESS', result.text);
+      }, (error) => {
+        console.log('FAILED', error.text);
+      });
+      }).catch(function (error){
+        alert('Failed to create new object, with error code: ' + error.message);
+       });
     }
   }
 };

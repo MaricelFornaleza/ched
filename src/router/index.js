@@ -28,7 +28,7 @@ const routes = [
         path: "/home",
         name: "home",
         component: HomeView,
-        meta:{requiresVisitor: false},
+        meta:{requiresAuth: true},
       },
       {
         path: "/hei",
@@ -83,7 +83,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  console.log(JSON.parse(localStorage.getItem('Parse/myAppId/currentUser[username]')));
+  console.log(JSON.parse(localStorage.getItem('Parse/myAppId/currentUser[username ]')));
   const isLogged = JSON.parse(localStorage.getItem('Parse/myAppId/currentUser'));
     if (isLogged) next()
     else{
