@@ -33,7 +33,7 @@
         <p class="uppercase font-bold label-sm">Higher Education Institution</p>
       </div>
 
-      <form ref="form" @submit.prevent="addHei">
+      <form ref="form" id="addHei" @submit.prevent="addHei">
         <div class="mb-4">
           <label class="block text-dark-200 text-sm font-bold mb-2" for="name">
             Name
@@ -163,18 +163,17 @@
               <option value="OGS">Other GOvernment Schools</option>
             </select>
           </div>
-          <input name="password" id="password" type="hidden" value="password" />
-          <div class="flex items-center justify-center space-x-5 mt-10">
-            <button class="btn-sm bg-light-300 font-bold" type="button">
-              Cancel
-            </button>
-            <button
-              class="btn-sm bg-brand-blue text-light-100 font-bold"
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
+        </div>
+        <div class="flex items-center justify-center space-x-5 mt-10">
+          <button class="btn-sm bg-light-300 font-bold" type="button">
+            Cancel
+          </button>
+          <button
+            class="btn-sm bg-brand-blue text-light-100 font-bold"
+            type="submit"
+          >
+            Submit
+          </button>
         </div>
       </form>
     </div>
@@ -183,9 +182,10 @@
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
 import Parse from "parse";
-import emailjs from "@emailjs/browser";
+//import emailjs from '@emailjs/browser';
 
 export default {
+  auth: true,
   components: {
     LibraryIcon,
   },
@@ -200,8 +200,9 @@ export default {
     };
   },
   methods: {
-    addHei() {
+    async addHei() {
       var password = Math.random().toString(36).slice(-8);
+      this.form.password = password;
       const Hei = Parse.Object.extend("Hei");
       const hei = new Hei();
       hei.set("name", this.name);
@@ -209,34 +210,21 @@ export default {
       hei.set("contact_number", this.contact_number);
       hei.set("institutional_code", this.institutional_code);
       hei.set("hei_type", this.hei_type);
-      hei.set("password", password);
-      hei
-        .save()
-        .then(function (hei) {
-          // any logic to be executed after the object is saved.
+      hei.set("password", this.password);
+      hei.save();
+      // .then(function(hei) {
+      //   // any logic to be executed after the object is saved.
 
-          alert("New object created with objectId: " + hei.id);
-          emailjs
-            .sendForm(
-              "service_0ftc4vc",
-              "template_gmz4sqi",
-              this.$refs.form,
-              "jTSIh7CnjU-vTFAm4"
-            )
-            .then(
-              (result) => {
-                console.log("SUCCESS", result.text);
-              },
-              (error) => {
-                console.log("FAILED", error.text);
-              }
-            );
-        })
-        .catch(function (error) {
-          alert(
-            "Failed to create new object, with error code: " + error.message
-          );
-        });
+      //   alert('New object created with objectId: ' + hei.id);
+      //   emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
+      // .then((result) => {
+      //   console.log('SUCCESS', result.text);
+      // }, (error) => {
+      //   console.log('FAILED', error.text);
+      // });
+      // }).catch(function (error){
+      //   alert('Failed to create new object, with error code: ' + error.message);
+      // });
     },
   },
 };

@@ -115,11 +115,11 @@
             <td class="px-6 py-0">
               <EyeIcon
                 @click="viewApplication(application.id)"
-                class="h-6 mx-auto"
+                class="h-6 mx-auto cursor-pointer"
               />
             </td>
             <td class="px-6 py-4">
-              <TrashIcon class="h-6 mx-auto text-error" />
+              <TrashIcon class="h-6 mx-auto text-error cursor-pointer" />
             </td>
           </tr>
         </tbody>
