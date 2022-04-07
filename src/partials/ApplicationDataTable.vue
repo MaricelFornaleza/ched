@@ -1,5 +1,5 @@
 <template>
-  <div class="p-10">
+  <div class="p-10 w-full">
     <div class="overflow-x-auto">
       <div class="flex space-x-5 absolute right-20 mt-5 z-10">
         <div class="flex flex-col">
@@ -72,7 +72,8 @@
           </button>
         </div>
       </div>
-      <table id="dataTable" class="p-4 hover text-center w-full">
+
+      <table id="dataTable" class="p-4 hover text-center w-full bg-light-200">
         <thead class="bg-gray-50 text-xs uppercase">
           <tr>
             <th v-for="table_header in table_headers" :key="table_header">

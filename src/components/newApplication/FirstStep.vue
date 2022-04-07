@@ -147,7 +147,7 @@
 import DropZone from "@/partials/DropZone.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 import studentsData from "@/assets/json/students.json";
-import StudentsDataTable from "@/partials/StudentsDataTable.vue";
+import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/parseFile.worker.js";
@@ -212,7 +212,7 @@ export default {
               _this.students = event.data.rows;
               _this.male_num = event.data.male;
               _this.female_num = event.data.female;
-
+              console.log(_this.students);
               if (event.data.complete) {
                 _this.visible = false;
                 _this.$emit("complete", step);
