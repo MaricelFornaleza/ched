@@ -2,7 +2,7 @@
   <div class="p-10">
     <div class="font-bold uppercase mb-3">{{ hei }}</div>
     <div class="bg-light-100 h-full w-full p-5 text-center">
-      <div class="flexborder-light-300 border-2">
+      <div class="flex border-light-300 border-2">
         <div
           v-for="step in steps"
           :key="step.no"
