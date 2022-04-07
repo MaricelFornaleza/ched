@@ -6,11 +6,14 @@
           <button
             id="dropdownButton"
             @click="dropdownToggle()"
-            class="btn-sm btn-default
-            inline-flex
-            items-center w-fit
-            ml-auto
-            px-4"
+            class="
+              btn-sm btn-default
+              inline-flex
+              items-center
+              w-fit
+              ml-auto
+              px-4
+            "
             type="button"
           >
             Add Application
@@ -33,7 +36,7 @@
             "
           >
             <slot>
-               <ul class="py-1" aria-labelledby="dropdownButton">
+              <ul class="py-1" aria-labelledby="dropdownButton">
                 <li>
                   <router-link to="/application/new"
                     ><p class="block py-2 px-4 text-sm hover:bg-light-300">
@@ -51,9 +54,19 @@
               </ul>
             </slot>
           </div>
-      </div>
+        </div>
         <div class="flex flex-col">
-          <button class="btn-sm h-fit px-4 border-dark-100 bg-dark-100 text-light-100 hover:ring-4 hover:ring-light-400">
+          <button
+            class="
+              btn-sm
+              h-fit
+              px-4
+              border-dark-100
+              bg-dark-100
+              text-light-100
+              hover:ring-4 hover:ring-light-400
+            "
+          >
             <CloudDownloadIcon class="h-5" />
           </button>
         </div>
@@ -61,49 +74,52 @@
       <table id="dataTable" class="p-4 hover text-center w-full">
         <thead class="bg-gray-50 text-xs uppercase">
           <tr>
-            <th class="p-8 text-left">HEI Name</th>
-            <th class="p-8">Application Type</th>
-            <th class="p-8">NSTP Program</th>
-            <th class="p-8">Graduates</th>
-            <th class="p-8">Date Applied</th>
-            <th class="p-8">Date Approved</th>
-            <th class="p-8">Status</th>
-            <th class="px-6 py-2">Action</th>
+            <th v-for="table_header in table_headers" :key="table_header">
+              {{ table_header.title }}
+            </th>
+            <th class="px-6 py-2 text-xs text-gray-500">View</th>
+            <th class="px-6 py-2 text-xs text-gray-500">Delete</th>
           </tr>
         </thead>
         <tbody class="bg-white text-sm">
           <tr
-            v-for="Application in Applications"
-            :key="Application.id"
+            v-for="application in applications"
+            :key="application.id"
             class="whitespace-nowrap"
           >
-            <td class="px-6 py-4 text-left">{{ Application.hei_name }}</td>
+            <td class="px-6 py-4 text-left">{{ application.hei_name }}</td>
             <td class="px-6 py-4">
               <div class="text-gray-900">
-                {{ Application.application_type }}
+                {{ application.application_type }}
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="">{{ Application.program }}</div>
+              <div class="">{{ application.program }}</div>
             </td>
-            <td class="px-6 py-4">{{ Application.no_of_graduates }}</td>
+            <td class="px-6 py-4">{{ application.no_of_graduates }}</td>
             <td class="px-6 py-4">
-              {{ Application.date_approved }}
+              {{ application.date_applied }}
             </td>
-            <td class="px-6 py-4">{{ Application.date_applied }}</td>
-            <td class="px-6 py-4"><span :class="variant(Application.status)">{{ Application.status }}</span></td>
+            <td class="px-6 py-4">{{ application.date_approved }}</td>
             <td class="px-6 py-4">
-              <a href="#" class="px-4 py-1 text-white bg-red-400 rounded"
-                >Delete</a
-              >
+              <span :class="variant(application.status)">{{
+                application.status
+              }}</span>
+            </td>
+            <td class="px-6 py-0">
+              <EyeIcon
+                @click="viewApplication(application.id)"
+                class="h-6 mx-auto"
+              />
+            </td>
+            <td class="px-6 py-4">
+              <TrashIcon class="h-6 mx-auto text-error" />
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-
-  
 </template>
 
 <script>
@@ -114,12 +130,24 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
-import { CloudDownloadIcon, ChevronDownIcon } from "@heroicons/vue/outline";
+import router from "../router";
+import {
+  CloudDownloadIcon,
+  ChevronDownIcon,
+  EyeIcon,
+  TrashIcon,
+} from "@heroicons/vue/outline";
 
 export default {
   components: {
     CloudDownloadIcon,
     ChevronDownIcon,
+    EyeIcon,
+    TrashIcon,
+  },
+  props: {
+    applications: Object,
+    table_headers: Array,
   },
   mounted() {
     $(document).ready(function () {
@@ -129,115 +157,37 @@ export default {
           search: "",
           sLengthMenu: "_MENU_",
         },
-        "order": [],
+        order: [],
       });
     });
   },
   data: function () {
     return {
       dropdown: false,
-      Applications: [
-        {
-          id: 1,
-          hei_name: "Ateneo de Naga University",
-          application_type: "New Application",
-          program: "CWTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Approval",
-        },
-        {
-          id: 2,
-          hei_name: "University of Nueva Caceres",
-          application_type: "New Application",
-          program: "LTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Approval",
-        },
-        {
-          id: 3,
-          hei_name: "Ateneo de Naga University",
-          application_type: "New Application",
-          program: "CWTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "February 09, 2022",
-          status: "Approved",
-        },
-        {
-          id: 4,
-          hei_name: "University of Nueva Caceres",
-          application_type: "New Application",
-          program: "LTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Approval",
-        },
-        {
-          id: 5,
-          hei_name: "University of Nueva Caceres",
-          application_type: "New Application",
-          program: "LTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Approval",
-        },
-        {
-          id: 6,
-          hei_name: "Ateneo de Naga University",
-          application_type: "New Application",
-          program: "CWTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "2/3",
-        },
-        {
-          id: 7,
-          hei_name: "Ateneo de Naga University",
-          application_type: "New Application",
-          program: "CWTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Approval",
-        },
-        {
-          id: 8,
-          hei_name: "Ateneo de Naga University",
-          application_type: "New Application",
-          program: "CWTS",
-          no_of_graduates: 200,
-          date_applied: "February 08, 2022",
-          date_approved: "NA",
-          status: "For Revision",
-        },
-      ],
     };
   },
   methods: {
     dropdownToggle() {
       this.dropdown = !this.dropdown;
     },
+    viewApplication(app_id) {
+      router.push({
+        name: "Step1",
+        params: { application: app_id },
+      });
+    },
     variant(stats) {
-      if(stats == "Approved") {
-        return 'badge-success';
+      if (stats == "APPROVED") {
+        return "badge-success";
+      } else if (stats == "FOR APPROVAL") {
+        return "badge-warning";
+      } else if (stats == "FOR REVISION") {
+        return "badge-error";
+      } else {
+        //Ongoing
+        return "badge";
       }
-      else if(stats == "For Approval") {
-        return 'badge-warning';
-      }
-      else if(stats == "For Revision") {
-        return 'badge-error';
-      }
-      else { //Ongoing
-        return 'badge';
-      }
-    }
+    },
   },
 };
 </script>

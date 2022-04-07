@@ -67,28 +67,15 @@ export default {
   },
   async created() {
     this.application_id = this.$route.params.application;
-    this.currentStep = this.$route.params.step;
+
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.application_id);
     var results = await query.first();
     this.hei = results.get("hei");
-
     this.steps = results.get("steps");
-    this.currentStep = results.get("status");
+    this.getCompletedStep();
     this.isCompleted = this.findStep(this.currentStep);
-
-    // this.hei = this.$route.params.hei;
-    // this.currentStep = this.$route.params.step;
-    // this.hei_id = this.$route.params.application;
-
-    // const ApplicationSteps = Parse.Object.extend("ApplicationSteps");
-    // const query = new Parse.Query(ApplicationSteps);
-    // query.find("parent", this.hei_id);
-    // const result = await query.first();
-    // this.steps = result.get("steps");
-    // console.log(this.hei_id);
-    // console.log(result.get("steps"));
   },
   methods: {
     activeStep(step) {
@@ -106,6 +93,20 @@ export default {
           return this.steps[i].completed;
         }
       }
+    },
+    getCompletedStep() {
+      var count = 0;
+      for (var i in this.steps) {
+        if (this.steps[i].completed == true) {
+          count++;
+        }
+      }
+      if (count < 5) {
+        count++;
+      }
+      this.currentStep = count;
+      console.log(count);
+      this.activeStep(count);
     },
     completeStep(currentStep) {
       // console.log(currentStep);

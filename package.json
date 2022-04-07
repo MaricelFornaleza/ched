@@ -29,7 +29,8 @@
     "vue-router": "^4.0.13",
     "vue-sidebar-menu": "^5.2.1",
     "vue3-select2-component": "^0.1.7",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

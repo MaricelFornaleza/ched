@@ -169,6 +169,7 @@ export default {
         }
       );
       this.$emit("complete", step);
+      this.$emit("setStatus", "3 OF 5");
     },
     async getUrl(appId) {
       // this function gets the url of the uploaded document in parse

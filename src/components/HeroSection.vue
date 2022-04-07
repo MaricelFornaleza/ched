@@ -6,7 +6,7 @@
         :class="open ? 'xxl:text-left xxl:pl-32' : ' text-center'"
       >
         <div
-          class="pt-10 mb-20 xxl:mb-32 space-y-2 sm:pt-20 sm:mb-28"
+          class="pt-10 mb-20 space-y-2 sm:pt-20 sm:mb-28"
           :class="open ? 'lg:pl-0' : ''"
         >
           <img
@@ -22,16 +22,7 @@
           class="w-full px-10 lg:px-20 xl:w-2/3 xxl:w-1/2"
           :class="open ? 'xxl:pl-0' : 'mx-auto'"
         >
-          <h1
-            class="
-              mb-10
-              xxl:mb-10
-              text-2xl
-              xs:text-4xl
-              sm:text-5xl
-              xxl:text-6xl
-            "
-          >
+          <h1 class="mb-10 xxl:mb-10 text-2xl xs:text-4xl sm:text-5xl">
             The 1st NSTP Serial Number Online Application & Issuance
           </h1>
           <p class="body-small xs:text-base mb-20 sm:body-m lg:text-xl">
@@ -50,7 +41,7 @@
       </div>
       <!-- login panel  -->
       <div
-        class="slidein w-full bg-light-200 inset-y-0 lg:w-1/2 xxl:w-1/3"
+        class="slidein w-full bg-light-200 inset-y-0 md:w-1/2 lg:w-1/3"
         :class="open ? 'open' : ''"
       >
         <button class="close-btn" @click="toggle"><XIcon class="h-8" /></button>

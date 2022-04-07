@@ -155,13 +155,21 @@ export default {
         });
       } else if (application_type == "additional") {
         //for additional graduates
+        var currentDate = new Date()
+          .toLocaleDateString()
+          .replace(/[^\w\s]/gi, "/");
         const Application = Parse.Object.extend("Application");
 
         const application = new Application();
 
-        application.set("dateApplied", "3/31/2022");
-        application.set("status", 1);
+        application.set("dateApplied", currentDate);
+        application.set("status", "1 OF 5");
         application.set("hei", this.value);
+        application.set("applicationType", "For Additional Graduates");
+        application.set("nstpProgram", "");
+        application.set("graduates", 0);
+        application.set("dateApproved", "");
+
         application.set("steps", this.additionalSteps);
         application.save().then(
           (application) => {
