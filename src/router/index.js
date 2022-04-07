@@ -42,26 +42,54 @@ const routes = [
         path: "/home",
         name: "home",
         component: HomeView,
+        meta:{
+          breadcrumb: [
+            {name: 'Home'},
+          ]
+        }
       },
       {
         path: "/hei",
         name: "hei",
         component: HEIView,
+        meta:{
+          breadcrumb: [
+            {name: 'HEI'},
+          ]
+        }
       },
       {
         path: "/hei/new",
         name: "newHEI",
         component: NewHei,
+        meta:{
+          breadcrumb: [
+            { name: 'HEI', link: '/hei' },
+            {name: 'New'}
+          ]
+        }
       },
       {
         path: "/hei/upload",
         name: "uploadHEI",
         component: UploadHei,
+        meta:{
+          breadcrumb: [
+            { name: 'HEI', link: '/hei' },
+            {name: 'Upload Excel File'}
+          ]
+        }
       },
       {
         path: "/application",
         name: "application",
         component: ApplicationView,
+        meta:{
+          breadcrumb: [
+            { name: 'Applications' },
+           
+          ]
+        }
       },
       {
         path: "/application/new",
@@ -72,6 +100,7 @@ const routes = [
             name: "1stStep",
             component: FirstStep,
             props: true,
+            
           },
           {
             path: "/application/new/2/:hei",
@@ -108,6 +137,13 @@ const routes = [
             name: "Step1",
             component: StepOne,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'Additional Graduates'},
+                {name: 'Step 1'},
+              ]
+            }
            
           },
           {
@@ -115,24 +151,52 @@ const routes = [
             name: "Step2",
             component: StepTwo,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'Additional Graduates'},
+                {name: 'Step 2'},
+              ]
+            }
           },
           {
             path: "/application/additional/3/:application",
             name: "Step3",
             component: StepThree,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'Additional Graduates'},
+                {name: 'Step 3'},
+              ]
+            }
           },
           {
             path: "/application/additional/4/:application",
             name: "Step4",
             component: StepFour,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'Additional Graduates'},
+                {name: 'Step 4'},
+              ]
+            }
           },
           {
             path: "/application/additional/5/:application",
             name: "Step5",
             component: StepFive,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'Additional Graduates'},
+                {name: 'Step 5'},
+              ]
+            }
           },
         ]
       },
@@ -140,21 +204,45 @@ const routes = [
         path: "/enrollment",
         name: "enrollment",
         component: EnrollmentView,
+        meta:{
+          breadcrumb: [
+            { name: 'Summary of Enrollment' },
+           
+          ]
+        }
       },
       {
         path: "/graduates",
         name: "graduates",
         component: GraduatesView,
+        meta:{
+          breadcrumb: [
+            { name: 'Summary of Graduates' },
+           
+          ]
+        }
       },
       {
         path: "/serial-numbers",
         name: "serial-numbers",
         component: SerialNumbersView,
+        meta:{
+          breadcrumb: [
+            { name: 'Serial Numbers' },
+           
+          ]
+        }
       },
       {
         path: "/report-summary",
         name: "report-summary",
         component: ReportSummaryView,
+        meta:{
+          breadcrumb: [
+            { name: 'Report Summary' },
+           
+          ]
+        }
       },
 
     ]
