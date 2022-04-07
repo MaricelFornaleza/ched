@@ -4,7 +4,10 @@
       <div class="flex space-x-5 absolute right-20 mt-5 z-20">
         <slot name="button"></slot>
 
-        <button class="btn-sm h-fit px-4 bg-dark-100 text-light-100">
+        <button
+          @click="exportToExcel"
+          class="btn-sm h-fit px-4 bg-dark-100 text-light-100"
+        >
           <DownloadIcon class="h-5" />
         </button>
       </div>
@@ -110,6 +113,7 @@ import "datatables.net-buttons/js/buttons.flash.js";
 import "datatables.net-buttons/js/buttons.html5.js";
 import "datatables.net-buttons/js/buttons.print.js";
 import $ from "jquery";
+import * as XLSX from "xlsx";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 export default {
   name: "EnrollmentDataTable",
@@ -122,6 +126,22 @@ export default {
     return {
       dropdown: false,
     };
+  },
+  methods: {
+    exportToExcel() {
+      var currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      var workbook = XLSX.utils.book_new();
+
+      var sheet1 = XLSX.utils.table_to_sheet(
+        document.getElementById("dataTable")
+      );
+
+      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
+      var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
+      XLSX.writeFileXLSX(workbook, filename);
+    },
   },
 
   mounted() {

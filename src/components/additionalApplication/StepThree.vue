@@ -40,7 +40,7 @@
         </button>
         <button
           v-if="!completed"
-          @click="upload(3)"
+          @click="uploadxl()"
           class="btn-sm btn-default"
           type="submit"
         >
@@ -82,7 +82,7 @@
 import DropZone from "@/partials/DropZone.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
-
+import * as XLSX from "xlsx";
 import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDataTable.vue";
 import { ref } from "vue";
@@ -118,9 +118,18 @@ export default {
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
     };
+
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {
+    uploadxl() {
+      var workbook = XLSX.read(this.dropzoneFile);
+      var data = XLSX.utils.sheet_to_json(workbook, {
+        header: 1,
+      });
+      console.log(data);
+    },
+
     upload(step) {
       this.$emit("complete", step);
       this.completed = !this.completed;

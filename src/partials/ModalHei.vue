@@ -119,6 +119,7 @@
 // import { SearchIcon } from "@heroicons/vue/outline";
 import router from "../router";
 import Select2 from "vue3-select2-component";
+import Parse from "parse";
 
 export default {
   name: "ModalHei",
@@ -127,6 +128,13 @@ export default {
       results: false,
       value: "",
       placeholder: "Select",
+      additionalSteps: [
+        { no: 1, title: "Notarized Transmittal Letter", completed: false },
+        { no: 2, title: "Proof", completed: false },
+        { no: 3, title: "List of Graduates", completed: false },
+        { no: 4, title: "Application for Approval", completed: false },
+        { no: 5, title: "Application Complete", completed: false },
+      ],
     };
   },
   props: {
@@ -139,16 +147,46 @@ export default {
   },
   methods: {
     nextPage(application_type) {
-      if (application_type == "new") {  //new application
-        router.push({ 
-          name: "1stStep", 
-          params: { step: 1, hei: this.value },
-        });
-      } else if (application_type == "additional") {  //for additional graduates
+      if (application_type == "new") {
+        //new application
         router.push({
-          name: "Step1",
+          name: "1stStep",
           params: { step: 1, hei: this.value },
         });
+      } else if (application_type == "additional") {
+        //for additional graduates
+        var currentDate = new Date()
+          .toLocaleDateString()
+          .replace(/[^\w\s]/gi, "/");
+        const Application = Parse.Object.extend("Application");
+
+        const application = new Application();
+
+        application.set("dateApplied", currentDate);
+        application.set("status", "1 OF 5");
+        application.set("hei", this.value);
+        application.set("applicationType", "For Additional Graduates");
+        application.set("nstpProgram", "");
+        application.set("graduates", 0);
+        application.set("dateApproved", "");
+
+        application.set("steps", this.additionalSteps);
+        application.save().then(
+          (application) => {
+            router.push({
+              name: "Step1",
+              params: {
+                step: 1,
+                application: application.id,
+              },
+            });
+          },
+          (error) => {
+            alert(
+              "Failed to create new object, with error code: " + error.message
+            );
+          }
+        );
       }
     },
     myChangeEvent(val) {

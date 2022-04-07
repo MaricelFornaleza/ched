@@ -104,31 +104,32 @@ const routes = [
         component: ApplicationSteps,
         children: [
           {
-            path: "/application/additional/1/:hei",
+            path: "/application/additional/1/:application",
             name: "Step1",
             component: StepOne,
             props: true,
+           
           },
           {
-            path: "/application/additional/2/:hei",
+            path: "/application/additional/2/:application",
             name: "Step2",
             component: StepTwo,
             props: true,
           },
           {
-            path: "/application/additional/3/:hei",
+            path: "/application/additional/3/:application",
             name: "Step3",
             component: StepThree,
             props: true,
           },
           {
-            path: "/application/additional/4/:hei",
+            path: "/application/additional/4/:application",
             name: "Step4",
             component: StepFour,
             props: true,
           },
           {
-            path: "/application/additional/5/:hei",
+            path: "/application/additional/5/:application",
             name: "Step5",
             component: StepFive,
             props: true,
