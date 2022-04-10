@@ -203,7 +203,6 @@ export default {
       }
       Parse.User.logIn(this.email, this.password)
         .then(() => {
-          alert("success");
           this.$router.push({ name: "home" });
         })
         .catch(function (err) {

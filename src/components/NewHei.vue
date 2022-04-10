@@ -201,17 +201,18 @@ export default {
   },
   methods: {
     async addHei() {
-      var password = Math.random().toString(36).slice(-8);
+      var password = Math.random().toString(36).slice(-12);
       this.form.password = password;
-      const Hei = Parse.Object.extend("Hei");
-      const hei = new Hei();
-      hei.set("name", this.name);
-      hei.set("email", this.email);
-      hei.set("contact_number", this.contact_number);
-      hei.set("institutional_code", this.institutional_code);
-      hei.set("hei_type", this.hei_type);
-      hei.set("password", this.password);
-      hei.save();
+      const User = Parse.Object.extend("User");
+      const user = new User();
+      user.set("name", this.name);
+      user.set("email", this.email);
+      user.set("contact_number", this.contact_number);
+      user.set("institutional_code", this.institutional_code);
+      user.set("hei_type", this.hei_type);
+      user.set("password", this.password);
+      
+      user.save();
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
 
@@ -225,6 +226,7 @@ export default {
       // }).catch(function (error){
       //   alert('Failed to create new object, with error code: ' + error.message);
       // });
+
     },
   },
 };

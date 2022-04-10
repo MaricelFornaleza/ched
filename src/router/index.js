@@ -20,40 +20,55 @@ import ThirdStep from "../components/newApplication/ThirdStep.vue";
 import FourthStep from "../components/newApplication/FourthStep.vue";
 import FifthStep from "../components/newApplication/FifthStep.vue";
 
-import StepOne from "../components/additionalApplication/StepOne.vue";
-import StepTwo from "../components/additionalApplication/StepTwo.vue";
-import StepThree from "../components/additionalApplication/StepThree.vue";
-import StepFour from "../components/additionalApplication/StepFour.vue";
-import StepFive from "../components/additionalApplication/StepFive.vue";
+
+import StepOne from '../components/additionalApplication/StepOne.vue'
+import StepTwo from '../components/additionalApplication/StepTwo.vue'
+import StepThree from '../components/additionalApplication/StepThree.vue'
+import StepFour from '../components/additionalApplication/StepFour.vue'
+import StepFive from '../components/additionalApplication/StepFive.vue'
+import Parse from "parse";
+
 
 const routes = [
   {
     path: "/",
     name: "landing",
     component: LandingView,
-    // meta:{requiresVisitor: true},
+    beforeEnter: () => {
+      if (Parse.User.current() !== null) {
+        return { name: 'home' }
+      } 
+    }
   },
   {
     path: "/nstp",
     component: ViewLayout,
-
+      beforeEnter: () => {
+        if (Parse.User.current().get("user_type") !== "admin") {
+          return { name: '403' }
+        } 
+      }, 
     children: [
       {
         path: "/home",
         name: "home",
         component: HomeView,
-        meta: {
-          requiresVisitor: false,
-          breadcrumb: [{ name: "Home" }],
-        },
+        meta:{
+          breadcrumb: [
+            {name: 'Home'},
+          ]
+        }
       },
       {
         path: "/hei",
         name: "hei",
         component: HEIView,
-        meta: {
-          breadcrumb: [{ name: "HEI" }],
-        },
+        meta:{
+          breadcrumb: [
+            {name: 'HEI'},
+          ]
+        }
+        
       },
       {
         path: "/hei/new",
@@ -230,18 +245,9 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   console.log(
-//     JSON.parse(localStorage.getItem("Parse/myAppId/currentUser[username]"))
-//   );
-//   const isLogged = JSON.parse(
-//     localStorage.getItem("Parse/myAppId/currentUser")
-//   );
-//   if (isLogged) next();
-//   else {
-//     if (to.meta.requiresVisitor) next();
-//     else next("/");
-//   }
-// });
+router.beforeEach((to, from, next) => {
+    if (to.name !== 'landing' && Parse.User.current() === null) next({ name: 'landing' })
+    else next()
+})
 
 export default router;

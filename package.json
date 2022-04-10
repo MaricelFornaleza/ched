@@ -20,6 +20,7 @@
     "emailjs-com": "^3.2.0",
     "jquery": "^3.6.0",
     "parse": "^3.4.1",
+    "parse-smtp-template": "^2.2.0",
     "postcss": "^8",
     "register-service-worker": "^1.7.2",
     "tailwindcss": "^3",
