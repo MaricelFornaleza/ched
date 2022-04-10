@@ -211,7 +211,7 @@ export default {
       user.set("institutional_code", this.institutional_code);
       user.set("hei_type", this.hei_type);
       user.set("password", this.password);
-      
+      user.set("user_type", "Hei");
       user.save();
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
