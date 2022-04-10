@@ -70,7 +70,8 @@
           <p class="uppercase">total</p>
         </div>
       </div>
-      <StudentsDataTable :students="students"></StudentsDataTable>
+      <span v-if="students == ''">Loading...</span>
+      <StudentsDataTable v-else :students="students"></StudentsDataTable>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
         <button
@@ -210,6 +211,7 @@ export default {
             }
             _this.worker.postMessage({
               d: data,
+              id: _this.appId,
             });
 
             //can be improved by abstraction
