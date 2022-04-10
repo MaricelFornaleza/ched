@@ -118,7 +118,6 @@
       @close="toggleModal('')"
     />
   </div>
-
 </template>
 
 
@@ -168,35 +167,62 @@ export default {
       this.visible = !this.visible;
       this.application_type = type;
     },
+    async getHeis() {
+      var heiList = [];
+
+      const hei = new Parse.Query(Parse.User);
+      hei.equalTo("userType", "hei");
+      const heidata = await hei.find();
+
+      for (var i = 0; i < heidata.length; i++) {
+        const object = heidata[i];
+
+        heiList.push({
+          id: object.id,
+          text: object.get("name"),
+        });
+      }
+      this.lists = heiList;
+    },
   },
   async mounted() {
+    this.getHeis();
     var data = [];
     const Applications = Parse.Object.extend("Application");
     const query = new Parse.Query(Applications);
+    query.include("heiId");
+    query.descending("dateApplied");
+
     const results = await query.find();
+    console.log(results);
     for (let i = 0; i < results.length; i++) {
       const object = results[i];
 
       data.push({
         id: object.id,
-        hei_name: object.get("hei"),
+        hei_name: object.get("heiId").get("name"),
         application_type: object.get("applicationType"),
-        program: object.get("nstpProgram"),
-        no_of_graduates: object.get("graduates"),
-        date_applied: object.get("dateApplied"),
+        program: "",
+        no_of_graduates: "",
+        date_applied: object.get("dateApplied").toLocaleDateString("en", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
         date_approved: object.get("dateApproved"),
         status: object.get("status"),
       });
     }
 
     this.total_applications = results.length;
-    query.equalTo("status", "FOR APPROVAL");
+    query.equalTo("status", "For Approval");
     const count1 = await query.find();
     this.for_approval = count1.length;
-    query.equalTo("status", "APPROVED");
+    query.equalTo("status", "Approved");
     const count2 = await query.find();
     this.approved = count2.length;
-    query.equalTo("status", "FOR REVISION");
+    query.equalTo("status", "For Revision");
     const count3 = await query.find();
     this.for_revision = count3.length;
 

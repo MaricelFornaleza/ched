@@ -2,17 +2,17 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import ViewLayout from "../layout/ViewLayout.vue";
 import LandingView from "../views/LandingView.vue";
-import HEIView from "../views/HEIView.vue"
-import ApplicationView from "../views/ApplicationView.vue"
-import EnrollmentView from "../views/EnrollmentView.vue"
-import GraduatesView from "../views/GraduatesView.vue"
-import SerialNumbersView from "../views/SerialNumbersView.vue"
-import ReportSummaryView from "../views/ReportSummaryView.vue"
+import HEIView from "../views/HEIView.vue";
+import ApplicationView from "../views/ApplicationView.vue";
+import EnrollmentView from "../views/EnrollmentView.vue";
+import GraduatesView from "../views/GraduatesView.vue";
+import SerialNumbersView from "../views/SerialNumbersView.vue";
+import ReportSummaryView from "../views/ReportSummaryView.vue";
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
 
-import ApplicationSteps from "../layout/ApplicationSteps.vue"
-import NewApplicationSteps from "../layout/NewApplicationSteps.vue"
+import ApplicationSteps from "../layout/ApplicationSteps.vue";
+import NewApplicationSteps from "../layout/NewApplicationSteps.vue";
 
 import FirstStep from "../components/newApplication/FirstStep.vue";
 import SecondStep from "../components/newApplication/SecondStep.vue";
@@ -74,34 +74,28 @@ const routes = [
         path: "/hei/new",
         name: "newHEI",
         component: NewHei,
-        meta:{
-          breadcrumb: [
-            { name: 'HEI', link: '/hei' },
-            {name: 'New'}
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "New" }],
+        },
       },
       {
         path: "/hei/upload",
         name: "uploadHEI",
         component: UploadHei,
-        meta:{
+        meta: {
           breadcrumb: [
-            { name: 'HEI', link: '/hei' },
-            {name: 'Upload Excel File'}
-          ]
-        }
+            { name: "HEI", link: "/hei" },
+            { name: "Upload Excel File" },
+          ],
+        },
       },
       {
         path: "/application",
         name: "application",
         component: ApplicationView,
-        meta:{
-          breadcrumb: [
-            { name: 'Applications' },
-           
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "Applications" }],
+        },
       },
       {
         path: "/application/new",
@@ -112,7 +106,6 @@ const routes = [
             name: "1stStep",
             component: FirstStep,
             props: true,
-            
           },
           {
             path: "/application/new/2/:hei",
@@ -138,7 +131,7 @@ const routes = [
             component: FifthStep,
             props: true,
           },
-        ]
+        ],
       },
       {
         path: "/application/additional",
@@ -149,115 +142,101 @@ const routes = [
             name: "Step1",
             component: StepOne,
             props: true,
-            meta:{
+            meta: {
               breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'Additional Graduates'},
-                {name: 'Step 1'},
-              ]
-            }
-           
+                { name: "Application", link: "/application" },
+                { name: "Additional Graduates" },
+                { name: "Step 1" },
+              ],
+            },
           },
           {
             path: "/application/additional/2/:application",
             name: "Step2",
             component: StepTwo,
             props: true,
-            meta:{
+            meta: {
               breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'Additional Graduates'},
-                {name: 'Step 2'},
-              ]
-            }
+                { name: "Application", link: "/application" },
+                { name: "Additional Graduates" },
+                { name: "Step 2" },
+              ],
+            },
           },
           {
             path: "/application/additional/3/:application",
             name: "Step3",
             component: StepThree,
             props: true,
-            meta:{
+            meta: {
               breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'Additional Graduates'},
-                {name: 'Step 3'},
-              ]
-            }
+                { name: "Application", link: "/application" },
+                { name: "Additional Graduates" },
+                { name: "Step 3" },
+              ],
+            },
           },
           {
             path: "/application/additional/4/:application",
             name: "Step4",
             component: StepFour,
             props: true,
-            meta:{
+            meta: {
               breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'Additional Graduates'},
-                {name: 'Step 4'},
-              ]
-            }
+                { name: "Application", link: "/application" },
+                { name: "Additional Graduates" },
+                { name: "Step 4" },
+              ],
+            },
           },
           {
             path: "/application/additional/5/:application",
             name: "Step5",
             component: StepFive,
             props: true,
-            meta:{
+            meta: {
               breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'Additional Graduates'},
-                {name: 'Step 5'},
-              ]
-            }
+                { name: "Application", link: "/application" },
+                { name: "Additional Graduates" },
+                { name: "Step 5" },
+              ],
+            },
           },
-        ]
+        ],
       },
       {
         path: "/enrollment",
         name: "enrollment",
         component: EnrollmentView,
-        meta:{
-          breadcrumb: [
-            { name: 'Summary of Enrollment' },
-           
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "Summary of Enrollment" }],
+        },
       },
       {
         path: "/graduates",
         name: "graduates",
         component: GraduatesView,
-        meta:{
-          breadcrumb: [
-            { name: 'Summary of Graduates' },
-           
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "Summary of Graduates" }],
+        },
       },
       {
         path: "/serial-numbers",
         name: "serial-numbers",
         component: SerialNumbersView,
-        meta:{
-          breadcrumb: [
-            { name: 'Serial Numbers' },
-           
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "Serial Numbers" }],
+        },
       },
       {
         path: "/report-summary",
         name: "report-summary",
         component: ReportSummaryView,
-        meta:{
-          breadcrumb: [
-            { name: 'Report Summary' },
-           
-          ]
-        }
+        meta: {
+          breadcrumb: [{ name: "Report Summary" }],
+        },
       },
-
-    ]
+    ],
   },
 ];
 

@@ -2,12 +2,15 @@
 
 import * as XLSX from 'xlsx';
 
-onmessage = function(event) {
+
+onmessage =  async function(event) {
     var data = event.data.d;
+
 
     let headers = [];
     let rows = [];
     var male = 0, female = 0;
+    
    
     /* reader.readAsArrayBuffer(file) -> data will be an ArrayBuffer */
     var workbook = XLSX.read(data, {type : 'array'});
@@ -39,12 +42,16 @@ onmessage = function(event) {
         }
     }
 
+    
+
     postMessage({
         headers: headers,
         rows: rows,
         male: male,
         female: female,
-        complete: true
+        complete: true,
+       
+
     });
     // _this.table_headers = headers;
     // _this.students = rows;

@@ -116,6 +116,7 @@ export default {
           this.isCompleted = this.findStep(currentStep);
         }
       }
+
       this.saveSteps();
     },
     async saveSteps() {

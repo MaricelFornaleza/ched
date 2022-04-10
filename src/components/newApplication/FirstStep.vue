@@ -1,96 +1,98 @@
 <template>
-  <div
-    v-if="!completed"
-    class="container w-fit mx-auto flex flex-col items-center justify-center"
-  >
-    <AlertWidget :className="className">
-      Please Upload the List of Enrollment for First Semester. Follow the format
-      provided in the Template.&nbsp;
-      <router-link to="/#" class="font-bold underline">
-        Download Template
-      </router-link>
-    </AlertWidget>
+  <div>
+    <div
+      v-if="!completed"
+      class="container w-fit mx-auto flex flex-col items-center justify-center"
+    >
+      <AlertWidget :className="className">
+        Please Upload the List of Enrollment for First Semester. Follow the
+        format provided in the Template.&nbsp;
+        <router-link to="/#" class="font-bold underline">
+          Download Template
+        </router-link>
+      </AlertWidget>
 
-    <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-      <DropZone @drop.prevent="drop" @change="selectedFile" />
-      <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
+      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
+        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
+      </div>
+
+      <div
+        v-else
+        class="my-20 w-fit flex justify-between p-5 border border-light-300"
+      >
+        <div class="flex space-x-5">
+          <img
+            src="@/assets/img/xls.png"
+            class="h-8"
+            alt="XLS Icon by Dimitry Miroliubov"
+          />
+          <div class="text-base">{{ dropzoneFile.name }}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center space-x-5 mt-5">
+        <button
+          @click="$emit('previousStep')"
+          class="btn-sm btn-default btn-outline"
+          type="button"
+        >
+          Cancel
+        </button>
+        <button
+          v-if="!completed"
+          @click="upload(1)"
+          class="btn-sm btn-default"
+          type="submit"
+        >
+          Upload
+        </button>
+      </div>
     </div>
 
     <div
       v-else
-      class="my-20 w-fit flex justify-between p-5 border border-light-300"
+      class="container mx-auto flex flex-col items-center justify-center"
     >
-      <div class="flex space-x-5">
-        <img
-          src="@/assets/img/xls.png"
-          class="h-8"
-          alt="XLS Icon by Dimitry Miroliubov"
-        />
-        <div class="text-base">{{ dropzoneFile.name }}</div>
+      <SuccessAlert className="alert-success">
+        The list for the 1st semester was successfully uploaded. An
+        Acknowledgement letter was sent to the email address.
+      </SuccessAlert>
+
+      <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+        <div class="flex flex-col items-center">
+          <h2 class="">{{ female_num }}</h2>
+          <p class="uppercase">female</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <h2 class="">{{ male_num }}</h2>
+          <p class="uppercase">male</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <h2 class="">{{ male_num + female_num }}</h2>
+          <p class="uppercase">total</p>
+        </div>
       </div>
-    </div>
 
-    <div class="flex items-center justify-center space-x-5 mt-5">
-      <button
-        @click="$emit('previousStep')"
-        class="btn-sm btn-default btn-outline"
-        type="button"
-      >
-        Cancel
-      </button>
-      <button
-        v-if="!completed"
-        @click="upload(1)"
-        class="btn-sm btn-default"
-        type="submit"
-      >
-        Upload
-      </button>
-    </div>
-  </div>
+      <!-- pass props lists -->
+      <StudentsDataTable
+        :students="students"
+        :table_headers="table_headers"
+      ></StudentsDataTable>
 
-  <div
-    v-else
-    class="container w-fit mx-auto flex flex-col items-center justify-center"
-  >
-    <AlertWidget className="alert-success">
-      The list for the 1st semester was successfully uploaded. An
-      Acknowledgement letter was sent to the email address.
-    </AlertWidget>
+      <div class="flex items-center justify-center space-x-5 mt-5">
+        <button
+          @click="$emit('previousStep')"
+          class="btn-sm btn-default btn-outline"
+          type="button"
+        >
+          Cancel
+        </button>
 
-    <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-      <div class="flex flex-col items-center">
-        <h2 class="">{{ female_num }}</h2>
-        <p class="uppercase">female</p>
+        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+          Next
+        </button>
       </div>
-      <div class="flex flex-col items-center">
-        <h2 class="">{{ male_num }}</h2>
-        <p class="uppercase">male</p>
-      </div>
-      <div class="flex flex-col items-center">
-        <h2 class="">{{ male_num + female_num }}</h2>
-        <p class="uppercase">total</p>
-      </div>
-    </div>
-
-    <!-- pass props lists -->
-    <StudentsDataTable
-      :students="students"
-      :table_headers="table_headers"
-    ></StudentsDataTable>
-
-    <div class="flex items-center justify-center space-x-5 mt-5">
-      <button
-        @click="$emit('previousStep')"
-        class="btn-sm btn-default btn-outline"
-        type="button"
-      >
-        Cancel
-      </button>
-
-      <button @click="nextStep()" class="btn-sm btn-default" type="submit">
-        Next
-      </button>
     </div>
 
     <ModalWidget v-show="visible">
@@ -145,7 +147,7 @@
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
-import AlertWidget from "@/partials/AlertWidget.vue";
+import SuccessAlert from "@/partials/SuccessAlert.vue";
 import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
@@ -169,7 +171,7 @@ export default {
     };
   },
   components: {
-    AlertWidget,
+    SuccessAlert,
     DropZone,
     StudentsDataTable,
     ModalWidget,

@@ -54,9 +54,17 @@
       </SuccessAlert>
 
       <div
-        class="my-20 w-full flex justify-between p-5 border border-light-300"
+        class="
+          my-20
+          w-full
+          flex
+          items-center
+          justify-between
+          p-5
+          border border-light-300
+        "
       >
-        <div class="flex space-x-5">
+        <div class="flex items-center space-x-5">
           <img
             src="@/assets/img/pdf.png"
             class="h-8"
@@ -138,10 +146,7 @@ export default {
         .replace(/[^\w\s]/gi, "");
       var name = this.title + currentDate + ".pdf";
       this.filename = name;
-      const title = this.title;
-
-      const Parse = require("parse");
-      const app_id = this.appId;
+      let _this = this;
       const parseFile = new Parse.File(this.filename, this.dropzoneFile);
       parseFile.save().then(
         function () {
@@ -150,10 +155,13 @@ export default {
           // documentType, filename, document, applicationId
           //applicationId - reference to the parent application
           var ApplicationDocument = new Parse.Object("ApplicationDocument");
-          ApplicationDocument.set("documentType", title);
+          ApplicationDocument.set("documentType", _this.title);
           ApplicationDocument.set("filename", name);
           ApplicationDocument.set("document", parseFile);
-          ApplicationDocument.set("applicationId", app_id);
+          ApplicationDocument.set(
+            "applicationId",
+            new Parse.Object("Application", { id: _this.appId })
+          );
           ApplicationDocument.save().then(() => {
             // get the url of the document saved in parse
             // then set it as the href of element with id=fileurl
@@ -177,7 +185,10 @@ export default {
       // condition: the document's type must be equal to this.title
       const Document = Parse.Object.extend("ApplicationDocument");
       const Appdocument = new Parse.Query(Document);
-      Appdocument.equalTo("applicationId", appId);
+      Appdocument.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: appId })
+      );
       Appdocument.equalTo("documentType", this.title);
       const results = await Appdocument.first();
 
