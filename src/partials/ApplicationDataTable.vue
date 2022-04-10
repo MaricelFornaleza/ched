@@ -202,11 +202,11 @@ export default {
       this.$emit("displayMsg", "success", "Download successful!");
     },
     variant(stats) {
-      if (stats == "APPROVED") {
+      if (stats == "Approved") {
         return "badge-success";
-      } else if (stats == "FOR APPROVAL") {
+      } else if (stats == "For Approval") {
         return "badge-warning";
-      } else if (stats == "FOR REVISION") {
+      } else if (stats == "For Revision") {
         return "badge-error";
       } else {
         //Ongoing

@@ -138,7 +138,7 @@ export default {
     };
   },
   props: {
-    lists: Array,
+    lists: Object,
     application_type: String,
   },
   components: {
@@ -146,7 +146,7 @@ export default {
     Select2,
   },
   methods: {
-    nextPage(application_type) {
+    async nextPage(application_type) {
       if (application_type == "new") {
         //new application
         router.push({
@@ -155,28 +155,24 @@ export default {
         });
       } else if (application_type == "additional") {
         //for additional graduates
-        var currentDate = new Date()
-          .toLocaleDateString()
-          .replace(/[^\w\s]/gi, "/");
-        const Application = Parse.Object.extend("Application");
+        // const dateformat = require("dateformat");
+        let currentDate = new Date();
+        // var currentDate = dateformat(now, "dddd, mmmm d, yyyy, h:MM TT");
 
+        const Application = Parse.Object.extend("Application");
         const application = new Application();
 
         application.set("dateApplied", currentDate);
-        application.set("status", "1 OF 5");
-        application.set("hei", this.value);
-        application.set("applicationType", "For Additional Graduates");
-        application.set("nstpProgram", "");
-        application.set("graduates", 0);
-        application.set("dateApproved", "");
-
+        application.set("status", "1 of 5");
         application.set("steps", this.additionalSteps);
+        application.set("applicationType", "For Additional Graduates");
+        application.set("heiId", new Parse.User({ id: this.value }));
+
         application.save().then(
           (application) => {
             router.push({
               name: "Step1",
               params: {
-                step: 1,
                 application: application.id,
               },
             });
