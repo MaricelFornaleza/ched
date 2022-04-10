@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <div
@@ -43,6 +44,7 @@
         <button
           class="btn-sm bg-brand-blue text-light-100 font-bold"
           type="submit"
+          @click="upload()"
         >
           Upload
         </button>
@@ -53,12 +55,31 @@
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
+//import AlertWidget from "@/partials/AlertWidget.vue";
+import heisData from "@/assets/json/heis.json";
+//import HeiDataTable from "@/partials/HeiDatatable.vue";
+//import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
+import Worker from "@/assets/js/parseHei.worker.js";
 import { LibraryIcon } from "@heroicons/vue/solid";
 export default {
+  data() {
+    return {
+      visible: false,
+      completed: false,
+      className: "alert-info",
+      table_headers: { A: "NO.", B: "NAME" },
+      heis: heisData,
+      excelData: [],
+      worker: undefined,
+    };
+  },
   components: {
     LibraryIcon,
+   // AlertWidget,
     DropZone,
+    //HeiDataTable,
+    //ModalWidget,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -70,6 +91,48 @@ export default {
     };    
     
     return { dropzoneFile, drop, selectedFile };
+  },
+  methods: {
+    upload() {
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+
+      if (this.dropzoneFile === "") {
+        this.className = "alert-error";
+      } else if (regex.test(this.dropzoneFile.name)) {
+        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+        this.visible = true;
+        let _this = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+
+          if (typeof Worker !== "undefined") {
+            if (typeof _this.worker == "undefined") {
+              _this.worker = new Worker();
+            }
+            _this.worker.postMessage({
+              d: data,
+            });
+
+            //can be improved by abstraction
+            _this.worker.onmessage = function (event) {
+              _this.table_headers = event.data.headers;
+              _this.heis = event.data.rows;
+              console.log(_this.heis);
+
+              if (event.data.complete) {
+                _this.visible = false;
+               //_this.$emit("complete", step);
+                _this.completed = !_this.completed;
+              }
+            };
+          }
+        };
+        reader.readAsArrayBuffer(this.dropzoneFile);
+      } else {
+        alert("Please upload a .xlsx file!");
+      }
+    },
   },
 };
 </script>

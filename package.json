@@ -20,14 +20,18 @@
     "emailjs-com": "^3.2.0",
     "jquery": "^3.6.0",
     "parse": "^3.4.1",
+    "parse-smtp-template": "^2.2.0",
     "postcss": "^8",
     "register-service-worker": "^1.7.2",
     "tailwindcss": "^3",
     "vue": "^3.2.13",
     "vue-chart-3": "^3.1.4",
+    "vue-plugin-load-script": "^2.1.1",
     "vue-router": "^4.0.13",
     "vue-sidebar-menu": "^5.2.1",
-    "vuex": "^4.0.2"
+    "vue3-select2-component": "^0.1.7",
+    "vuex": "^4.0.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -42,7 +46,8 @@
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.4.8",
     "tailwindcss": "^3.0.23",
-    "vue-cli-plugin-tailwind": "~3.0.0"
+    "vue-cli-plugin-tailwind": "~3.0.0",
+    "worker-loader": "^3.0.8"
   },
   "eslintConfig": {
     "root": true,

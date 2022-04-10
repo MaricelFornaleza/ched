@@ -41,7 +41,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -63,7 +63,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -88,7 +88,7 @@
           <input
             class="
               appearance-none
-              border border-2
+              border-2
               rounded
               w-full
               py-2
@@ -114,7 +114,7 @@
             <input
               class="
                 appearance-none
-                border border-2
+                border-2
                 rounded
                 w-full
                 py-2
@@ -146,13 +146,13 @@
                 py-2
                 text-sm text-dark-100
                 bg-clip-padding
-                border border-2
+                border-2
                 rounded
                 transition
                 ease-in-out
                 m-0
                 focus:outline-none
-              " 
+              "
               v-model="hei_type"
               name="hei_type"
             >
@@ -162,7 +162,7 @@
               <option value="Private">Private</option>
               <option value="OGS">Other GOvernment Schools</option>
             </select>
-        </div>
+          </div>
         </div>
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button class="btn-sm bg-light-300 font-bold" type="button">
@@ -181,8 +181,8 @@
 </template>
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
-import Parse from 'parse';
-import emailjs from '@emailjs/browser';
+import Parse from "parse";
+//import emailjs from '@emailjs/browser';
 
 export default {
   auth: true,
@@ -192,7 +192,7 @@ export default {
   data() {
     return {
       open: true,
-      name: "", 
+      name: "",
       email: "",
       contact_number: "",
       institutional_code: "",
@@ -201,31 +201,33 @@ export default {
   },
   methods: {
     async addHei() {
-      var password = Math.random().toString(36).slice(-8);
+      var password = Math.random().toString(36).slice(-12);
       this.form.password = password;
-      const Hei = Parse.Object.extend("Hei");
-      const hei = new Hei();
-      hei.set("name", this.name);
-      hei.set("email", this.email);
-      hei.set("contact_number", this.contact_number);
-      hei.set("institutional_code", this.institutional_code);
-      hei.set("hei_type", this.hei_type);
-      hei.set("password", this.password);
-      hei.save()
-      .then(function(hei) {
-      // any logic to be executed after the object is saved.
-        
-      alert('New object created with objectId: ' + hei.id);
-      emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
-      .then((result) => {
-      console.log('SUCCESS', result.text);
-      }, (error) => {
-        console.log('FAILED', error.text);
-      });
-      }).catch(function (error){
-        alert('Failed to create new object, with error code: ' + error.message);
-       });
-    }
-  }
+      const User = Parse.Object.extend("User");
+      const user = new User();
+      user.set("name", this.name);
+      user.set("email", this.email);
+      user.set("contact_number", this.contact_number);
+      user.set("institutional_code", this.institutional_code);
+      user.set("hei_type", this.hei_type);
+      user.set("password", this.password);
+      
+      user.save();
+      // .then(function(hei) {
+      //   // any logic to be executed after the object is saved.
+
+      //   alert('New object created with objectId: ' + hei.id);
+      //   emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
+      // .then((result) => {
+      //   console.log('SUCCESS', result.text);
+      // }, (error) => {
+      //   console.log('FAILED', error.text);
+      // });
+      // }).catch(function (error){
+      //   alert('Failed to create new object, with error code: ' + error.message);
+      // });
+
+    },
+  },
 };
 </script>

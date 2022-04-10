@@ -1,0 +1,239 @@
+<template>
+  <div class="p-10">
+    <div class="font-bold uppercase mb-3">{{ hei }}</div>
+    <div class="bg-light-100 h-full w-full p-5 text-center">
+      <div class="flex border-light-300 border-2">
+        <div
+          v-for="step in steps"
+          :key="step.no"
+          @click="activeStep(step.no)"
+          class="step z-50 flex items-center pl-3 cursor-pointer"
+          :class="[
+            currentStep == step.no ? 'active' : '',
+            step.completed ? 'completed' : '',
+          ]"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="
+                rounded-full
+                flex
+                items-center
+                justify-center
+                border-2
+                h-10
+                w-10
+              "
+              :class="[
+                currentStep === step.no
+                  ? 'bg-brand-blue border-brand-blue text-light-100'
+                  : 'border-light-400',
+                step.completed ? 'border-light-100' : '',
+              ]"
+            >
+              {{ step.no }}
+            </div>
+            <div class="text-xs text-left">
+              <div class="uppercase font-bold">Step {{ step.no }}</div>
+              <div class="hidden lg:block">{{ step.title }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <router-view
+        @complete="completeStep"
+        @nextStep="nextStep"
+        @previousStep="previousStep"
+        @goToApplication="goToApplication"
+        @setStatus="setStatus"
+        v-model:isCompleted="isCompleted"
+        :appId="application_id"
+      ></router-view>
+    </div>
+  </div>
+</template>
+<script>
+import router from "../router";
+import Parse from "parse";
+export default {
+  data() {
+    return {
+      hei: "",
+      application_id: "",
+      currentStep: 0,
+      steps: [],
+      isCompleted: false,
+    };
+  },
+  async created() {
+    this.application_id = this.$route.params.application;
+
+    const Application = Parse.Object.extend("Application");
+    const query = new Parse.Query(Application);
+    query.equalTo("objectId", this.application_id);
+    var results = await query.first();
+    this.hei = results.get("hei");
+    this.steps = results.get("steps");
+    this.getCompletedStep();
+    this.isCompleted = this.findStep(this.currentStep);
+  },
+  methods: {
+    activeStep(step) {
+      this.currentStep = step;
+      this.isCompleted = this.findStep(step);
+      router.push({
+        name: "Step" + this.currentStep,
+        params: { application: this.application_id },
+      });
+    },
+
+    findStep(step) {
+      for (var i in this.steps) {
+        if (this.steps[i].no == step) {
+          return this.steps[i].completed;
+        }
+      }
+    },
+    getCompletedStep() {
+      var count = 0;
+      for (var i in this.steps) {
+        if (this.steps[i].completed == true) {
+          count++;
+        }
+      }
+      if (count < 5) {
+        count++;
+      }
+      this.currentStep = count;
+      console.log(count);
+      this.activeStep(count);
+    },
+    completeStep(currentStep) {
+      // console.log(currentStep);
+      for (var i in this.steps) {
+        if (this.steps[i].no == currentStep) {
+          this.steps[i].completed = true;
+          this.isCompleted = this.findStep(currentStep);
+        }
+      }
+      this.saveSteps();
+    },
+    async saveSteps() {
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.application_id);
+      var results = await query.first();
+      results.set("steps", this.steps);
+      results.save().then(
+        () => {
+          console.log("steps saved!");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    },
+    async setStatus(data) {
+      const status = data;
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.application_id);
+      var results = await query.first();
+      results.set("status", status);
+      results.save().then(
+        () => {
+          console.log("status saved!");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    },
+    nextStep() {
+      if (this.currentStep < 5) {
+        this.currentStep++;
+        this.isCompleted = this.findStep(this.currentStep);
+        router.push({
+          name: "Step" + this.currentStep,
+          params: { step: this.currentStep, application: this.application_id },
+        });
+      }
+    },
+    previousStep() {
+      if (this.currentStep > 1) {
+        this.currentStep--;
+        this.isCompleted = this.findStep(this.currentStep);
+        router.push({
+          name: "Step" + this.currentStep,
+          params: { step: this.currentStep, application: this.application_id },
+        });
+      }
+    },
+    goToApplication() {
+      this.$router.push({ name: "application" });
+    },
+  },
+  components: {},
+};
+</script>
+
+
+<style>
+.step {
+  position: relative;
+  width: 20%;
+  height: 100px;
+  margin-left: 0;
+  color: theme("colors.dark.300");
+  background-color: theme("colors.light.300");
+  text-align: center;
+}
+.step:after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 0px;
+  width: 0px;
+  height: 0px;
+  border-top: 50px solid transparent;
+  border-left: 20px solid theme("colors.light.300");
+  border-bottom: 50px solid transparent;
+}
+.step:nth-of-type(1) {
+  z-index: 5;
+}
+.step:nth-of-type(2) {
+  z-index: 4;
+  padding-left: 25px;
+}
+.step:nth-of-type(3) {
+  z-index: 3;
+  padding-left: 25px;
+}
+.step:nth-of-type(4) {
+  z-index: 2;
+  padding-left: 25px;
+}
+.step:nth-of-type(5) {
+  z-index: 1;
+  padding-left: 25px;
+}
+.active {
+  background-color: theme("colors.light.100");
+  color: theme("colors.brand.blue");
+}
+.active:after {
+  border-left: 20px solid theme("colors.light.100");
+}
+.completed {
+  background-color: theme("colors.brand.blue");
+  color: theme("colors.light.100");
+}
+.completed:after {
+  border-left: 20px solid theme("colors.brand.blue");
+}
+.step:nth-of-type(5):after,
+.completed:nth-of-type(5):after {
+  border-left: 0px !important;
+}
+</style>  
