@@ -1,4 +1,5 @@
 <template>
+<div>
   <div
     v-if="!completed"
     class="container w-fit mx-auto flex flex-col items-center justify-center"
@@ -60,6 +61,7 @@
     v-else
     class="container w-fit mx-auto flex flex-col items-center justify-center"
   >
+  </div>
     <ModalWidget v-show="visible">
       <template #body>
         <div
@@ -124,7 +126,7 @@ export default {
       completed: false,
       className: "alert-info",
       table_headers: { A: "NO.", B: "NAME" },
-      heis: {},
+      heis: [],
       excelData: [],
       worker: undefined,
     };

@@ -39,7 +39,7 @@
         "
       >
         <button><BellIcon class="h-6" /></button>
-        <button class="gap-2 flex">
+        <button class="gap-2 flex" @click="logout()">
           <LogoutIcon class="h-6" />
           <div class="hidden lg:block">Logout</div>
         </button>
@@ -49,6 +49,7 @@
 </template>
 <script>
 import { BellIcon, LogoutIcon } from "@heroicons/vue/outline";
+import Parse from "parse";
 
 export default {
   name: "TopNavigation",
@@ -56,6 +57,16 @@ export default {
     BellIcon,
     LogoutIcon,
   },
+  methods: {
+    async logout() {
+      await Parse.User.logOut();
+      const currentUser = await Parse.User.current();
+      if (currentUser === null) {
+        alert("success");
+        this.$router.push({ name: "landing" });
+      }
+    }
+  }
 };
 </script>
 
