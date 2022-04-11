@@ -149,7 +149,7 @@
 import DropZone from "@/partials/DropZone.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
 import studentsData from "@/assets/json/students.json";
-import StudentsDataTable from "@/partials/StudentsDataTable.vue";
+import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/parseFile.worker.js";
