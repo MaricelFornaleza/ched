@@ -8,4 +8,5 @@ import router from './router'
 Parse.initialize("myAppId", "jsKey");  // can use masterKey but should remove jsKey in parse-server to work....
 Parse.serverURL = 'http://localhost:1337/api';
 
+
 createApp(App).use(router).mount('#app')

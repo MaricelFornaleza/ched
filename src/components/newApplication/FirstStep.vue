@@ -52,12 +52,12 @@
 
     <div
       v-else
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
+      class="container mx-auto flex flex-col items-center justify-center"
     >
-      <AlertWidget className="alert-success">
+      <SuccessAlert className="alert-success">
         The list for the 1st semester was successfully uploaded. An
         Acknowledgement letter was sent to the email address.
-      </AlertWidget>
+      </SuccessAlert>
 
       <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
         <div class="flex flex-col items-center">
@@ -147,7 +147,7 @@
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
-import AlertWidget from "@/partials/AlertWidget.vue";
+import SuccessAlert from "@/partials/SuccessAlert.vue";
 import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDataTable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
@@ -171,7 +171,7 @@ export default {
     };
   },
   components: {
-    AlertWidget,
+    SuccessAlert,
     DropZone,
     StudentsDataTable,
     ModalWidget,

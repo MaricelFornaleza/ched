@@ -1,6 +1,6 @@
 <template>
   <!-- When hei is empty -->
-  <div v-if="empty == true">
+  <div v-if="heis == ''">
     <EmptyState>
       <p class="text-4xl font-medium text-dark-300">No Heis</p>
       <p class="body-l text-dark-200">Get started by creating a new hei</p>
@@ -144,16 +144,10 @@ import EmptyState from "@/components/EmptyState.vue";
 import { LibraryIcon } from "@heroicons/vue/solid";
 import VueDataTable from "@/partials/VueDataTable.vue";
 import { ChevronDownIcon } from "@heroicons/vue/outline";
+import Parse from "parse";
 export default {
   name: "HEIView",
-  components: {
-    EmptyState,
-    SimpleWidget,
-    LibraryIcon,
-    VueDataTable,
 
-    ChevronDownIcon,
-  },
   data() {
     return {
       empty: false,
@@ -164,38 +158,41 @@ export default {
         { title: "Type" },
         { title: "Email" },
       ],
-      heis: [
-        {
-          institutional_code: 1,
-          hei_name: "Ateneo de Naga University",
-          hei_type: "Private",
-          email: "areneo@gbox.adnu.edu.ph",
-        },
-        {
-          institutional_code: 2,
-          hei_name: "Bicol University - Main Campus",
-          hei_type: "SUC",
-          email: "areneo@gbox.adnu.edu.ph",
-        },
-        {
-          institutional_code: 3,
-          hei_name: "Bicol University - Main Campus",
-          hei_type: "Private",
-          email: "areneo@gbox.adnu.edu.ph",
-        },
-        {
-          institutional_code: 4,
-          hei_name: "Bicol University - Main Campus",
-          hei_type: "Private",
-          email: "areneo@gbox.adnu.edu.ph",
-        },
-      ],
+      heis: [],
     };
   },
+
   methods: {
     dropdownToggle() {
       this.dropdown = !this.dropdown;
     },
+  },
+  async mounted() {
+    var hei = [];
+    const query = new Parse.Query(Parse.User);
+
+    query.equalTo("userType", "hei");
+    const result = await query.find();
+    for (let i = 0; i < result.length; i++) {
+      const object = result[i];
+      hei.push({
+        id: object.id,
+        institutional_code: object.get("institutionalCode"),
+        hei_name: object.get("name"),
+        hei_type: object.get("type"),
+        email: object.get("email"),
+      });
+    }
+    this.heis = hei;
+    console.log(this.heis);
+  },
+  components: {
+    EmptyState,
+    SimpleWidget,
+    LibraryIcon,
+    VueDataTable,
+
+    ChevronDownIcon,
   },
 };
 </script>

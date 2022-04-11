@@ -8,7 +8,7 @@
       </button>
     </div>
     <div class="overflow-x-auto">
-      <table id="dataTable" class="p-4 hover">
+      <table id="dataTable2" class="p-4 hover">
         <thead class="bg-gray-50">
           <tr>
             <th
@@ -23,15 +23,11 @@
           </tr>
         </thead>
         <tbody class="bg-white">
-          <tr
-            v-for="hei in heis"
-            :key="hei.institutional_code"
-            class="whitespace-nowrap"
-          >
+          <tr v-for="hei in heis" :key="hei.id" class="whitespace-nowrap">
             <td class="px-6 py-4 text-sm text-center text-gray-500">
               {{ hei.institutional_code }}
             </td>
-            <td class="px-6 py-4 text-center">
+            <td class="px-6 py-4 text-left">
               <div class="text-sm text-gray-900">{{ hei.hei_name }}</div>
             </td>
             <td class="px-6 py-4 text-center">
@@ -80,16 +76,24 @@ export default {
   data: function () {
     return {};
   },
+
   mounted() {
-    $(document).ready(function () {
-      $("#dataTable").DataTable({
-        language: {
-          searchPlaceholder: "Search",
-          search: "",
-          sLengthMenu: "_MENU_",
-        },
+    $("#datatable2").DataTable().destroy();
+    this.setDatatable();
+    console.log(this.heis);
+  },
+  methods: {
+    setDatatable() {
+      $(document).ready(function () {
+        $("#dataTable2").DataTable({
+          language: {
+            searchPlaceholder: "Search",
+            search: "",
+            sLengthMenu: "_MENU_",
+          },
+        });
       });
-    });
+    },
   },
 };
 </script>

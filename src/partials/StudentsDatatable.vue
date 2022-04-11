@@ -9,18 +9,16 @@
         >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
-              <th class="p-8">
-                {{ table_headers.A }}
-              </th>
-              <th class="text-left">{{ table_headers.F }}</th>
-              <th>{{ table_headers.G }}</th>
-              <th>{{ table_headers.I }}</th>
-              <th>{{ table_headers.H }}</th>
-              <th>{{ table_headers.J }}</th>
-              <th>{{ table_headers.K }}</th>
-              <th>{{ table_headers.T }}</th>
-              <th>{{ table_headers.U }}</th>
-              <th>{{ table_headers.S }}</th>
+              <th class="p-8">No.</th>
+              <th class="text-left">Last name</th>
+              <th>First name</th>
+              <th>Extension Name</th>
+              <th>Middle</th>
+              <th>Birthdate</th>
+              <th>Sex</th>
+              <th>Street/Brgy.</th>
+              <th>Town/City</th>
+              <th>Province</th>
             </tr>
           </thead>
           <tbody class="bg-white text-sm">
@@ -29,24 +27,26 @@
               :key="index"
               class="whitespace-nowrap"
             >
-              <td class="px-6 py-4">{{ student.A }}</td>
-              <td class="px-6 py-4 text-left">{{ student.F }}</td>
+              <td class="px-6 py-4">{{ index }}</td>
+              <td class="px-6 py-4 text-left">
+                {{ student.name.lastName }}
+              </td>
               <td class="px-6 py-4">
                 <div class="text-gray-900">
-                  {{ student.G }}
+                  {{ student.name.firstName }}
                 </div>
               </td>
               <td class="px-6 py-4">
-                <div class="">{{ student.I }}</div>
+                <div class="">{{ student.name.extensionName }}</div>
               </td>
-              <td class="px-6 py-4">{{ student.H }}</td>
+              <td class="px-6 py-4">{{ student.name.middleName }}</td>
               <td class="px-6 py-4">
-                {{ student.J }}
+                {{ student.birthdate }}
               </td>
-              <td class="px-6 py-4">{{ student.K }}</td>
-              <td class="px-6 py-4">{{ student.T }}</td>
-              <td class="px-6 py-4">{{ student.U }}</td>
-              <td class="px-6 py-4">{{ student.S }}</td>
+              <td class="px-6 py-4">{{ student.gender }}</td>
+              <td class="px-6 py-4">{{ student.address.street }}</td>
+              <td class="px-6 py-4">{{ student.address.city }}</td>
+              <td class="px-6 py-4">{{ student.address.province }}</td>
             </tr>
           </tbody>
         </table>
@@ -66,28 +66,32 @@ import $ from "jquery";
 
 export default {
   components: {},
-  mounted() {
-    $(document).ready(function () {
-      $("#dataTable").DataTable({
-        language: {
-          searchPlaceholder: "Search",
-          search: "",
-          sLengthMenu: "_MENU_",
-        },
-        scrollX: true,
-      });
-    });
+  data() {
+    return {};
+  },
+  props: { students: Object },
+
+  created() {
+    this.updateDt();
 
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
   },
-  data: function () {
-    return {
-      example: { A: "Hi", B: "Hey" },
-    };
-  },
-  props: {
-    table_headers: Object,
-    students: Array,
+  methods: {
+    updateDt() {
+      $("#datatable").DataTable().destroy();
+      $(document).ready(function () {
+        $("#dataTable").DataTable({
+          processing: true,
+          retrieve: true,
+          language: {
+            searchPlaceholder: "Search",
+            search: "",
+            sLengthMenu: "_MENU_",
+          },
+          scrollX: true,
+        });
+      });
+    },
   },
 };
 </script>
