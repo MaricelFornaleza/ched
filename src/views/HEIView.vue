@@ -179,7 +179,7 @@ export default {
         id: object.id,
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
-        hei_type: object.get("type"),
+        hei_type: object.get("heiType"),
         email: object.get("email"),
       });
     }
