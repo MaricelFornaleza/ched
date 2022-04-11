@@ -101,11 +101,16 @@
             <td v-else class="px-6 py-4">
               <div class="">{{ application.program }}</div>
             </td>
-            <td class="px-6 py-4">{{ application.no_of_graduates }}</td>
+            <td v-if="application.no_of_graduates == ''" class="px-6 py-4">
+              0
+            </td>
+            <td v-else class="px-6 py-4">{{ application.no_of_graduates }}</td>
             <td class="px-6 py-4">
               {{ application.date_applied }}
             </td>
-            <td v-if="application.date_approved == ''" class="px-6 py-4">NA</td>
+            <td v-if="application.date_approved == undefined" class="px-6 py-4">
+              NA
+            </td>
             <td v-else class="px-6 py-4">{{ application.date_approved }}</td>
             <td class="px-6 py-4">
               <span :class="variant(application.status)">{{

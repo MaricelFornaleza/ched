@@ -44,7 +44,7 @@ const routes = [
     path: "/nstp",
     component: ViewLayout,
       beforeEnter: () => {
-        if (Parse.User.current().get("user_type") !== "admin") {
+        if (Parse.User.current().get("userType") !== "admin") {
           return { name: '403' }
         } 
       }, 

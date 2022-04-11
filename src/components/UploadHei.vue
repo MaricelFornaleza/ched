@@ -56,7 +56,7 @@
 <script>
 import DropZone from "@/partials/DropZone.vue";
 //import AlertWidget from "@/partials/AlertWidget.vue";
-import heisData from "@/assets/json/heis.json";
+// import heisData from "@/assets/json/heis.json";
 //import HeiDataTable from "@/partials/HeiDatatable.vue";
 //import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
@@ -69,14 +69,14 @@ export default {
       completed: false,
       className: "alert-info",
       table_headers: { A: "NO.", B: "NAME" },
-      heis: heisData,
+      heis: [],
       excelData: [],
       worker: undefined,
     };
   },
   components: {
     LibraryIcon,
-   // AlertWidget,
+    // AlertWidget,
     DropZone,
     //HeiDataTable,
     //ModalWidget,
@@ -85,11 +85,11 @@ export default {
     let dropzoneFile = ref("");
     const drop = (e) => {
       dropzoneFile.value = e.dataTransfer.files[0];
-    }; 
+    };
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
-    };    
-    
+    };
+
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {
@@ -122,7 +122,7 @@ export default {
 
               if (event.data.complete) {
                 _this.visible = false;
-               //_this.$emit("complete", step);
+                //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
               }
             };

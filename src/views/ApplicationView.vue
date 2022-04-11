@@ -227,6 +227,7 @@ export default {
     this.for_revision = count3.length;
 
     this.applications = data;
+    console.log(this.applications);
   },
 
   components: {
