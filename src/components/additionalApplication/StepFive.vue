@@ -9,7 +9,7 @@
         <tr>
           <td class="border p-2">Date Approved</td>
           <td class="border p-2">
-            <span :class="variant(data.status)">{{ data.status }}</span>
+            {{ data.dateApproved }}
           </td>
         </tr>
         <tr>
@@ -22,11 +22,11 @@
         </tr>
         <tr>
           <td class="border p-2">Award Year</td>
-          <td class="border p-2">{{ data.female }}</td>
+          <td class="border p-2">{{ data.awardYear }}</td>
         </tr>
         <tr>
           <td class="border p-2">Serial Number Range</td>
-          <td class="border p-2">{{ data.male }}</td>
+          <td class="border p-2">{{ data.snRange }}</td>
         </tr>
 
         <tr>
@@ -113,18 +113,28 @@ export default {
             month: "long",
             day: "numeric",
           });
-        // _this.data.dateApproved = results[0]
-        //   .get("applicationId")
-        //   .get("dateApproved")
-        //   .toLocaleDateString("en", {
-        //     weekday: "long",
-        //     year: "numeric",
-        //     month: "long",
-        //     day: "numeric",
-        //   });
-        // _this.data.awardYear = results[0].get("applicationId").get("awardYear");
+        _this.data.dateApproved = results[0]
+          .get("applicationId")
+          .get("dateApproved")
+          .toLocaleDateString("en", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        _this.data.awardYear = results[0].get("applicationId").get("awardYear");
+        console.log(_this.data.dateApproved + " " + _this.data.awardYear);
 
         _this.data.program = results[0].get("nstpId").get("programName");
+        const sn = results[0].get("applicationId").get("serialNumber");
+        _this.data.snRange =
+          _this.data.program.charAt(0) +
+          "-" +
+          (sn.start + "").padStart(6, "0") +
+          "-" +
+          (sn.end + "").padStart(6, "0") +
+          "-" +
+          _this.data.awardYear.slice(-2);
       });
     },
     setStatus(status) {
