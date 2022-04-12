@@ -209,7 +209,7 @@ export default {
       user.set("username", this.email);
       user.set("contactNumber", this.contact_number);
       user.set("institutionalCode", this.institutional_code);
-      user.set("heiType", this.hei_type);
+      user.set("type", this.hei_type);
       user.set("password", password);
       user.set("userType", "hei");
       user.save();
