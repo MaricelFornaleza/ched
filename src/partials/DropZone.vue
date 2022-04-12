@@ -30,7 +30,8 @@
       </span>
       <span class="body-m"
         >Must be .xlsx file using this
-        <button class="font-bold underline">template</button>.</span>
+        <button class="font-bold underline">template</button>.</span
+      >
 
       <input type="file" id="dropzoneFile" class="dropzoneFile" />
     </div>
@@ -42,12 +43,7 @@
   display: none;
 }
 .active-dropzone {
-  color: #fff;
-  border-color: #fff;
-  background-color: theme("colors.brand.blue");
-}
-.active-dropzone .icon {
-  color: #fff;
+  background-color: theme("colors.info.light");
 }
 </style>
 

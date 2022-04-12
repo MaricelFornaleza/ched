@@ -118,6 +118,8 @@ import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/parseHei.worker.js";
 import { LibraryIcon } from "@heroicons/vue/solid";
+import Parse from "parse";
+
 export default {
   data() {
     return {
@@ -172,13 +174,15 @@ export default {
             //can be improved by abstraction
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
-              _this.heis = event.data.rows;
-              console.log(_this.heis);
+              var heis = event.data.rows;
+              console.log(heis);
+              _this.storeHeis(heis);
 
               if (event.data.complete) {
                 _this.visible = false;
                 //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
+                _this.$router.push({ name: "hei" });
               }
             };
           }
@@ -186,6 +190,29 @@ export default {
         reader.readAsArrayBuffer(this.dropzoneFile);
       } else {
         alert("Please upload a .xlsx file!");
+      }
+    },
+       storeHeis(data) {
+      for (let i = 0; i < data.length; i++) {
+        const user = new Parse.Object("User");
+        user.set("institutionalCode", data[i].A);
+        user.set("name", data[i].B);
+        user.set("address", {
+          street: data[i].C,
+          barangay: data[i].D,
+          city: data[i].E,
+          province: data[i].F,
+          regionNo: data[i].G,
+          regionName: data[i].H,
+        });
+        user.set("email", data[i].I);
+        user.set("contactNumber", data[i].J);
+        user.set("type", data[i].K);
+        user.set("userType", "hei"); 
+        user.set("username", data[i].L);
+        user.save().then(() => {
+          alert("success");
+        });
       }
     },
   },
