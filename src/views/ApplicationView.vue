@@ -51,17 +51,17 @@
             <template v-slot:count>{{ for_approval }}</template>
             <template v-slot:label>For Approval</template>
           </simple-widget>
-          <simple-widget bgColor="bg-info-light" textColor="text-info">
+          <simple-widget bgColor="bg-success-light" textColor="text-success">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ approved }}</template>
             <template v-slot:label>Approved</template>
           </simple-widget>
-          <simple-widget bgColor="bg-success-light" textColor="text-success">
+          <simple-widget bgColor="bg-error-light" textColor="text-error">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ for_revision }}</template>
             <template v-slot:label>For Revision</template>
           </simple-widget>
-          <simple-widget bgColor="bg-error-light" textColor="text-error">
+          <simple-widget bgColor="bg-info-light" textColor="text-info">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ total_applications }}</template>
             <template v-slot:label>Total Applications</template>

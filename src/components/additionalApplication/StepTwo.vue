@@ -118,7 +118,8 @@ export default {
       title: "ProofOfcompletion",
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: { isCompleted: Boolean, appId: String, hei_username: String },
+
   components: {
     SuccessAlert,
     AlertWidget,

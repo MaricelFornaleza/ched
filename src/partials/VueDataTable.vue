@@ -80,7 +80,7 @@ export default {
   mounted() {
     $("#datatable2").DataTable().destroy();
     this.setDatatable();
-    console.log(this.heis);
+    // console.log(this.heis);
   },
   methods: {
     setDatatable() {

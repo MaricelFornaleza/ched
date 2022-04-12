@@ -184,7 +184,7 @@ export default {
       });
     }
     this.heis = hei;
-    console.log(this.heis);
+    // console.log(this.heis);
   },
   components: {
     EmptyState,
