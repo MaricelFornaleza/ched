@@ -1,10 +1,10 @@
 <template>
   <div>
     <div
-      v-if="!completed"
+      v-if="!isCompleted"
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
-      <AlertWidget :className="className">
+      <AlertWidget className="alert-info">
         Please Upload the List of Enrollment for First Semester. Follow the
         format provided in the Template.&nbsp;
         <router-link to="/#" class="font-bold underline">
@@ -33,14 +33,14 @@
 
       <div class="flex items-center justify-center space-x-5 mt-5">
         <button
-          @click="$emit('previousStep')"
+          @click="goToApplication()"
           class="btn-sm btn-default btn-outline"
           type="button"
         >
           Cancel
         </button>
         <button
-          v-if="!completed"
+          v-if="!isCompleted"
           @click="upload(1)"
           class="btn-sm btn-default"
           type="submit"
@@ -82,7 +82,7 @@
 
       <div class="flex items-center justify-center space-x-5 mt-5">
         <button
-          @click="$emit('previousStep')"
+          @click="goToApplication()"
           class="btn-sm btn-default btn-outline"
           type="button"
         >
@@ -147,20 +147,20 @@
 
 <script>
 import DropZone from "@/partials/DropZone.vue";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
 import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/parseFile.worker.js";
-// import Parse from 'parse';
+import Parse from 'parse';
 
 export default {
   // inheritAttrs: false,
   data() {
     return {
       visible: false,
-      completed: false,
       className: "alert-info",
       table_headers: { A: "NO.", B: "NAME" },
       students: studentsData,
@@ -168,9 +168,15 @@ export default {
       female_num: 0,
       excelData: [],
       worker: undefined,
+      checkedData: true,
+      acadYear: "",
+      nstp: "",
+      nstpId: "",
     };
   },
+  props: { isCompleted: Boolean, appId: String },
   components: {
+    AlertWidget,
     SuccessAlert,
     DropZone,
     StudentsDataTable,
@@ -185,6 +191,9 @@ export default {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
     };
     return { dropzoneFile, drop, selectedFile };
+  },
+  created() {
+    this.getStudents();
   },
   methods: {
     upload(step) {
@@ -211,14 +220,38 @@ export default {
             //can be improved by abstraction
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
-              _this.students = event.data.rows;
+              var students = event.data.rows;
               _this.male_num = event.data.male;
               _this.female_num = event.data.female;
-              // console.log(_this.students);
-              if (event.data.complete) {
-                _this.visible = false;
-                _this.$emit("complete", step);
-                _this.completed = !_this.completed;
+
+              if (_this.checkData(students)) {
+
+                _this.setAcadYear(_this.acadYear);
+                _this.getNstpId(_this.nstp)
+                  .then(result => {
+                      _this.storeStudents(students);
+                  })
+                console.log("success");
+
+               
+                  // .then((studentList) => {
+                  //     console.log("Lists: " + studentList);
+                  //     _this.students = studentList;
+                  //     if (event.data.complete) {
+                  //       _this.visible = false;
+                  //       _this.$emit("complete", step);
+                  //       _this.$emit("setStatus", "2 of 5");
+                  //     }
+                  //   }).catch((e) => {
+                  //     console.log("Error: " + e); 
+                  //   });
+                  if (event.data.complete) {
+                        _this.visible = false;
+                        _this.$emit("complete", step);
+                        _this.$emit("setStatus", "2 of 5");
+                      }
+              } else {
+                console.log("error");
               }
             };
           }
@@ -228,11 +261,110 @@ export default {
         alert("Please upload a .xlsx file!");
       }
     },
+    storeStudents(data) {
+      for (let i = 0; i < data.length; i++) {
+        const student = new Parse.Object("Student");
+        const nstpEnrollment = new Parse.Object("NstpEnrollment");
+        student.set("name", {
+          lastName: data[i].F,
+          firstName: data[i].G,
+          extensionName: data[i].H,
+          middleName: data[i].I,
+        });
+        student.set("birthdate", data[i].J);
+        student.set("gender", data[i].K);
+        student.set("emailAddress", data[i].T);
+        student.set("contactNumber", data[i].U);
+        student.set("address", {
+          street: data[i].L,
+          city: data[i].M,
+          province: data[i].N,
+          region: data[i].D,
+        });
+        student.set("program", {
+          programLevelCode: data[i].R,
+          programName: data[i].S,
+        });
+
+        student.save().then((student) => {
+          nstpEnrollment.set(
+            "studentId",
+            new Parse.Object("Student", { id: student.id })
+          );
+          nstpEnrollment.set(
+            "nstpId",
+            new Parse.Object("Nstp", { id: this.nstpId })
+          );
+          nstpEnrollment.set(
+            "applicationId",
+            new Parse.Object("Application", { id: this.appId })
+          );
+          nstpEnrollment.set("takenNstp1", true);
+          nstpEnrollment.save();
+        });
+      }
+      // console.log(studentList);
+      // return Promise.resolve(studentList);
+    },
+    checkData(data) {
+      for (let i = 0; i < data.length; i++) {
+        this.acadYear = data[0].B;
+        this.nstp = data[0].C;
+
+        if (data[i].B != this.acadYear || data[i].C != this.nstp) {   //acadYears and NSTP program must be the same in all rows
+          this.checkedData = false;
+        }
+      }
+      return this.checkedData;
+    },
+    async setAcadYear(acadYear) {
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.appId);
+      var results = await query.first();
+      results.set("academicYear", acadYear);
+      results.save();
+    },
+    async getNstpId(nstp) {
+      const Nstp = Parse.Object.extend("Nstp");
+      const query = new Parse.Query(Nstp);
+      query.equalTo("programName", nstp);
+      var result = await query.first();
+      this.nstpId = result.id;
+    },
+    async getStudents() {
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      // query.equalTo("applicationId", this.appId);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.include("studentId");
+      var results = await query.find();
+      var studentList = [];
+
+      for (let i = 0; i < results.length; i++) {
+        studentList.push({
+          name: results[i].get("studentId").get("name"),
+          birthdate: results[i].get("studentId").get("birthdate"),
+          gender: results[i].get("studentId").get("gender"),
+          address: results[i].get("studentId").get("address"),
+        });
+      }
+      this.students = studentList;
+      // console.log("studentList" + studentList);
+      
+    },
+
     nextStep() {
       this.worker.terminate();
       this.worker = undefined;
 
       this.$emit("nextStep");
+    },
+    goToApplication() {
+      this.$emit("goToApplication");
     },
   },
 };
