@@ -200,19 +200,20 @@ export default {
     };
   },
   methods: {
-    async addHei() {
+    addHei() {
       var password = Math.random().toString(36).slice(-12);
-      this.form.password = password;
       const User = Parse.Object.extend("User");
       const user = new User();
       user.set("name", this.name);
       user.set("email", this.email);
-      user.set("contact_number", this.contact_number);
-      user.set("institutional_code", this.institutional_code);
-      user.set("hei_type", this.hei_type);
+      user.set("username", this.email);
+      user.set("contactNumber", this.contact_number);
+      user.set("institutionalCode", this.institutional_code);
+      user.set("type", this.hei_type);
       user.set("password", password);
-      user.set("user_type", "hei");
+      user.set("userType", "hei");
       user.save();
+      this.$router.push({ name: "hei" });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
 
