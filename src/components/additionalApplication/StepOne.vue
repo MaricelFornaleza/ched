@@ -118,7 +118,7 @@ export default {
       title: "NotarizedTransmittalLetter",
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: { isCompleted: Boolean, appId: String, hei_username: String },
 
   components: {
     SuccessAlert,
@@ -145,7 +145,7 @@ export default {
       var currentDate = new Date()
         .toLocaleDateString()
         .replace(/[^\w\s]/gi, "");
-      var name = this.title + currentDate + ".pdf";
+      var name = this.hei_username + "-" + this.title + currentDate + ".pdf";
       this.filename = name;
       let _this = this;
       const parseFile = new Parse.File(this.filename, this.dropzoneFile);

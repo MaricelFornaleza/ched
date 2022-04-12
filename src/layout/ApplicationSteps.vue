@@ -48,6 +48,7 @@
         @setStatus="setStatus"
         v-model:isCompleted="isCompleted"
         :appId="application_id"
+        :hei_username="hei_username"
       ></router-view>
     </div>
   </div>
@@ -59,6 +60,7 @@ export default {
   data() {
     return {
       hei: "",
+      hei_username: "",
       application_id: "",
       currentStep: 0,
       steps: [],
@@ -71,8 +73,11 @@ export default {
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.application_id);
+    query.include("heiId");
     var results = await query.first();
-    this.hei = results.get("hei");
+    this.hei = results.get("heiId").get("name");
+    this.hei_username = results.get("heiId").get("username");
+    console.log(this.hei_username);
     this.steps = results.get("steps");
     this.getCompletedStep();
     this.isCompleted = this.findStep(this.currentStep);

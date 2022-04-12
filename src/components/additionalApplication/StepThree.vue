@@ -66,11 +66,18 @@
           <p class="uppercase">male</p>
         </div>
         <div class="flex flex-col items-center">
-          <h2 class="">{{ male_num + female_num }}</h2>
+          <h2 class="">{{ total }}</h2>
           <p class="uppercase">total</p>
         </div>
       </div>
-      <span v-if="students == ''">Loading...</span>
+      <button
+        v-if="students == ''"
+        @click="getStudents()"
+        class="px-5 py-2 bg-success text-light-100 rounded mx-10"
+      >
+        Click to View List of Students
+      </button>
+
       <StudentsDataTable v-else :students="students"></StudentsDataTable>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
@@ -159,6 +166,7 @@ export default {
       table_headers: { A: "NO.", B: "NAME" },
       students: [],
       male_num: 0,
+      total: 0,
 
       female_num: 0,
       excelData: [],
@@ -170,13 +178,7 @@ export default {
     };
   },
   props: { isCompleted: Boolean, appId: String },
-  components: {
-    SuccessAlert,
-    AlertWidget,
-    DropZone,
-    StudentsDataTable,
-    ModalWidget,
-  },
+
   setup() {
     let dropzoneFile = ref("");
     const drop = (e) => {
@@ -220,11 +222,11 @@ export default {
               var students = event.data.rows;
               _this.male_num = event.data.male;
               _this.female_num = event.data.female;
+              _this.total = _this.male_num + _this.female_num;
 
               if (_this.checkData(students)) {
                 _this.setAcadYear(_this.acadYear);
                 _this.getNstpId(_this.nstp);
-                console.log("success");
 
                 _this.storeStudents(students);
               } else {
@@ -318,6 +320,10 @@ export default {
     },
 
     async getStudents() {
+      var studentList = [];
+      this.female_num = 0;
+      this.male_num = 0;
+      this.total = 0;
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       // query.equalTo("applicationId", this.appId);
@@ -326,17 +332,24 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
-      var results = await query.find();
-      var studentList = [];
+      const results = await query.find();
 
       for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+
         studentList.push({
-          name: results[i].get("studentId").get("name"),
-          birthdate: results[i].get("studentId").get("birthdate"),
-          gender: results[i].get("studentId").get("gender"),
-          address: results[i].get("studentId").get("address"),
+          name: object.get("studentId").get("name"),
+          birthdate: object.get("studentId").get("birthdate"),
+          gender: object.get("studentId").get("gender"),
+          address: object.get("studentId").get("address"),
         });
+        if (object.get("studentId").get("gender") == "F") {
+          this.female_num++;
+        } else if (object.get("studentId").get("gender") == "M") {
+          this.male_num++;
+        }
       }
+      this.total = this.female_num + this.male_num;
       this.students = studentList;
 
       console.log(results);
@@ -349,6 +362,13 @@ export default {
 
       this.$emit("nextStep");
     },
+  },
+  components: {
+    SuccessAlert,
+    AlertWidget,
+    DropZone,
+    StudentsDataTable,
+    ModalWidget,
   },
 };
 </script>

@@ -210,8 +210,8 @@ export default {
       user.set("contact_number", this.contact_number);
       user.set("institutional_code", this.institutional_code);
       user.set("hei_type", this.hei_type);
-      user.set("password", this.password);
-      user.set("user_type", "Hei");
+      user.set("password", password);
+      user.set("user_type", "hei");
       user.save();
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
@@ -226,7 +226,6 @@ export default {
       // }).catch(function (error){
       //   alert('Failed to create new object, with error code: ' + error.message);
       // });
-
     },
   },
 };

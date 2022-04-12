@@ -172,7 +172,7 @@ export default {
     const query = new Parse.Query(Parse.User);
 
     query.equalTo("userType", "hei");
-    const result = await query.find();
+    const result = await query.find({ useMasterKey: true });
     for (let i = 0; i < result.length; i++) {
       const object = result[i];
       hei.push({
