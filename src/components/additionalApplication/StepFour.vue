@@ -30,14 +30,14 @@
         </tr>
         <tr>
           <td class="border p-2">Academic Year</td>
-          <td class="border p-2">{{ data.awardYear }}</td>
+          <td class="border p-2">{{ data.acadYear }}</td>
         </tr>
       </tbody>
     </table>
     <div class="flex justify-center space-x-5">
-      <button>Back</button>
-      <button>For Revision</button>
-      <button>Approve</button>
+      <button class="btn-sm btn-default btn-outline">Back</button>
+      <button class="btn-sm text-light-100 bg-error">For Revision</button>
+      <button class="btn-sm text-light-100 bg-success">Approve</button>
     </div>
   </div>
 </template>
@@ -54,7 +54,7 @@ export default {
         female: 0,
         male: 0,
         program: "",
-        awardYear: "",
+        acadYear: "",
       },
     };
   },
@@ -87,14 +87,26 @@ export default {
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo("applicationId", application);
       query.include("applicationId");
+      query.include("nstpId");
 
       await query.find().then(function (results) {
         _this.data.graduates = results.length;
         _this.data.status = results[0].get("applicationId").get("status");
+        _this.data.acadYear = results[0]
+          .get("applicationId")
+          .get("academicYear");
         _this.data.dateApplied = results[0]
           .get("applicationId")
-          .get("dateApplied");
+          .get("dateApplied")
+          .toLocaleDateString("en", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        _this.data.program = results[0].get("nstpId").get("programName");
       });
+
       const f = innerquery.equalTo("gender", "F");
       query.matchesQuery("studentId", f);
       await query.find().then(function (results) {
