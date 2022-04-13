@@ -162,12 +162,14 @@
     inline-flex 
     items-center 
     justify-center 
-    px-3 py-1 
-    text-xs 
+    px-3 py-2 
+    label-xs 
     font-semibold 
     leading-none 
-    text-light-100 
-    bg-info-dark 
+    
+    bg-info-light
+   border border-info
+    text-info 
     rounded-full;
   }
   .badge-success {
@@ -175,12 +177,13 @@
     inline-flex 
     items-center 
     justify-center 
-    px-2 py-1 
-    text-xs 
+    px-3 py-2 
+    label-xs 
     font-semibold 
     leading-none 
-    text-light-100 
-    bg-success-dark 
+    text-success
+    border border-success 
+    bg-success-light 
     rounded-full;
   }
   .badge-warning {
@@ -188,12 +191,13 @@
     inline-flex 
     items-center 
     justify-center 
-    px-2 py-1 
-    text-xs 
+    px-3 py-2 
+    label-xs 
     font-semibold 
     leading-none 
-    text-light-100 
-    bg-warning 
+    text-warning
+    border border-warning 
+    bg-warning-light 
     rounded-full;
   }
   .badge-error {
@@ -201,12 +205,13 @@
     inline-flex 
     items-center 
     justify-center 
-    px-2 py-1 
-    text-xs 
+    px-3 py-2 
+    label-xs 
     font-semibold 
     leading-none 
-    text-light-100 
-    bg-error-dark 
+    text-error
+    border border-error 
+    bg-error-light 
     rounded-full;
   }
 

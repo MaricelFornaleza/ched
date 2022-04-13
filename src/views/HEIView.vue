@@ -45,22 +45,22 @@
       <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
         <simple-widget bgColor="bg-warning-light" textColor="text-warning">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ suc }}</template>
           <template v-slot:label>State Universities and Colleges</template>
         </simple-widget>
         <simple-widget bgColor="bg-info-light" textColor="text-info">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ luc }}</template>
           <template v-slot:label>Local Universities and Colleges</template>
         </simple-widget>
         <simple-widget bgColor="bg-success-light" textColor="text-success">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ private_hei }}</template>
           <template v-slot:label>Private</template>
         </simple-widget>
         <simple-widget bgColor="bg-error-light" textColor="text-error">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ ogs }}</template>
           <template v-slot:label>Other Government Schools</template>
         </simple-widget>
       </div>
@@ -82,10 +82,10 @@
                 hover:bg-blue-800
                 focus:ring-4 focus:ring-blue-300
                 font-medium
-                rounded-lg
+                rounded-sm
                 text-sm
                 px-4
-                py-2.5
+                py-2
                 text-center
                 inline-flex
                 items-center
@@ -157,8 +157,13 @@ export default {
         { title: "HEI Name" },
         { title: "Type" },
         { title: "Email" },
+        { title: "Address" },
       ],
       heis: [],
+      private_hei: 0,
+      suc: 0,
+      luc: 0,
+      ogs: 0,
     };
   },
 
@@ -169,6 +174,7 @@ export default {
   },
   async mounted() {
     var hei = [];
+    let _this = this;
     const query = new Parse.Query(Parse.User);
 
     query.equalTo("userType", "hei");
@@ -179,11 +185,29 @@ export default {
         id: object.id,
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
+        hei_username: object.get("username"),
         hei_type: object.get("type"),
         email: object.get("email"),
+        address: object.get("address"),
       });
     }
     this.heis = hei;
+    query.equalTo("type", "LUC");
+    await query.find().then(function (res) {
+      _this.luc = res.length;
+    });
+    query.equalTo("type", "SUC");
+    await query.find().then(function (res) {
+      _this.suc = res.length;
+    });
+    query.equalTo("type", "Private");
+    await query.find().then(function (res) {
+      _this.private_hei = res.length;
+    });
+    query.equalTo("type", "OGS");
+    await query.find().then(function (res) {
+      _this.ogs = res.length;
+    });
     // console.log(this.heis);
   },
   components: {
