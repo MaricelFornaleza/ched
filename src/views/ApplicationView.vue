@@ -194,16 +194,36 @@ export default {
     query.descending("dateApplied");
 
     const results = await query.find();
+    // get nstp enrollment
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    var query2 = new Parse.Query(NstpEnrollment);
+
     console.log(results);
     for (let i = 0; i < results.length; i++) {
       const object = results[i];
+      var count = 0;
+      var prog = "";
+      query2.matches("applicationId", object.id);
+      query2.include("nstpId");
+      await query2.find().then(function (res) {
+        count = res.length;
+      });
+      if (
+        object.get("status") == "For Approval" ||
+        object.get("status") == "For Revision" ||
+        object.get("status") == "Approved"
+      ) {
+        await query2.first().then(function (res) {
+          prog = res.get("nstpId").get("programName");
+        });
+      }
 
       data.push({
         id: object.id,
         hei_name: object.get("heiId").get("name"),
         application_type: object.get("applicationType"),
-        program: "",
-        no_of_graduates: "",
+        program: prog,
+        no_of_graduates: count,
         date_applied: object.get("dateApplied").toLocaleDateString("en", {
           weekday: "long",
           year: "numeric",
