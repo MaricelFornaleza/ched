@@ -7,12 +7,21 @@
             id="dropdownButton"
             @click="dropdownToggle()"
             class="
-              btn-sm btn-default
-              inline-flex
-              items-center
               w-fit
               ml-auto
+              text-light-100
+              bg-brand-blue
+              hover:bg-blue-800
+              focus:ring-4 focus:ring-blue-300
+              font-medium
+              rounded-sm
+              text-sm
               px-4
+              py-2
+              text-center
+              inline-flex
+              items-center
+              dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
             "
             type="button"
           >
@@ -59,22 +68,21 @@
           <button
             @click="exportToExcel()"
             class="
-              btn-sm
               h-fit
-              px-4
-              border-dark-100
+              p-2
+              rounded-sm
               bg-dark-100
               text-light-100
-              hover:ring-4 hover:ring-light-400
+              focus:ring-4 focus:ring-success-light focus:bg-success
             "
           >
-            <CloudDownloadIcon class="h-5" />
+            <DownloadIcon class="h-5" />
           </button>
         </div>
       </div>
 
-      <table id="dataTable" class="p-4 hover text-center w-full bg-light-200">
-        <thead class="bg-gray-50 text-xs uppercase">
+      <table id="dataTable" class="p-4 hover text-center w-full row-border">
+        <thead class="text-xs">
           <tr>
             <th v-for="table_header in table_headers" :key="table_header">
               {{ table_header.title }}
@@ -111,7 +119,16 @@
             <td v-if="application.date_approved == undefined" class="px-6 py-4">
               NA
             </td>
-            <td v-else class="px-6 py-4">{{ application.date_approved }}</td>
+            <td v-else class="px-6 py-4">
+              {{
+                application.date_approved.toLocaleDateString("en", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              }}
+            </td>
             <td class="px-6 py-4">
               <span :class="variant(application.status)">{{
                 application.status
@@ -149,7 +166,7 @@ import Parse from 'parse';
 
 import router from "../router";
 import {
-  CloudDownloadIcon,
+  DownloadIcon,
   ChevronDownIcon,
   EyeIcon,
   TrashIcon,
@@ -157,7 +174,7 @@ import {
 
 export default {
   components: {
-    CloudDownloadIcon,
+    DownloadIcon,
     ChevronDownIcon,
     EyeIcon,
     TrashIcon,

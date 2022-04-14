@@ -192,6 +192,7 @@ export default {
   },
   created() {
     this.getStudents();
+    console.log(this.isCompleted);
   },
   methods: {
     upload(step) {
@@ -288,6 +289,7 @@ export default {
             new Parse.Object("Application", { id: this.appId })
           );
           nstpEnrollment.set("takenNstp1", true);
+          nstpEnrollment.set("takenNstp2", true);
           nstpEnrollment.save();
         });
       }
@@ -357,7 +359,7 @@ export default {
     },
 
     nextStep() {
-      this.worker.terminate();
+      // this.worker.terminate();
       this.worker = undefined;
 
       this.$emit("nextStep");

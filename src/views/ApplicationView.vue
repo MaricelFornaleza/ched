@@ -51,17 +51,17 @@
             <template v-slot:count>{{ for_approval }}</template>
             <template v-slot:label>For Approval</template>
           </simple-widget>
-          <simple-widget bgColor="bg-info-light" textColor="text-info">
+          <simple-widget bgColor="bg-success-light" textColor="text-success">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ approved }}</template>
             <template v-slot:label>Approved</template>
           </simple-widget>
-          <simple-widget bgColor="bg-success-light" textColor="text-success">
+          <simple-widget bgColor="bg-error-light" textColor="text-error">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ for_revision }}</template>
             <template v-slot:label>For Revision</template>
           </simple-widget>
-          <simple-widget bgColor="bg-error-light" textColor="text-error">
+          <simple-widget bgColor="bg-info-light" textColor="text-info">
             <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
             <template v-slot:count>{{ total_applications }}</template>
             <template v-slot:label>Total Applications</template>
@@ -193,16 +193,36 @@ export default {
     query.descending("dateApplied");
 
     const results = await query.find();
+    // get nstp enrollment
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    var query2 = new Parse.Query(NstpEnrollment);
+
     console.log(results);
     for (let i = 0; i < results.length; i++) {
       const object = results[i];
+      var count = 0;
+      var prog = "";
+      query2.matches("applicationId", object.id);
+      query2.include("nstpId");
+      await query2.find().then(function (res) {
+        count = res.length;
+      });
+      if (
+        object.get("status") == "For Approval" ||
+        object.get("status") == "For Revision" ||
+        object.get("status") == "Approved"
+      ) {
+        await query2.first().then(function (res) {
+          prog = res.get("nstpId").get("programName");
+        });
+      }
 
       data.push({
         id: object.id,
         hei_name: object.get("heiId").get("name"),
         application_type: object.get("applicationType"),
-        program: "",
-        no_of_graduates: "",
+        program: prog,
+        no_of_graduates: count,
         date_applied: object.get("dateApplied").toLocaleDateString("en", {
           weekday: "long",
           year: "numeric",

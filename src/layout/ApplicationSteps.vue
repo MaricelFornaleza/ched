@@ -46,9 +46,10 @@
         @previousStep="previousStep"
         @goToApplication="goToApplication"
         @setStatus="setStatus"
-        v-model:isCompleted="isCompleted"
+        :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
+        :hei_region_code="hei_region_code"
       ></router-view>
     </div>
   </div>
@@ -61,6 +62,7 @@ export default {
     return {
       hei: "",
       hei_username: "",
+      hei_region_code: "",
       application_id: "",
       currentStep: 0,
       steps: [],
@@ -77,7 +79,8 @@ export default {
     var results = await query.first();
     this.hei = results.get("heiId").get("name");
     this.hei_username = results.get("heiId").get("username");
-    console.log(this.hei_username);
+    this.hei_region_code = results.get("heiId").get("address").regionNo;
+
     this.steps = results.get("steps");
     this.getCompletedStep();
     this.isCompleted = this.findStep(this.currentStep);

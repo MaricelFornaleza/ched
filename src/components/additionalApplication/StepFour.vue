@@ -34,19 +34,48 @@
         </tr>
       </tbody>
     </table>
-    <div class="flex justify-center space-x-5">
-      <button class="btn-sm btn-default btn-outline">Back</button>
-      <button class="btn-sm text-light-100 bg-error">For Revision</button>
-      <button class="btn-sm text-light-100 bg-success">Approve</button>
+    <div v-if="!isCompleted" class="flex justify-center space-x-5">
+      <button
+        @click="$emit('previousStep')"
+        class="btn-sm btn-default btn-outline"
+      >
+        Back
+      </button>
+      <button
+        @click="setStatus('For Revision')"
+        class="btn-sm text-light-100 bg-error"
+      >
+        For Revision
+      </button>
+      <button @click="approve()" class="btn-sm text-light-100 bg-success">
+        Approve
+      </button>
+    </div>
+    <div v-else class="flex justify-center space-x-5">
+      <button
+        @click="$emit('previousStep')"
+        class="btn-sm btn-default btn-outline"
+      >
+        Back
+      </button>
+
+      <button
+        @click="$emit('nextStep')"
+        class="btn-sm text-light-100 bg-brand-blue"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>
 
 <script>
 import Parse from "parse";
+
 export default {
   data() {
     return {
+      completed: false,
       data: {
         dateApplied: "",
         status: "",
@@ -58,7 +87,8 @@ export default {
       },
     };
   },
-  props: { appId: String },
+  props: { isCompleted: Boolean, appId: String, hei_region_code: String },
+
   mounted() {
     this.getData();
   },
@@ -117,6 +147,64 @@ export default {
       await query.find().then(function (results) {
         _this.data.male = results.length;
       });
+    },
+    setStatus(status) {
+      this.$emit("setStatus", status);
+
+      this.getData();
+    },
+    async approve() {
+      let _this = this;
+      const date = new Date();
+      const fullyear = new Date().getFullYear();
+      const year = new Date().toLocaleDateString("en", { year: "2-digit" });
+      const program = this.data.program.charAt(0);
+
+      const Application = Parse.Object.extend("Application");
+      //get the end of serial number
+      const query = new Parse.Query(Application);
+      query.descending("serialNumber");
+      const serialNumber = await query.first();
+      const endSerialNumber = serialNumber.get("serialNumber").end;
+      const newStart = endSerialNumber + 1;
+      const newEnd = endSerialNumber + this.data.graduates;
+
+      //get application details
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      await application.first().then(function (result) {
+        result.set("dateApproved", date);
+        result.set("awardYear", fullyear.toString());
+        result.set("serialNumber", { start: newStart, end: newEnd });
+        result.save();
+      });
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const enrollment = new Parse.Query(NstpEnrollment);
+      enrollment.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      await enrollment.find().then(function (results) {
+        var start = newStart;
+        // save serial number for each student
+        for (let i = 0; i < results.length; i++) {
+          var sn =
+            program +
+            "-" +
+            _this.hei_region_code.padStart(2, "0") +
+            "-" +
+            (start + "").padStart(6, "0") +
+            "-" +
+            year;
+          results[i].set("serialNumber", sn);
+          results[i].save();
+          start++;
+        }
+      });
+      this.$emit("setStatus", "Approved");
+      this.$emit("complete", 4);
+      this.$emit("nextStep");
     },
   },
 };

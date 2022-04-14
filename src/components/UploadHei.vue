@@ -175,8 +175,9 @@ export default {
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
               var heis = event.data.rows;
+              console.log(_this.table_headers);
               console.log(heis);
-              _this.storeHeis(heis);
+              // _this.storeHeis(heis);
 
               if (event.data.complete) {
                 _this.visible = false;
@@ -192,9 +193,9 @@ export default {
         alert("Please upload a .xlsx file!");
       }
     },
-       storeHeis(data) {
+    storeHeis(data) {
       for (let i = 0; i < data.length; i++) {
-        const user = new Parse.Object("User");
+        const user = new Parse.User();
         user.set("institutionalCode", data[i].A);
         user.set("name", data[i].B);
         user.set("address", {
@@ -208,10 +209,11 @@ export default {
         user.set("email", data[i].I);
         user.set("contactNumber", data[i].J);
         user.set("type", data[i].K);
-        user.set("userType", "hei"); 
+        user.set("userType", "hei");
         user.set("username", data[i].L);
+        user.set("password", "password");
         user.save().then(() => {
-          alert("success");
+          console.log("success");
         });
       }
     },
