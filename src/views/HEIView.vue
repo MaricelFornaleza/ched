@@ -186,7 +186,7 @@ export default {
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
         hei_username: object.get("username"),
-        hei_type: object.get("heiType"),
+        hei_type: object.get("type"),
         email: object.get("email"),
         address: object.get("address"),
       });
