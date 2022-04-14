@@ -69,12 +69,18 @@ export default {
   data() {
     return {};
   },
-  props: { students: Object },
-
+  props: { students: Array },
   created() {
     this.updateDt();
-
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
+    
+  },
+  watch: {
+    students() {
+      console.log("UPDATED students!");
+      console.log(this.students);
+      // this.$forceUpdate();
+    }
   },
   methods: {
     updateDt() {

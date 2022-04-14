@@ -4,16 +4,21 @@
       v-if="!isCompleted"
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
-      <AlertWidget className="alert-info">
+      <AlertWidget :className="className">
         Please Upload the List of Enrollment for First Semester. Follow the
         format provided in the Template.&nbsp;
-        <router-link to="/#" class="font-bold underline">
+        <a :href="templateUrl" class="font-bold underline hover:text-brand-blue" download>
           Download Template
-        </router-link>
+        </a>
       </AlertWidget>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <DropZone @drop.prevent="drop" @change="selectedFile">
+          <span class="body-m">
+            Must be .xlsx file using this
+            <a :href="templateUrl" class="font-bold underline hover:text-brand-blue" download>template</a>.
+          </span>
+        </DropZone>
         <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
       </div>
 
@@ -75,9 +80,8 @@
       </div>
 
       <!-- pass props lists -->
-      <StudentsDataTable
+      <StudentsDataTable :key="componentKey"
         :students="students"
-        :table_headers="table_headers"
       ></StudentsDataTable>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
@@ -95,7 +99,7 @@
       </div>
     </div>
 
-    <ModalWidget v-show="visible">
+    <ModalWidget v-show="pending">
       <template #body>
         <div
           class="
@@ -149,29 +153,26 @@
 import DropZone from "@/partials/DropZone.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
-import studentsData from "@/assets/json/students.json";
+// import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
-import Worker from "@/assets/js/parseFile.worker.js";
+import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from 'parse';
 
 export default {
   // inheritAttrs: false,
   data() {
     return {
-      visible: false,
+      templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_1st_SEM.xlsx",   //may switch to file-loader package to load files
+      componentKey: 0,
+      pending: false,
       className: "alert-info",
-      table_headers: { A: "NO.", B: "NAME" },
-      students: studentsData,
+      students: [],
+      excelData: [],
       male_num: 0,
       female_num: 0,
-      excelData: [],
       worker: undefined,
-      checkedData: true,
-      acadYear: "",
-      nstp: "",
-      nstpId: "",
     };
   },
   props: { isCompleted: Boolean, appId: String },
@@ -196,104 +197,115 @@ export default {
     this.getStudents();
   },
   methods: {
-    upload(step) {
+    forceRerender() {
+      this.componentKey += 1;
+    },
+    validate(filename) {
       var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
-
-      if (this.dropzoneFile === "") {
+      if (filename === "") {
         this.className = "alert-error";
-      } else if (regex.test(this.dropzoneFile.name)) {
-        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
-        this.visible = true;
-        let _this = this;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var data = e.target.result;
+        return false;
+      }
+      else if (regex.test(filename.name)) {
+        return true;
+      }
+      else {
+        alert("Please upload a .xlsx file!");
+        return false;
+      }
 
-          if (typeof Worker !== "undefined") {
-            if (typeof _this.worker == "undefined") {
-              _this.worker = new Worker();
-            }
-            _this.worker.postMessage({
-              d: data,
-            });
-
-            //can be improved by abstraction
-            _this.worker.onmessage = function (event) {
-              _this.table_headers = event.data.headers;
-              var students = event.data.rows;
-              _this.male_num = event.data.male;
-              _this.female_num = event.data.female;
-
-              if (_this.checkData(students)) {
-
-                _this.setAcadYear(_this.acadYear);
-                _this.getNstpId(_this.nstp)
-                  .then(result => {
-                      _this.storeStudents(students);
-                  })
-                console.log("success");
-
-               
-                  // .then((studentList) => {
-                  //     console.log("Lists: " + studentList);
-                  //     _this.students = studentList;
-                  //     if (event.data.complete) {
-                  //       _this.visible = false;
-                  //       _this.$emit("complete", step);
-                  //       _this.$emit("setStatus", "2 of 5");
-                  //     }
-                  //   }).catch((e) => {
-                  //     console.log("Error: " + e); 
-                  //   });
-                  if (event.data.complete) {
-                        _this.visible = false;
-                        _this.$emit("complete", step);
-                        _this.$emit("setStatus", "2 of 5");
-                      }
-              } else {
-                console.log("error");
-              }
-            };
+    },
+    createWorker(data, step, self) {
+      if (typeof Worker !== "undefined") {
+        if (typeof self.worker == "undefined") {
+          self.worker = new Worker();
+        }
+        self.worker.postMessage({ d: data });
+        //can be improved by abstraction
+        self.worker.onmessage = function (event) {
+          // _this.table_headers = event.data.headers;
+          // self.students = event.data.rows;
+          if (event.data.complete) {
+            console.log("Successfully parsed xlsx file!");
+            self.male_num = event.data.male;
+            self.female_num = event.data.female;
+            // self.total = self.male_num + self.female_num;
+            self.storeStudents(
+              event.data.rows, 
+              event.data.acadYear,
+              event.data.nstp
+            );
+            self.pending = false;
+            self.$emit("complete", step);
+            self.$emit("setStatus", "2 of 5");
+            // this.completed = !this.completed;
+          }
+          else {
+            console.log("Something went wrong while parsing xlsx file!");
+            self.pending = false;
           }
         };
-        reader.readAsArrayBuffer(this.dropzoneFile);
-      } else {
-        alert("Please upload a .xlsx file!");
       }
     },
-    storeStudents(data) {
-      for (let i = 0; i < data.length; i++) {
+    async setAcadYear(acadYear) {
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      query.equalTo("objectId", this.appId);
+      var results = await query.first();
+      results.set("academicYear", acadYear);
+      //results.set("awardYear", acadYear);
+      results.save();
+    },
+    async getNstpId(nstp) {
+      const Nstp = Parse.Object.extend("Nstp");
+      const query = new Parse.Query(Nstp);
+      query.equalTo("programName", nstp);
+      var result = await query.first();
+      return result.id;
+    },
+    async storeStudents(studentData, acadYear, nstpProgram) {
+      await this.setAcadYear(acadYear);
+      var nstpId = await this.getNstpId(nstpProgram);
+
+      for (let i = 0; i < studentData.length; i++) {
         const student = new Parse.Object("Student");
         const nstpEnrollment = new Parse.Object("NstpEnrollment");
         student.set("name", {
-          lastName: data[i].F,
-          firstName: data[i].G,
-          extensionName: data[i].H,
-          middleName: data[i].I,
+          lastName: studentData[i].F,
+          firstName: studentData[i].G,
+          extensionName: studentData[i].H,
+          middleName: studentData[i].I,
         });
-        student.set("birthdate", data[i].J);
-        student.set("gender", data[i].K);
-        student.set("emailAddress", data[i].T);
-        student.set("contactNumber", data[i].U);
+        student.set("birthdate", studentData[i].J);
+        student.set("gender", studentData[i].K);
+        student.set("emailAddress", studentData[i].T);
+        student.set("contactNumber", studentData[i].U);
         student.set("address", {
-          street: data[i].L,
-          city: data[i].M,
-          province: data[i].N,
-          region: data[i].D,
+          street: studentData[i].L,
+          city: studentData[i].M,
+          province: studentData[i].N,
+          region: studentData[i].D,
         });
         student.set("program", {
-          programLevelCode: data[i].R,
-          programName: data[i].S,
+          programLevelCode: studentData[i].R,
+          programName: studentData[i].S,
         });
 
         student.save().then((student) => {
+          this.students.push({
+            name: student.get("name"),
+            birthdate: student.get("birthdate"),
+            gender: student.get("gender"),
+            address: student.get("address"),
+          });
+          this.forceRerender(); //solution to updating DOM of child component
           nstpEnrollment.set(
             "studentId",
             new Parse.Object("Student", { id: student.id })
           );
           nstpEnrollment.set(
             "nstpId",
-            new Parse.Object("Nstp", { id: this.nstpId })
+            new Parse.Object("Nstp", { id: nstpId })
           );
           nstpEnrollment.set(
             "applicationId",
@@ -303,36 +315,28 @@ export default {
           nstpEnrollment.save();
         });
       }
-      // console.log(studentList);
-      // return Promise.resolve(studentList);
     },
-    checkData(data) {
-      for (let i = 0; i < data.length; i++) {
-        this.acadYear = data[0].B;
-        this.nstp = data[0].C;
-
-        if (data[i].B != this.acadYear || data[i].C != this.nstp) {   //acadYears and NSTP program must be the same in all rows
-          this.checkedData = false;
-        }
+    upload(step) {
+      var validation = this.validate(this.dropzoneFile);
+      if(validation) {
+        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+        this.pending = true;
+        const self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          try{
+            self.createWorker(data, step, self);
+          } catch(e) {
+            console.log(e);
+            this.pending = false;
+          }
+        };
+        reader.readAsArrayBuffer(this.dropzoneFile);
       }
-      return this.checkedData;
-    },
-    async setAcadYear(acadYear) {
-      const Application = Parse.Object.extend("Application");
-      const query = new Parse.Query(Application);
-      query.equalTo("objectId", this.appId);
-      var results = await query.first();
-      results.set("academicYear", acadYear);
-      results.save();
-    },
-    async getNstpId(nstp) {
-      const Nstp = Parse.Object.extend("Nstp");
-      const query = new Parse.Query(Nstp);
-      query.equalTo("programName", nstp);
-      var result = await query.first();
-      this.nstpId = result.id;
     },
     async getStudents() {
+      var studentList = [];
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       // query.equalTo("applicationId", this.appId);
@@ -341,22 +345,27 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
-      var results = await query.find();
-      var studentList = [];
-
+      const results = await query.find();
+      
+      if(results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+
         studentList.push({
-          name: results[i].get("studentId").get("name"),
-          birthdate: results[i].get("studentId").get("birthdate"),
-          gender: results[i].get("studentId").get("gender"),
-          address: results[i].get("studentId").get("address"),
+          name: object.get("studentId").get("name"),
+          birthdate: object.get("studentId").get("birthdate"),
+          gender: object.get("studentId").get("gender"),
+          address: object.get("studentId").get("address"),
         });
+        if (object.get("studentId").get("gender") == "F") {
+          this.female_num++;
+        } else if (object.get("studentId").get("gender") == "M") {
+          this.male_num++;
+        }
       }
       this.students = studentList;
-      // console.log("studentList" + studentList);
-      
+      this.forceRerender(); 
     },
-
     nextStep() {
       this.worker.terminate();
       this.worker = undefined;

@@ -45,10 +45,4 @@ onmessage = async function (event) {
         female: female,
         complete: true,
     });
-    // _this.table_headers = headers;
-    // _this.students = rows;
-
-    // _this.visible = false;
-    // _this.$emit("complete", step);
-    // _this.completed = !_this.completed;
 }

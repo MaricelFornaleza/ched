@@ -28,11 +28,12 @@
         >
         or drag and drop a file
       </span>
-      <span class="body-m"
-        >Must be .xlsx file using this
-        <button class="font-bold underline">template</button>.</span
-      >
-
+      <slot>
+        <span class="body-m">
+          Must be .xlsx file using this
+          <button class="font-bold underline">template</button>.
+        </span>
+      </slot>
       <input type="file" id="dropzoneFile" class="dropzoneFile" />
     </div>
   </div>

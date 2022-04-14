@@ -54,7 +54,7 @@
     >
       <SuccessAlert className="alert-success">
         The list of graduates was successfully uploaded. A transmittal letter
-        was sent to Ateneo de Naga University’s email address.
+        was sent to the email address.
       </SuccessAlert>
       <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
         <div class="flex flex-col items-center">

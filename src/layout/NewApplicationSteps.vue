@@ -104,7 +104,7 @@ export default {
         count++;
       }
       this.currentStep = count;
-      console.log(count);
+      console.log("activeStep: " + count);
       this.activeStep(count);
     },
     completeStep(currentStep) {
@@ -154,8 +154,7 @@ export default {
         this.currentStep++;
         this.isCompleted = this.findStep(this.currentStep);
         router.push({
-          name: "Step" + this.currentStep,
-          params: { step: this.currentStep, application: this.application_id },
+          path: `/application/new/${this.currentStep}/${this.application_id}`,
         });
       }
     },
@@ -164,8 +163,7 @@ export default {
         this.currentStep--;
         this.isCompleted = this.findStep(this.currentStep);
         router.push({
-          name: "Step" + this.currentStep,
-          params: { step: this.currentStep, application: this.application_id },
+          path: `/application/new/${this.currentStep}/${this.application_id}`,
         });
       }
     },
