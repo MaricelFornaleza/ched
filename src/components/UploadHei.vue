@@ -194,8 +194,9 @@ export default {
       }
     },
        storeHeis(data) {
-      for (let i = 0; i < data.length; i++) {
-        const user = new Parse.Object("User");
+      for (let i = 1; i < data.length; i++) {
+        const user = new Parse.User();
+        const password = Math.random().toString(36).slice(-12);
         user.set("institutionalCode", data[i].A);
         user.set("name", data[i].B);
         user.set("address", {
@@ -210,6 +211,7 @@ export default {
         user.set("contactNumber", data[i].J);
         user.set("type", data[i].K);
         user.set("userType", "hei"); 
+         user.set("password", password); 
         user.set("username", data[i].L);
         user.save().then(() => {
           alert("success");

@@ -45,22 +45,22 @@
       <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
         <simple-widget bgColor="bg-warning-light" textColor="text-warning">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ countSUC }}</template>
           <template v-slot:label>State Universities and Colleges</template>
         </simple-widget>
         <simple-widget bgColor="bg-info-light" textColor="text-info">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ countLUC }}</template>
           <template v-slot:label>Local Universities and Colleges</template>
         </simple-widget>
         <simple-widget bgColor="bg-success-light" textColor="text-success">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ countPrivate }}</template>
           <template v-slot:label>Private</template>
         </simple-widget>
         <simple-widget bgColor="bg-error-light" textColor="text-error">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ countOGS }}</template>
           <template v-slot:label>Other Government Schools</template>
         </simple-widget>
       </div>
@@ -159,6 +159,10 @@ export default {
         { title: "Email" },
       ],
       heis: [],
+      countSUC: 0,
+      countLUC: 0,
+      countPrivate: 0,
+      countOGS: 0,
     };
   },
 
@@ -185,6 +189,16 @@ export default {
     }
     this.heis = hei;
     console.log(this.heis);
+
+    query.equalTo("type", "LUC");
+    this.countLUC = await query.count();
+    query.equalTo("type", "SUC");
+    this.countSUC = await query.count();
+    query.equalTo("type", "Private");
+    this.countPrivate = await query.count();
+    query.equalTo("type", "OGS");
+    this.countOGS = await query.count();
+
   },
   components: {
     EmptyState,
