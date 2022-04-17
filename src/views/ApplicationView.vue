@@ -205,7 +205,11 @@ export default {
       query2.matches("applicationId", object.id);
       query2.include("nstpId");
       await query2.find().then(function (res) {
-        count = res.length;
+        // count = res.length;
+        for(let x = 0; x < res.length; x++) {
+          if(typeof res[x].get("serialNumber") !== "undefined")
+            count++;
+        }
       });
       if (
         object.get("status") == "For Approval" ||

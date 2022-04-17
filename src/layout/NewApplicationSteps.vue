@@ -217,11 +217,11 @@ export default {
   padding-left: 25px;
 }
 .active {
-  background-color: theme("colors.light.100");
-  color: theme("colors.brand.blue");
+  background-color: theme("colors.light.100") !important; 
+  color: theme("colors.brand.blue") !important;
 }
 .active:after {
-  border-left: 20px solid theme("colors.light.100");
+  border-left: 20px solid theme("colors.light.100") !important;
 }
 .completed {
   background-color: theme("colors.brand.blue");

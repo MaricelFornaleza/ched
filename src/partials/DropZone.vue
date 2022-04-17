@@ -34,7 +34,7 @@
           <button class="font-bold underline">template</button>.
         </span>
       </slot>
-      <input type="file" id="dropzoneFile" class="dropzoneFile" />
+      <input type="file" id="dropzoneFile" class="dropzoneFile" :accept="fileType" />
     </div>
   </div>
 </template>
@@ -56,6 +56,7 @@ export default {
   components: {
     DocumentAddIcon,
   },
+  props: { fileType: String },
   setup() {
     const active = ref(false);
     const toggleActive = () => {

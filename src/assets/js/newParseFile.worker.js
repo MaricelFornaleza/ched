@@ -9,6 +9,7 @@ onmessage = async function (event) {
     var tempStr = '';
     var maleNum = 0, femaleNum = 0;
     var checker = true;
+    var reason = "";
 
     /* reader.readAsArrayBuffer(file) -> data will be an ArrayBuffer */
     var workbook = XLSX.read(data, { type: 'array' });
@@ -39,6 +40,7 @@ onmessage = async function (event) {
             nstp = rowObj[i].C;
             if (rowObj[9].B != rowObj[i].B || rowObj[9].C != rowObj[i].C) {     //awardYear & nstpProgram
                 checker = false;
+                reason = "There are some student record whose Award Year or NSTP program are different from the others. Kindly recheck the document."
             }
         }
         else if (i == (rowObj.length - 6)) {    //row in excel file
@@ -49,7 +51,14 @@ onmessage = async function (event) {
         }
     }
     var acadYear = tempStr.replace(/[^0-9-]+/g, '');    //removes other characters except numbers and -
-    if (acadYear == '') acadYear = awardYear;
+    if (acadYear == '') {
+        checker = false;
+        reason = "Academic Year is not set.";
+    }
+    if(rows.length <= 0) {
+        checker = false;
+        reason = "There are no records found. Please ensure you are following the format on the provided template."
+    }
     // console.log(acadYear);
     postMessage({
         headers: headers,
@@ -60,5 +69,6 @@ onmessage = async function (event) {
         awardYear: awardYear,
         nstp: nstp,
         complete: checker,
+        reason: reason
     });
 }

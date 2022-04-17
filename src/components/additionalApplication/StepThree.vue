@@ -288,7 +288,7 @@ export default {
             "applicationId",
             new Parse.Object("Application", { id: this.appId })
           );
-          nstpEnrollment.set("takenNstp1", true);
+          nstpEnrollment.set("takenNstp1", true);     //should check first if takenNstp1 is true
           nstpEnrollment.set("takenNstp2", true);
           nstpEnrollment.save();
         });

@@ -219,6 +219,7 @@ export default {
       }
     },
     deleteApplication(app_id, app_status) {
+      //to be updated
       if(app_status == "1 of 5") {
         if (confirm("Are you sure to delete?") == true) {
           // Application

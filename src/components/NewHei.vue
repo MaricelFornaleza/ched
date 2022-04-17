@@ -208,6 +208,8 @@ export default {
       user.set("email", this.email);
       user.set("username", this.email);
       user.set("contactNumber", this.contact_number);
+      var address = {street: "Ateneo ave.", barangay: "Bagumbayan Sur", city: "Naga City", province: "Cam. Sur", regionNo: "05", regionName: "Bicol"}
+      user.set("address", address);
       user.set("institutionalCode", this.institutional_code);
       user.set("type", this.hei_type);
       user.set("password", password);

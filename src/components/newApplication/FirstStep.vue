@@ -13,7 +13,7 @@
       </AlertWidget>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile">
+        <DropZone @drop.prevent="drop" @change="selectedFile" fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
           <span class="body-m">
             Must be .xlsx file using this
             <a :href="templateUrl" class="font-bold underline hover:text-brand-blue" download>template</a>.
@@ -66,15 +66,15 @@
 
       <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
         <div class="flex flex-col items-center">
-          <h2 class="">{{ female_num }}</h2>
+          <h2 class="">{{ femaleNum }}</h2>
           <p class="uppercase">female</p>
         </div>
         <div class="flex flex-col items-center">
-          <h2 class="">{{ male_num }}</h2>
+          <h2 class="">{{ maleNum }}</h2>
           <p class="uppercase">male</p>
         </div>
         <div class="flex flex-col items-center">
-          <h2 class="">{{ male_num + female_num }}</h2>
+          <h2 class="">{{ maleNum + femaleNum }}</h2>
           <p class="uppercase">total</p>
         </div>
       </div>
@@ -170,8 +170,8 @@ export default {
       className: "alert-info",
       students: [],
       excelData: [],
-      male_num: 0,
-      female_num: 0,
+      maleNum: 0,
+      femaleNum: 0,
       worker: undefined,
     };
   },
@@ -227,22 +227,23 @@ export default {
           // self.students = event.data.rows;
           if (event.data.complete) {
             console.log("Successfully parsed xlsx file!");
-            self.male_num = event.data.male;
-            self.female_num = event.data.female;
-            // self.total = self.male_num + self.female_num;
+            self.maleNum = event.data.male;
+            self.femaleNum = event.data.female;
+            // self.total = self.maleNum + self.femaleNum;
             self.storeStudents(
               event.data.rows, 
               event.data.acadYear,
               event.data.nstp
             );
-            self.pending = false;
+            // self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 5");
             // this.completed = !this.completed;
           }
           else {
-            console.log("Something went wrong while parsing xlsx file!");
+            //console.log("Something went wrong while parsing xlsx file!");
             self.pending = false;
+            alert(event.data.reason);
           }
         };
       }
@@ -266,6 +267,9 @@ export default {
     async storeStudents(studentData, acadYear, nstpProgram) {
       await this.setAcadYear(acadYear);
       var nstpId = await this.getNstpId(nstpProgram);
+
+      //TO-DO: still need to check if student already exists in db
+      //if exists, dont save. if not, save
 
       for (let i = 0; i < studentData.length; i++) {
         const student = new Parse.Object("Student");
@@ -315,6 +319,7 @@ export default {
           nstpEnrollment.save();
         });
       }
+      this.pending = false;
     },
     upload(step) {
       var validation = this.validate(this.dropzoneFile);
@@ -337,6 +342,9 @@ export default {
     },
     async getStudents() {
       var studentList = [];
+      //reset the numbers to be sure
+      this.femaleNum = 0;
+      this.maleNum = 0;
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       // query.equalTo("applicationId", this.appId);
@@ -351,16 +359,18 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        studentList.push({
-          name: object.get("studentId").get("name"),
-          birthdate: object.get("studentId").get("birthdate"),
-          gender: object.get("studentId").get("gender"),
-          address: object.get("studentId").get("address"),
-        });
-        if (object.get("studentId").get("gender") == "F") {
-          this.female_num++;
-        } else if (object.get("studentId").get("gender") == "M") {
-          this.male_num++;
+        if(object.get("takenNstp1") == true) {
+          studentList.push({
+            name: object.get("studentId").get("name"),
+            birthdate: object.get("studentId").get("birthdate"),
+            gender: object.get("studentId").get("gender"),
+            address: object.get("studentId").get("address"),
+          });
+          if (object.get("studentId").get("gender").toUpperCase() == "F" || object.get("studentId").get("gender").toUpperCase() == "FEMALE") {
+            this.femaleNum++;
+          } else if (object.get("studentId").get("gender").toUpperCase() == "M" || object.get("studentId").get("gender").toUpperCase() == "MALE") {
+            this.maleNum++;
+          }
         }
       }
       this.students = studentList;
