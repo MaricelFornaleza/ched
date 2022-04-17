@@ -174,7 +174,7 @@ export default {
   },
   async mounted() {
     var hei = [];
-    let _this = this;
+    // let _this = this;
     const query = new Parse.Query(Parse.User);
 
     query.equalTo("userType", "hei");
