@@ -2,7 +2,17 @@
   <div>
     <div
       v-if="!completed"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
+      class="
+        m-auto
+        mt-20
+        border border-1 border-light-300
+        shadow-sm
+        px-20
+        py-10
+        bg-light-100
+        w-4/5
+        xl:w-4/12
+      "
     >
       <div
         class="
@@ -44,7 +54,7 @@
       </div>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
-        <button class="btn-sm bg-light-300 font-bold" type="button">
+        <button class="btn-sm border-none bg-light-300 font-bold" type="button">
           Cancel
         </button>
         <button
