@@ -57,6 +57,31 @@
           />
         </div>
         <div class="mb-4">
+          <label
+            class="block text-dark-200 text-sm font-bold mb-2"
+            for="username"
+          >
+            Username
+          </label>
+          <input
+            class="
+              appearance-none
+              border-2
+              rounded
+              w-full
+              py-2
+              px-4
+              text-dark-100 text-sm
+              focus:outline-none focus:ring
+            "
+            name="username"
+            id="username"
+            type="text"
+            v-model="username"
+            placeholder="Enter HEI's Username"
+          />
+        </div>
+        <div class="mb-4">
           <label class="block text-dark-200 text-sm font-bold mb-2" for="email">
             Email
           </label>
@@ -102,6 +127,165 @@
             type="text"
             placeholder="09********"
           />
+        </div>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="street"
+            >
+              Street
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="street"
+              id="street"
+              v-model="street"
+              type="text"
+              placeholder="Enter Street"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="barangay"
+            >
+              Barangay
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="barangay"
+              id="barangay"
+              v-model="barangay"
+              type="text"
+              placeholder="Enter Barangay"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="city"
+            >
+              City
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="city"
+              id="city"
+              v-model="city"
+              type="text"
+              placeholder="Enter City"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="province"
+            >
+              Province
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="province"
+              id="province"
+              v-model="province"
+              type="text"
+              placeholder="Enter Province"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="regionNo"
+            >
+              Region Number
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="regionNo"
+              id="regionNo"
+              v-model="regionNo"
+              type="text"
+              placeholder="Enter Region No."
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="regionName"
+            >
+              Region Name
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="regionName"
+              id="regionName"
+              v-model="regionName"
+              type="text"
+              placeholder="Enter Region Name"
+            />
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
@@ -193,8 +377,15 @@ export default {
     return {
       open: true,
       name: "",
+      username: "",
       email: "",
       contact_number: "",
+      street: "",
+      barangay: "",
+      city: "",
+      province: "",
+      regionNo: "",
+      regionName: "",
       institutional_code: "",
       hei_type: "",
     };
@@ -202,28 +393,28 @@ export default {
   methods: {
     addHei() {
       var password = Math.random().toString(36).slice(-12);
-      const User = Parse.Object.extend("User");
-      const user = new User();
+      const user = new Parse.User();
       user.set("name", this.name);
       user.set("email", this.email);
-      user.set("username", this.email);
+      user.set("username", this.username);
       user.set("contactNumber", this.contact_number);
+      user.set("address", {
+        street: this.street,
+        barangay: this.barangay,
+        city: this.city,
+        province: this.province,
+        regionNo: this.regionNo,
+        regionName: this.regionName,
+      });
       user.set("institutionalCode", this.institutional_code);
       user.set("type", this.hei_type);
       user.set("password", password);
       user.set("userType", "hei");
       user.save();
-      this.$router.push({ name: "hei" });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
-
       //   alert('New object created with objectId: ' + hei.id);
-      //   emailjs.sendForm('service_0ftc4vc', 'template_gmz4sqi', this.form, 'jTSIh7CnjU-vTFAm4')
-      // .then((result) => {
-      //   console.log('SUCCESS', result.text);
-      // }, (error) => {
-      //   console.log('FAILED', error.text);
-      // });
+
       // }).catch(function (error){
       //   alert('Failed to create new object, with error code: ' + error.message);
       // });

@@ -22,8 +22,8 @@ onmessage = function(event) {
             rows.push(rowObj[i]);
     }*/
     for(var i=0; i<rowObj.length; i++){
-        if(i == 6 && Object.keys(rowObj[6]).length == 12) {
-            headers = rowObj[6];
+        if(i ==  5 && Object.keys(rowObj[5]).length == 12) {
+            headers = rowObj[5];
         } 
         else if (Object.keys(rowObj[i]).length == 12) {
             rows.push(rowObj[i]);
