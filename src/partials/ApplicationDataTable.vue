@@ -20,13 +20,17 @@
               py-2
               text-center
               inline-flex
+              space-x-2
               items-center
               dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
             "
             type="button"
           >
-            Add Application
-            <ChevronDownIcon class="ml-2 h-5" />
+            <div>
+              Add <span class="hidden lg:inline-flex">Application</span>
+            </div>
+
+            <ChevronDownIcon class="h-5" />
           </button>
 
           <!-- Dropdown menu -->
@@ -44,6 +48,7 @@
               dark:bg-gray-700
             "
           >
+            <!-- xmhbiesbmfhykmwp -->
             <slot>
               <ul class="py-1" aria-labelledby="dropdownButton">
                 <li>

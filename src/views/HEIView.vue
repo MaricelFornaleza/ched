@@ -145,6 +145,7 @@ import { LibraryIcon } from "@heroicons/vue/solid";
 import VueDataTable from "@/partials/VueDataTable.vue";
 import { ChevronDownIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
+
 export default {
   name: "HEIView",
 
@@ -171,6 +172,7 @@ export default {
     dropdownToggle() {
       this.dropdown = !this.dropdown;
     },
+    
   },
   async mounted() {
     var hei = [];
@@ -209,6 +211,7 @@ export default {
       _this.ogs = res.length;
     });
     // console.log(this.heis);
+  
   },
   components: {
     EmptyState,
