@@ -4,32 +4,51 @@
       <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
         <advanced-widget bgColor="bg-info-light" textColor="text-info">
           <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
+          <template v-slot:count>{{ hei.total }}</template>
           <template v-slot:label>Higher Education Institutions</template>
           <template v-slot:data>
-            <data-count dataCount="345" dataLabel="SUC"></data-count>
-            <data-count dataCount="45" dataLabel="LUC"></data-count>
-            <data-count dataCount="345" dataLabel="Private"></data-count>
-            <data-count dataCount="967" dataLabel="OGS"></data-count>
+            <data-count :dataCount="hei.countSuc" dataLabel="SUC"></data-count>
+            <data-count :dataCount="hei.countLuc" dataLabel="LUC"></data-count>
+            <data-count
+              :dataCount="hei.countPrivate"
+              dataLabel="Private"
+            ></data-count>
+            <data-count :dataCount="hei.countOgs" dataLabel="OGS"></data-count>
           </template>
         </advanced-widget>
         <advanced-widget bgColor="bg-error-light" textColor="text-error">
           <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
-          <template v-slot:count>456k</template>
+          <template v-slot:count>{{ graduates.total }}</template>
           <template v-slot:label>NSTP Graduates</template>
           <template v-slot:data
-            ><data-count dataCount="345" dataLabel="CWTS"></data-count>
-            <data-count dataCount="45" dataLabel="LTS"></data-count>
+            ><data-count
+              :dataCount="graduates.cwts"
+              dataLabel="CWTS"
+            ></data-count>
+            <data-count :dataCount="graduates.lts" dataLabel="LTS"></data-count>
           </template>
         </advanced-widget>
         <advanced-widget bgColor="bg-warning-light" textColor="text-warning">
           <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
-          <template v-slot:count>789k</template>
+          <template v-slot:count>{{ applications.total }}</template>
           <template v-slot:label>Total Applications</template>
           <template v-slot:data
-            ><data-count dataCount="345" dataLabel="For Approval"></data-count>
-            <data-count dataCount="45" dataLabel="For Revision"></data-count>
-            <data-count dataCount="345" dataLabel="Approved"></data-count>
+            ><data-count
+              :dataCount="applications.pending"
+              dataLabel="Pending"
+            ></data-count>
+            <data-count
+              :dataCount="applications.forApproval"
+              dataLabel="For Approval"
+            ></data-count>
+            <data-count
+              :dataCount="applications.forRevision"
+              dataLabel="For Revision"
+            ></data-count>
+            <data-count
+              :dataCount="applications.approved"
+              dataLabel="Approved"
+            ></data-count>
           </template>
         </advanced-widget>
       </div>
@@ -80,49 +99,18 @@
                 <DocumentTextIcon class="h-5 mr-2" />
                 <div class="text-base">Recent Applications</div>
               </div>
-              <button class="text-xs underline">View all</button>
+              <button @click="goToApplications" class="text-xs underline">
+                View all
+              </button>
             </li>
+
             <list-item
+              v-for="application in recentApplications"
+              :key="application"
               class="list-item"
-              school="Ateneo de Naga University"
-              graduates="673"
-              program="CWTS"
-              date="February 15, 2021"
-            ></list-item>
-            <list-item
-              class="list-item"
-              school="Naga College Foundation Inc."
-              graduates="123"
-              program="LTS"
-              date="February 15, 2021"
-            ></list-item>
-            <list-item
-              class="list-item"
-              school="University of Nueva Caceres"
-              graduates="67"
-              program="LTS"
-              date="February 15, 2021"
-            ></list-item>
-            <list-item
-              class="list-item"
-              school="ACLC College of Daet, Inc."
-              graduates="123"
-              program="LTS"
-              date="February 15, 2021"
-            ></list-item>
-            <list-item
-              class="list-item"
-              school="Universidad de Sta Isabel"
-              graduates="123"
-              program="LTS"
-              date="February 15, 2021"
-            ></list-item>
-            <list-item
-              class="list-item"
-              school="Bicol State Colege of Applied Sciences and Technology"
-              graduates="123"
-              program="LTS"
-              date="February 15, 2021"
+              :school="application.hei"
+              :type="application.type"
+              :date="application.dateApplied"
             ></list-item>
           </ul>
         </div>
@@ -145,6 +133,8 @@ import ListItem from "@/partials/ListItem.vue";
 import { ref } from "vue";
 import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
+import Parse from "parse";
+import router from "../router";
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -165,6 +155,35 @@ export default {
     BarChart,
     ProgressBar,
     ListItem,
+  },
+  data() {
+    return {
+      hei: {
+        total: 0,
+        countSuc: 0,
+        countLuc: 0,
+        countPrivate: 0,
+        countOgs: 0,
+      },
+      graduates: {
+        total: 0,
+        cwts: 0,
+        lts: 0,
+      },
+      applications: {
+        total: 0,
+        forApproval: 0,
+        forRevision: 0,
+        approved: 0,
+        pending: 0,
+      },
+      recentApplications: [],
+    };
+  },
+  mounted() {
+    this.getHeis();
+    this.getApplications();
+    this.getGaduates();
   },
   setup() {
     const testData = {
@@ -204,6 +223,73 @@ export default {
     });
 
     return { testData, options };
+  },
+
+  methods: {
+    async getHeis() {
+      const query = new Parse.Query(Parse.User);
+      query.equalTo("userType", "hei");
+      this.hei.total = await query.count();
+      query.equalTo("type", "LUC");
+      this.hei.countLuc = await query.count();
+      query.equalTo("type", "SUC");
+      this.hei.countSuc = await query.count();
+      query.equalTo("type", "Private");
+      this.hei.countPrivate = await query.count();
+      query.equalTo("type", "OGS");
+      this.hei.countOgs = await query.count();
+    },
+    async getApplications() {
+      var list = [];
+      const Applications = Parse.Object.extend("Application");
+      const query = new Parse.Query(Applications);
+      query.limit(9);
+      query.include("heiId");
+      query.descending("dateApplied");
+
+      var results = await query.find();
+      for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+        list.push({
+          dateApplied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "short",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          hei: object.get("heiId").get("name"),
+          type: object.get("applicationType"),
+        });
+      }
+      this.recentApplications = list;
+
+      this.applications.total = await query.count();
+      query.equalTo("status", "For Approval");
+      this.applications.forApproval = await query.count();
+      query.equalTo("status", "For Revision");
+      this.applications.forRevision = await query.count();
+      query.equalTo("status", "Approved");
+      this.applications.approved = await query.count();
+      query.notContainedIn("status", [
+        "For Approval",
+        "For Revision",
+        "Approved",
+      ]);
+      this.applications.pending = await query.count();
+    },
+    async getGaduates() {
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.exists("serialNumber");
+      this.graduates.total = await query.count();
+      query.startsWith("serialNumber", "C");
+      this.graduates.cwts = await query.count();
+      query.startsWith("serialNumber", "L");
+      this.graduates.lts = await query.count();
+    },
+    goToApplications() {
+      router.push({ name: "application" });
+    },
   },
 };
 </script>

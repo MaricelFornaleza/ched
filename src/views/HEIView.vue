@@ -192,7 +192,6 @@ export default {
       });
     }
     this.heis = hei;
-    console.log(this.heis);
 
     query.equalTo("type", "LUC");
     this.countLUC = await query.count();
@@ -202,10 +201,6 @@ export default {
     this.countPrivate = await query.count();
     query.equalTo("type", "OGS");
     this.countOGS = await query.count();
-<<<<<<< HEAD
-=======
-
->>>>>>> 0440cf064a9138460f359784ab95dbea886cff73
   },
   components: {
     EmptyState,
