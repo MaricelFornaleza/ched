@@ -46,10 +46,12 @@
         @previousStep="previousStep"
         @goToApplication="goToApplication"
         @setStatus="setStatus"
+        @checkActive="checkActive"
         :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
         :hei_region_code="hei_region_code"
+        :allow="allow"
       ></router-view>
     </div>
   </div>
@@ -67,6 +69,7 @@ export default {
       currentStep: 0,
       steps: [],
       isCompleted: false,
+      allow: false,
     };
   },
   async created() {
@@ -89,6 +92,7 @@ export default {
     activeStep(step) {
       this.currentStep = step;
       this.isCompleted = this.findStep(step);
+      this.checkActive(step);
       router.push({
         name: "Step" + this.currentStep,
         params: { application: this.application_id },
@@ -113,7 +117,7 @@ export default {
         count++;
       }
       this.currentStep = count;
-      console.log(count);
+
       this.activeStep(count);
     },
     completeStep(currentStep) {
@@ -180,6 +184,22 @@ export default {
     },
     goToApplication() {
       this.$router.push({ name: "application" });
+    },
+    checkActive(step) {
+      var count = 0;
+      for (var i in this.steps) {
+        if (this.steps[i].completed == true) {
+          count++;
+        }
+      }
+      if (count < 5) {
+        count++;
+      }
+      if (step > count) {
+        this.allow = false;
+      } else {
+        this.allow = true;
+      }
     },
   },
   components: {},

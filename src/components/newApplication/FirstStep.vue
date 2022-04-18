@@ -1,101 +1,129 @@
 <template>
   <div>
-    <div
-      v-if="!isCompleted"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
-    >
-      <AlertWidget :className="className">
-        Please Upload the List of Enrollment for First Semester. Follow the
-        format provided in the Template.&nbsp;
-        <a :href="templateUrl" class="font-bold underline hover:text-brand-blue" download>
-          Download Template
-        </a>
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
       </AlertWidget>
+    </div>
+    <div v-else>
+      <div
+        v-if="!isCompleted"
+        class="
+          container
+          w-fit
+          mx-auto
+          flex flex-col
+          items-center
+          justify-center
+        "
+      >
+        <AlertWidget :className="className">
+          Please Upload the List of Enrollment for First Semester. Follow the
+          format provided in the Template.&nbsp;
+          <a
+            :href="templateUrl"
+            class="font-bold underline hover:text-brand-blue"
+            download
+          >
+            Download Template
+          </a>
+        </AlertWidget>
 
-      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-          <span class="body-m">
-            Must be .xlsx file using this
-            <a :href="templateUrl" class="font-bold underline hover:text-brand-blue" download>template</a>.
-          </span>
-        </DropZone>
-        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
+        <div v-if="dropzoneFile === ''" class="mt-10 w-full">
+          <DropZone
+            @drop.prevent="drop"
+            @change="selectedFile"
+            fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          >
+            <span class="body-m">
+              Must be .xlsx file using this
+              <a
+                :href="templateUrl"
+                class="font-bold underline hover:text-brand-blue"
+                download
+                >template</a
+              >.
+            </span>
+          </DropZone>
+          <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
+        </div>
+
+        <div
+          v-else
+          class="my-20 w-fit flex justify-between p-5 border border-light-300"
+        >
+          <div class="flex space-x-5">
+            <img
+              src="@/assets/img/xls.png"
+              class="h-8"
+              alt="XLS Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">{{ dropzoneFile.name }}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            v-if="!isCompleted"
+            @click="upload(1)"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Upload
+          </button>
+        </div>
       </div>
 
       <div
         v-else
-        class="my-20 w-fit flex justify-between p-5 border border-light-300"
+        class="container mx-auto flex flex-col items-center justify-center"
       >
-        <div class="flex space-x-5">
-          <img
-            src="@/assets/img/xls.png"
-            class="h-8"
-            alt="XLS Icon by Dimitry Miroliubov"
-          />
-          <div class="text-base">{{ dropzoneFile.name }}</div>
+        <SuccessAlert className="alert-success">
+          The list for the 1st semester was successfully uploaded. An
+          Acknowledgement letter was sent to the email address.
+        </SuccessAlert>
+
+        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ femaleNum }}</h2>
+            <p class="uppercase">female</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNum }}</h2>
+            <p class="uppercase">male</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNum + femaleNum }}</h2>
+            <p class="uppercase">total</p>
+          </div>
         </div>
-      </div>
 
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="goToApplication()"
-          class="btn-sm btn-default btn-outline"
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          v-if="!isCompleted"
-          @click="upload(1)"
-          class="btn-sm btn-default"
-          type="submit"
-        >
-          Upload
-        </button>
-      </div>
-    </div>
+        <!-- pass props lists -->
+        <StudentsDataTable
+          :key="componentKey"
+          :students="students"
+        ></StudentsDataTable>
 
-    <div
-      v-else
-      class="container mx-auto flex flex-col items-center justify-center"
-    >
-      <SuccessAlert className="alert-success">
-        The list for the 1st semester was successfully uploaded. An
-        Acknowledgement letter was sent to the email address.
-      </SuccessAlert>
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
 
-      <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ femaleNum }}</h2>
-          <p class="uppercase">female</p>
+          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+            Next
+          </button>
         </div>
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ maleNum }}</h2>
-          <p class="uppercase">male</p>
-        </div>
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ maleNum + femaleNum }}</h2>
-          <p class="uppercase">total</p>
-        </div>
-      </div>
-
-      <!-- pass props lists -->
-      <StudentsDataTable :key="componentKey"
-        :students="students"
-      ></StudentsDataTable>
-
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="goToApplication()"
-          class="btn-sm btn-default btn-outline"
-          type="button"
-        >
-          Cancel
-        </button>
-
-        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
-          Next
-        </button>
       </div>
     </div>
 
@@ -158,13 +186,13 @@ import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
-import Parse from 'parse';
+import Parse from "parse";
 
 export default {
   // inheritAttrs: false,
   data() {
     return {
-      templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_1st_SEM.xlsx",   //may switch to file-loader package to load files
+      templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_1st_SEM.xlsx", //may switch to file-loader package to load files
       componentKey: 0,
       pending: false,
       className: "alert-info",
@@ -175,7 +203,7 @@ export default {
       worker: undefined,
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: { isCompleted: Boolean, appId: String, allow: Boolean },
   components: {
     AlertWidget,
     SuccessAlert,
@@ -195,6 +223,7 @@ export default {
   },
   created() {
     this.getStudents();
+    console.log(this.allow);
   },
   methods: {
     forceRerender() {
@@ -205,15 +234,12 @@ export default {
       if (filename === "") {
         this.className = "alert-error";
         return false;
-      }
-      else if (regex.test(filename.name)) {
+      } else if (regex.test(filename.name)) {
         return true;
-      }
-      else {
+      } else {
         alert("Please upload a .xlsx file!");
         return false;
       }
-
     },
     createWorker(data, step, self) {
       if (typeof Worker !== "undefined") {
@@ -231,7 +257,7 @@ export default {
             self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
             self.storeStudents(
-              event.data.rows, 
+              event.data.rows,
               event.data.acadYear,
               event.data.nstp
             );
@@ -239,8 +265,7 @@ export default {
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 5");
             // this.completed = !this.completed;
-          }
-          else {
+          } else {
             //console.log("Something went wrong while parsing xlsx file!");
             self.pending = false;
             alert(event.data.reason);
@@ -323,16 +348,16 @@ export default {
     },
     upload(step) {
       var validation = this.validate(this.dropzoneFile);
-      if(validation) {
+      if (validation) {
         // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
         this.pending = true;
         const self = this;
         var reader = new FileReader();
         reader.onload = function (e) {
           var data = e.target.result;
-          try{
+          try {
             self.createWorker(data, step, self);
-          } catch(e) {
+          } catch (e) {
             console.log(e);
             this.pending = false;
           }
@@ -354,27 +379,33 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
-      
-      if(results.length == 0) return;
+
+      if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        if(object.get("takenNstp1") == true) {
+        if (object.get("takenNstp1") == true) {
           studentList.push({
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
             address: object.get("studentId").get("address"),
           });
-          if (object.get("studentId").get("gender").toUpperCase() == "F" || object.get("studentId").get("gender").toUpperCase() == "FEMALE") {
+          if (
+            object.get("studentId").get("gender").toUpperCase() == "F" ||
+            object.get("studentId").get("gender").toUpperCase() == "FEMALE"
+          ) {
             this.femaleNum++;
-          } else if (object.get("studentId").get("gender").toUpperCase() == "M" || object.get("studentId").get("gender").toUpperCase() == "MALE") {
+          } else if (
+            object.get("studentId").get("gender").toUpperCase() == "M" ||
+            object.get("studentId").get("gender").toUpperCase() == "MALE"
+          ) {
             this.maleNum++;
           }
         }
       }
       this.students = studentList;
-      this.forceRerender(); 
+      this.forceRerender();
     },
     nextStep() {
       this.worker.terminate();

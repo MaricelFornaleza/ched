@@ -1,7 +1,13 @@
 <template>
   <div>
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
+      </AlertWidget>
+    </div>
+
     <div
-      v-if="!isCompleted"
+      v-if="!isCompleted && allow"
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
       <AlertWidget className="alert-info">
@@ -11,7 +17,6 @@
           Download Template
         </router-link>
       </AlertWidget>
-
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
         <DropZone @drop.prevent="drop" @change="selectedFile" />
         <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
@@ -48,6 +53,7 @@
         </button>
       </div>
     </div>
+
     <div
       v-else
       class="container mx-auto flex flex-col items-center justify-center"
@@ -177,7 +183,7 @@ export default {
       nstpId: "",
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: { isCompleted: Boolean, appId: String, allow: Boolean },
 
   setup() {
     let dropzoneFile = ref("");
@@ -192,7 +198,8 @@ export default {
   },
   created() {
     this.getStudents();
-    console.log(this.isCompleted);
+
+    console.log(this.allow);
   },
   methods: {
     upload(step) {
@@ -288,7 +295,7 @@ export default {
             "applicationId",
             new Parse.Object("Application", { id: this.appId })
           );
-          nstpEnrollment.set("takenNstp1", true);     //should check first if takenNstp1 is true
+          nstpEnrollment.set("takenNstp1", true); //should check first if takenNstp1 is true
           nstpEnrollment.set("takenNstp2", true);
           nstpEnrollment.save();
         });

@@ -1,63 +1,74 @@
 <template>
   <div>
-    <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
-      <tbody>
-        <tr>
-          <td class="border p-2">Application Date</td>
-          <td class="border p-2">{{ data.dateApplied }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Date Approved</td>
-          <td class="border p-2">
-            {{ data.dateApproved }}
-          </td>
-        </tr>
-        <tr>
-          <td class="border p-2">Number of Graduates</td>
-          <td class="border p-2">{{ data.graduates }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">NSTP Program</td>
-          <td class="border p-2">{{ data.program }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Award Year</td>
-          <td class="border p-2">{{ data.awardYear }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Serial Number Range</td>
-          <td class="border p-2">{{ data.snRange }}</td>
-        </tr>
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
+      </AlertWidget>
+    </div>
+    <div v-else>
+      <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
+        <tbody>
+          <tr>
+            <td class="border p-2">Application Date</td>
+            <td class="border p-2">{{ data.dateApplied }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Date Approved</td>
+            <td class="border p-2">
+              {{ data.dateApproved }}
+            </td>
+          </tr>
+          <tr>
+            <td class="border p-2">Number of Graduates</td>
+            <td class="border p-2">{{ data.graduates }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">NSTP Program</td>
+            <td class="border p-2">{{ data.program }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Award Year</td>
+            <td class="border p-2">{{ data.awardYear }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Serial Number Range</td>
+            <td class="border p-2">{{ data.snRange }}</td>
+          </tr>
 
-        <tr>
-          <td class="border p-2">Students's Serial Number</td>
-          <td class="border p-2">Download</td>
-        </tr>
-      </tbody>
-    </table>
+          <tr>
+            <td class="border p-2">Students's Serial Number</td>
+            <td class="border p-2">Download</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="flex justify-center space-x-5">
-      <button
-        @click="$emit('previousStep')"
-        class="btn-sm btn-default btn-outline"
-      >
-        Back
-      </button>
+      <div class="flex justify-center space-x-5">
+        <button
+          @click="$emit('previousStep')"
+          class="btn-sm btn-default btn-outline"
+        >
+          Back
+        </button>
 
-      <button
-        @click="$emit('complete', 5)"
-        class="btn-sm text-light-100 bg-brand-blue"
-      >
-        Done
-      </button>
+        <button
+          @click="$emit('complete', 5)"
+          class="btn-sm text-light-100 bg-brand-blue"
+        >
+          Done
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Parse from "parse";
+import AlertWidget from "@/partials/AlertWidget.vue";
 
 export default {
+  components: {
+    AlertWidget,
+  },
   data() {
     return {
       completed: false,
@@ -71,7 +82,7 @@ export default {
       },
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: { isCompleted: Boolean, appId: String, allow: Boolean },
 
   mounted() {
     this.getData();

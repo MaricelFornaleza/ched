@@ -1,101 +1,122 @@
 <template>
   <div>
-    <div
-      v-if="!isCompleted"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
-    >
-      <AlertWidget className="alert-info">
-        Please upload a Proof that the student/s Completed NSTP 1 and 2. (e.g.,
-        a Certificate of Grades or Transcript of Record)
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
       </AlertWidget>
+    </div>
+    <div v-else>
+      <div
+        v-if="!isCompleted"
+        class="
+          container
+          w-fit
+          mx-auto
+          flex flex-col
+          items-center
+          justify-center
+        "
+      >
+        <AlertWidget className="alert-info">
+          Please upload a Proof that the student/s Completed NSTP 1 and 2.
+          (e.g., a Certificate of Grades or Transcript of Record)
+        </AlertWidget>
 
-      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <div v-if="dropzoneFile === ''" class="mt-10 w-full">
+          <DropZone @drop.prevent="drop" @change="selectedFile" />
+        </div>
+        <div
+          v-else
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
+        >
+          <div class="flex space-x-5">
+            <img
+              src="@/assets/img/pdf.png"
+              class="h-8"
+              alt="PDF Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">{{ dropzoneFile.name }}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            v-if="!iscompleted"
+            @click="upload(2)"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Upload
+          </button>
+        </div>
       </div>
       <div
         v-else
-        class="my-20 w-full flex justify-between p-5 border border-light-300"
-      >
-        <div class="flex space-x-5">
-          <img
-            src="@/assets/img/pdf.png"
-            class="h-8"
-            alt="PDF Icon by Dimitry Miroliubov"
-          />
-          <div class="text-base">{{ dropzoneFile.name }}</div>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          v-if="!iscompleted"
-          @click="upload(2)"
-          class="btn-sm btn-default"
-          type="submit"
-        >
-          Upload
-        </button>
-      </div>
-    </div>
-    <div
-      v-else
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
-    >
-      <SuccessAlert className="alert-success">
-        The Proof that the student/s Completed NSTP 1 and 2 was successfully
-        uploaded.
-      </SuccessAlert>
-
-      <div
         class="
-          my-20
-          w-full
-          flex
+          container
+          w-fit
+          mx-auto
+          flex flex-col
           items-center
-          justify-between
-          p-5
-          border border-light-300
+          justify-center
         "
       >
-        <div class="flex items-center space-x-5">
-          <img
-            src="@/assets/img/pdf.png"
-            class="h-8"
-            alt="PDF Icon by Dimitry Miroliubov"
-          />
-          <a href="" id="fileurl" target="_blank" ref="file">
-            <div class="text-base">{{ filename }}</div>
-          </a>
-        </div>
-        <div class="flex space-x-4">
-          <button class="p-2 rounded fit-content bg-dark-100">
-            <EyeIcon class="h-4 text-light-100" />
-          </button>
-          <button class="p-2 rounded fit-content bg-error">
-            <DownloadIcon class="h-4 text-light-100" />
-          </button>
-        </div>
-      </div>
+        <SuccessAlert className="alert-success">
+          The Proof that the student/s Completed NSTP 1 and 2 was successfully
+          uploaded.
+        </SuccessAlert>
 
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-          type="button"
+        <div
+          class="
+            my-20
+            w-full
+            flex
+            items-center
+            justify-between
+            p-5
+            border border-light-300
+          "
         >
-          Back
-        </button>
+          <div class="flex items-center space-x-5">
+            <img
+              src="@/assets/img/pdf.png"
+              class="h-8"
+              alt="PDF Icon by Dimitry Miroliubov"
+            />
+            <a href="" id="fileurl" target="_blank" ref="file">
+              <div class="text-base">{{ filename }}</div>
+            </a>
+          </div>
+          <div class="flex space-x-4">
+            <button class="p-2 rounded fit-content bg-dark-100">
+              <EyeIcon class="h-4 text-light-100" />
+            </button>
+            <button class="p-2 rounded fit-content bg-error">
+              <DownloadIcon class="h-4 text-light-100" />
+            </button>
+          </div>
+        </div>
 
-        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
-          Next
-        </button>
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Back
+          </button>
+
+          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+            Next
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -118,7 +139,12 @@ export default {
       title: "ProofOfcompletion",
     };
   },
-  props: { isCompleted: Boolean, appId: String, hei_username: String },
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    hei_username: String,
+    allow: Boolean,
+  },
 
   components: {
     SuccessAlert,

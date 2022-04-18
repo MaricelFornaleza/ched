@@ -48,6 +48,7 @@
         @setStatus="setStatus"
         v-model:isCompleted="isCompleted"
         :appId="application_id"
+        :allow="allow"
       ></router-view>
     </div>
   </div>
@@ -63,6 +64,7 @@ export default {
       currentStep: 0,
       steps: [],
       isCompleted: false,
+      allow: false,
     };
   },
   async created() {
@@ -81,11 +83,13 @@ export default {
     activeStep(step) {
       this.currentStep = step;
       this.isCompleted = this.findStep(step);
+      this.checkActive(step);
+
       router.push({
         path: `/application/new/${this.currentStep}/${this.application_id}`,
       });
     },
-    
+
     findStep(step) {
       for (var i in this.steps) {
         if (this.steps[i].no == step) {
@@ -169,7 +173,23 @@ export default {
     },
     goToApplication() {
       this.$router.push({ name: "application" });
-    }
+    },
+    checkActive(step) {
+      var count = 0;
+      for (var i in this.steps) {
+        if (this.steps[i].completed == true) {
+          count++;
+        }
+      }
+      if (count < 5) {
+        count++;
+      }
+      if (step > count) {
+        this.allow = false;
+      } else {
+        this.allow = true;
+      }
+    },
   },
   components: {},
 };
@@ -217,7 +237,7 @@ export default {
   padding-left: 25px;
 }
 .active {
-  background-color: theme("colors.light.100") !important; 
+  background-color: theme("colors.light.100") !important;
   color: theme("colors.brand.blue") !important;
 }
 .active:after {
