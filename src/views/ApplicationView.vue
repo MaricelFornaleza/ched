@@ -70,12 +70,19 @@
             </simple-widget>
           </div>
         </div>
+        <!-- alert message -->
+        <div class="w-fit mx-10">
+          <AlertWidget :className="alert.className">
+            {{ alert.msg }}
+          </AlertWidget>
+        </div>
 
         <!-- dataTables  -->
         <div>
           <ApplicationDataTable
             :applications="applications"
             :table_headers="table_headers"
+            @displayAlert="displayAlert"
           >
             <ul class="py-1" aria-labelledby="dropdownButton">
               <li>
@@ -130,12 +137,14 @@ import EmptyState from "@/components/EmptyState.vue";
 import { DocumentTextIcon } from "@heroicons/vue/solid";
 import ApplicationDataTable from "@/partials/ApplicationDataTable.vue";
 import ModalHei from "@/partials/ModalHei.vue";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import Parse from "parse";
 
 export default {
   name: "ApplicationView",
   data() {
     return {
+      alert: {},
       loading: true,
       empty: true,
       visible: false,
@@ -182,6 +191,11 @@ export default {
       }
       this.lists = heiList;
     },
+    displayAlert(status, msg) {
+      this.alert.className = "alert-" + status;
+      this.alert.msg = msg;
+      console.log("success");
+    },
   },
   async mounted() {
     this.getHeis();
@@ -204,9 +218,8 @@ export default {
       query2.include("nstpId");
       await query2.find().then(function (res) {
         // count = res.length;
-        for(let x = 0; x < res.length; x++) {
-          if(typeof res[x].get("serialNumber") !== "undefined")
-            count++;
+        for (let x = 0; x < res.length; x++) {
+          if (typeof res[x].get("serialNumber") !== "undefined") count++;
         }
       });
       if (
@@ -258,6 +271,7 @@ export default {
     DocumentTextIcon,
     ApplicationDataTable,
     ModalHei,
+    AlertWidget,
   },
 };
 </script>
