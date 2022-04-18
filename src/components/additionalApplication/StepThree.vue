@@ -5,101 +5,110 @@
         Please complete the previous steps.
       </AlertWidget>
     </div>
+    <div v-else>
+      <div
+        v-if="!isCompleted"
+        class="
+          container
+          w-fit
+          mx-auto
+          flex flex-col
+          items-center
+          justify-center
+        "
+      >
+        <AlertWidget className="alert-info">
+          Please Upload the List of Graduates. Follow the format provided in the
+          Template.&nbsp;
+          <router-link to="/#" class="font-bold underline">
+            Download Template
+          </router-link>
+        </AlertWidget>
+        <div v-if="dropzoneFile === ''" class="mt-10 w-full">
+          <DropZone @drop.prevent="drop" @change="selectedFile" />
+          <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
+        </div>
+        <div
+          v-else
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
+        >
+          <div class="flex space-x-5">
+            <img
+              src="@/assets/img/xls.png"
+              class="h-8"
+              alt="XLS Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">{{ dropzoneFile.name }}</div>
+          </div>
+        </div>
 
-    <div
-      v-if="!isCompleted && allow"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
-    >
-      <AlertWidget className="alert-info">
-        Please Upload the List of Graduates. Follow the format provided in the
-        Template.&nbsp;
-        <router-link to="/#" class="font-bold underline">
-          Download Template
-        </router-link>
-      </AlertWidget>
-      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
-        <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            v-if="!isCompleted"
+            @click="upload(3)"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Upload
+          </button>
+        </div>
       </div>
+
       <div
         v-else
-        class="my-20 w-full flex justify-between p-5 border border-light-300"
+        class="container mx-auto flex flex-col items-center justify-center"
       >
-        <div class="flex space-x-5">
-          <img
-            src="@/assets/img/xls.png"
-            class="h-8"
-            alt="XLS Icon by Dimitry Miroliubov"
-          />
-          <div class="text-base">{{ dropzoneFile.name }}</div>
+        <SuccessAlert className="alert-success">
+          The list of graduates was successfully uploaded. A transmittal letter
+          was sent to the email address.
+        </SuccessAlert>
+        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ female_num }}</h2>
+            <p class="uppercase">female</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ male_num }}</h2>
+            <p class="uppercase">male</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ total }}</h2>
+            <p class="uppercase">total</p>
+          </div>
         </div>
-      </div>
+        <button
+          v-if="students == ''"
+          @click="getStudents()"
+          class="px-5 py-2 bg-success text-light-100 rounded mx-10"
+        >
+          Click to View List of Students
+        </button>
 
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          v-if="!isCompleted"
-          @click="upload(3)"
-          class="btn-sm btn-default"
-          type="submit"
-        >
-          Upload
-        </button>
+        <StudentsDataTable v-else :students="students"></StudentsDataTable>
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+
+          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+            Next
+          </button>
+        </div>
       </div>
     </div>
 
-    <div
-      v-else
-      class="container mx-auto flex flex-col items-center justify-center"
-    >
-      <SuccessAlert className="alert-success">
-        The list of graduates was successfully uploaded. A transmittal letter
-        was sent to the email address.
-      </SuccessAlert>
-      <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ female_num }}</h2>
-          <p class="uppercase">female</p>
-        </div>
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ male_num }}</h2>
-          <p class="uppercase">male</p>
-        </div>
-        <div class="flex flex-col items-center">
-          <h2 class="">{{ total }}</h2>
-          <p class="uppercase">total</p>
-        </div>
-      </div>
-      <button
-        v-if="students == ''"
-        @click="getStudents()"
-        class="px-5 py-2 bg-success text-light-100 rounded mx-10"
-      >
-        Click to View List of Students
-      </button>
-
-      <StudentsDataTable v-else :students="students"></StudentsDataTable>
-
-      <div class="flex items-center justify-center space-x-5 mt-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-          type="button"
-        >
-          Cancel
-        </button>
-
-        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
-          Next
-        </button>
-      </div>
-    </div>
     <ModalWidget v-show="visible">
       <template #body>
         <div
