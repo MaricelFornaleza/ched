@@ -3,14 +3,14 @@
     <div
       class="
         m-auto
-        mt-20
+        my-20
         border border-1 border-light-300
         shadow-sm
         px-20
         py-10
         bg-light-100
         w-4/5
-        lg:w-4/12
+        xl:w-4/12
       "
     >
       <div
@@ -132,10 +132,77 @@
           <div class="mb-4">
             <label
               class="block text-dark-200 text-sm font-bold mb-2"
+              for="institutional_code"
+            >
+              Institutional Code
+            </label>
+            <input
+              class="
+                appearance-none
+                border-2
+                rounded
+                w-full
+                py-2
+                px-4
+                text-dark-100 text-sm
+                focus:outline-none focus:ring
+              "
+              name="institutional_code"
+              id="institutional_code"
+              v-model="institutional_code"
+              type="text"
+              placeholder="Enter Code"
+            />
+          </div>
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
+              for="hei_type"
+            >
+              HEI Type
+            </label>
+            <select
+              class="
+                form-select
+                appearance-none
+                block
+                w-full
+                px-3
+                py-2
+                text-sm text-dark-100
+                bg-clip-padding
+                border-2
+                rounded
+                transition
+                ease-in-out
+                m-0
+                focus:outline-none
+              "
+              v-model="hei_type"
+              name="hei_type"
+              required
+            >
+              <option selected>Select</option>
+              <option value="LUC">Local Universities and Colleges</option>
+              <option value="SUC">State Universities and Colleges</option>
+              <option value="Private">Private</option>
+              <option value="OGS">Other GOvernment Schools</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex items-center my-5">
+          <label class="block text-dark-200 text-sm mr-5"> Address </label>
+          <hr class="border border-light-400 w-full" />
+        </div>
+        <div class="grid grid-cols-2 gap-5">
+          <div class="mb-4">
+            <label
+              class="block text-dark-200 text-sm font-bold mb-2"
               for="street"
             >
               Street
             </label>
+
             <input
               class="
                 appearance-none
@@ -287,69 +354,12 @@
             />
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-5">
-          <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="institutional_code"
-            >
-              Institutional Code
-            </label>
-            <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
-              name="institutional_code"
-              id="institutional_code"
-              v-model="institutional_code"
-              type="text"
-              placeholder="Enter Code"
-            />
-          </div>
-          <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="hei_type"
-            >
-              HEI Type
-            </label>
-            <select
-              class="
-                form-select
-                appearance-none
-                block
-                w-full
-                px-3
-                py-2
-                text-sm text-dark-100
-                bg-clip-padding
-                border-2
-                rounded
-                transition
-                ease-in-out
-                m-0
-                focus:outline-none
-              "
-              v-model="hei_type"
-              name="hei_type"
-            >
-              <option selected>Select</option>
-              <option value="LUC">Local Universities and Colleges</option>
-              <option value="SUC">State Universities and Colleges</option>
-              <option value="Private">Private</option>
-              <option value="OGS">Other GOvernment Schools</option>
-            </select>
-          </div>
-        </div>
+
         <div class="flex items-center justify-center space-x-5 mt-10">
-          <button class="btn-sm bg-light-300 font-bold" type="button">
+          <button
+            class="btn-sm border-none bg-light-300 font-bold"
+            type="button"
+          >
             Cancel
           </button>
           <button
