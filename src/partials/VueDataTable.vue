@@ -60,7 +60,7 @@
             </td>
             <td class="px-6 py-0">
               <EyeIcon
-                @click="viewApplication(application.id)"
+                @click="editHei(hei.id)"
                 class="h-6 mx-auto cursor-pointer"
               />
             </td>
@@ -81,7 +81,7 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
 import * as XLSX from "xlsx";
-
+import router from "../router";
 import { DownloadIcon, EyeIcon, TrashIcon } from "@heroicons/vue/outline";
 export default {
   components: {
@@ -113,6 +113,12 @@ export default {
             sLengthMenu: "_MENU_",
           },
         });
+      });
+    },
+    editHei(id) {
+      router.push({
+        name: "editHei",
+        params: { id: id },
       });
     },
     exportToExcel() {
