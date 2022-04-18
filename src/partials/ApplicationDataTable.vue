@@ -141,12 +141,15 @@
             </td>
             <td class="px-6 py-0">
               <EyeIcon
-                @click="viewApplication(application.id)"
+                @click="viewApplication(application.id, application.application_type)"
                 class="h-6 mx-auto cursor-pointer"
               />
             </td>
             <td class="px-6 py-4">
-              <TrashIcon class="h-6 mx-auto text-error cursor-pointer" />
+              <TrashIcon 
+                @click="deleteApplication(application.id, application.status)"
+                class="h-6 mx-auto text-error cursor-pointer" 
+              />
             </td>
           </tr>
         </tbody>
@@ -164,6 +167,7 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
 import * as XLSX from "xlsx";
+import Parse from 'parse';
 
 import router from "../router";
 import {
@@ -205,11 +209,81 @@ export default {
     dropdownToggle() {
       this.dropdown = !this.dropdown;
     },
-    viewApplication(app_id) {
-      router.push({
-        name: "Step1",
-        params: { application: app_id },
-      });
+    viewApplication(app_id, app_type) {
+      if(app_type == "New Application") {
+        router.push({
+          name: "1stStep",
+          params: { application: app_id },
+        });
+      } 
+      else if(app_type == "For Additional Graduates") {
+        router.push({
+          name: "Step1",
+          params: { application: app_id },
+        });
+      }
+    },
+    deleteApplication(app_id, app_status) {
+      //to be updated
+      if(app_status == "1 of 5") {
+        if (confirm("Are you sure to delete?") == true) {
+          // Application
+          const Application = Parse.Object.extend("Application");
+          const query1 = new Parse.Query(Application);
+          query1.get(app_id)
+            .then((object) => {
+              object.destroy();
+            }, (error) => {
+              console.log(error);
+            });
+          // ApplicationDocument
+          const Document = Parse.Object.extend("ApplicationDocument");
+          const query2 = new Parse.Query(Document);
+          query2.equalTo("applicationId", new Parse.Object("Application", { id: app_id }));
+          query2.find()
+            .then((results) => {
+              for (let i = 0; i < results.length; i++) {
+                results[i].destroy();
+              }
+            },(error) => {
+              console.log(error);
+            });
+          
+          // NstpEnrollment
+          const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+          const query3 = new Parse.Query(NstpEnrollment);
+          query3.equalTo("applicationId", new Parse.Object("Application", { id: app_id }));
+          // query3.include("studentId");
+          let studentList = [];
+          query3.find()
+            .then((results) => {
+              for (let i = 0; i < results.length; i++) {
+                studentList.push(results[i].get("studentId"));
+                results[i].destroy();
+              }
+            },(error) => {
+              console.log(error);
+            });
+          console.log("studentList: " + studentList);
+          // Student
+          const Student = Parse.Object.extend("Student");
+          const query4 = new Parse.Query(Student);
+
+          for (let i = 0; i < studentList.length; i++) {
+            console.log("student id: " + studentList[i]);
+            query4.get(studentList[i])
+              .then((object) => {
+                object.destroy();
+              }, (error) => {
+                console.log(error);
+              });
+          }
+          console.log("Application Deleted!");
+        }
+      }
+      else {
+        alert("Cannot delete application after step 1!");
+      }
     },
     exportToExcel() {
       var currentDate = new Date()

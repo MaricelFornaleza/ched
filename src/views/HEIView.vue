@@ -175,7 +175,6 @@ export default {
   },
   async mounted() {
     var hei = [];
-
     const query = new Parse.Query(Parse.User);
 
     query.equalTo("userType", "hei");
@@ -203,6 +202,10 @@ export default {
     this.countPrivate = await query.count();
     query.equalTo("type", "OGS");
     this.countOGS = await query.count();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0440cf064a9138460f359784ab95dbea886cff73
   },
   components: {
     EmptyState,

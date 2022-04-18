@@ -102,34 +102,69 @@ const routes = [
         component: NewApplicationSteps,
         children: [
           {
-            path: "/application/new/1/:hei",
+            path: "/application/new/1/:application",
             name: "1stStep",
             component: FirstStep,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'New Application'},
+                {name: 'Step 1'},
+              ]
+            }
           },
           {
-            path: "/application/new/2/:hei",
+            path: "/application/new/2/:application",
             name: "2ndStep",
             component: SecondStep,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'New Application'},
+                {name: 'Step 2'},
+              ]
+            }
           },
           {
-            path: "/application/new/3/:hei",
+            path: "/application/new/3/:application",
             name: "3rdStep",
             component: ThirdStep,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'New Application'},
+                {name: 'Step 3'},
+              ]
+            }
           },
           {
-            path: "/application/new/4/:hei",
+            path: "/application/new/4/:application",
             name: "4thStep",
             component: FourthStep,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'New Application'},
+                {name: 'Step 4'},
+              ]
+            }
           },
           {
-            path: "/application/new/5/:hei",
+            path: "/application/new/5/:application",
             name: "5thStep",
             component: FifthStep,
             props: true,
+            meta:{
+              breadcrumb: [
+                { name: 'Application', link: '/application' },
+                {name: 'New Application'},
+                {name: 'Step 5'},
+              ]
+            }
           },
         ],
       },
