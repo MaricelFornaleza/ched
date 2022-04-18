@@ -193,7 +193,13 @@ export default {
                 _this.visible = false;
                 //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
-                _this.$router.push({ name: "hei" });
+                _this.$router.push({
+                  name: "hei",
+                  query: {
+                    status: "success",
+                    msg: "The HEIs were successfully added.",
+                  },
+                });
               }
             };
           }

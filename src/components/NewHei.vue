@@ -376,6 +376,7 @@
 <script>
 import { LibraryIcon } from "@heroicons/vue/solid";
 import Parse from "parse";
+import router from "../router";
 //import emailjs from '@emailjs/browser';
 
 export default {
@@ -420,7 +421,15 @@ export default {
       user.set("type", this.hei_type);
       user.set("password", password);
       user.set("userType", "hei");
-      user.save();
+      user.save().then((user) => {
+        router.push({
+          name: "hei",
+          query: {
+            status: "success",
+            msg: user.get("name") + " was successfully added.",
+          },
+        });
+      });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
       //   alert('New object created with objectId: ' + hei.id);
