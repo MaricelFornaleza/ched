@@ -3,28 +3,30 @@
     <div class="overflow-x-auto">
       <div class="flex space-x-5 absolute right-20 mt-5 z-20">
         <div class="flex flex-col">
-          <button class="btn-sm h-fit px-4 bg-dark-100 text-light-100">
+          <button
+            @click="exportToExcel()"
+            class="btn-sm h-fit px-4 bg-dark-100 text-light-100"
+          >
             <DownloadIcon class="h-5" />
           </button>
         </div>
       </div>
-      <table id="dataTable" class="p-4 hover text-center w-full">
-        <thead class="bg-gray-50 text-xs uppercase">
+      <table id="dataTable" class="p-4 hover text-center w-full row-border">
+        <thead class="text-xs uppercase">
           <tr>
             <th
               v-for="table_header in table_headers"
               :key="table_header"
-              class="p-8 text-xs text-gray-500"
+              class="p-8"
             >
               {{ table_header.title }}
             </th>
-            <th class="px-6 py-2">Action</th>
           </tr>
         </thead>
         <tbody class="bg-white text-sm">
           <tr
-            v-for="application in applications"
-            :key="application.id"
+            v-for="(application, index) in applications"
+            :key="index"
             class="whitespace-nowrap"
           >
             <td class="px-6 py-4 text-left">{{ application.hei_name }}</td>
@@ -34,16 +36,11 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="">{{ application.sn_range }}</div>
+              <div class="">{{ application.snRange }}</div>
             </td>
             <td class="px-6 py-4">{{ application.no_of_graduates }}</td>
             <td class="px-6 py-4">
               {{ application.date_approved }}
-            </td>
-            <td class="px-6 py-4">
-              <a href="#" class="px-4 py-1 text-white bg-red-400 rounded"
-                >Delete</a
-              >
             </td>
           </tr>
         </tbody>
@@ -60,25 +57,55 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
+import * as XLSX from "xlsx";
+
 import { DownloadIcon } from "@heroicons/vue/outline";
 export default {
+  components: {
+    DownloadIcon,
+  },
+
   props: {
     applications: Object,
     table_headers: Array,
   },
-  components: {
-    DownloadIcon,
-  },
   mounted() {
-    $(document).ready(function () {
-      $("#dataTable").DataTable({
-        language: {
-          searchPlaceholder: "Search",
-          search: "",
-          sLengthMenu: "_MENU_",
-        },
+    $("#datatable").DataTable().destroy();
+    this.setDatatable();
+  },
+  methods: {
+    setDatatable() {
+      $(document).ready(function () {
+        $("#dataTable").DataTable({
+          language: {
+            searchPlaceholder: "Search",
+            search: "",
+            sLengthMenu: "_MENU_",
+          },
+        });
       });
-    });
+    },
+    exportToExcel() {
+      var currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      var workbook = XLSX.utils.book_new();
+
+      var sheet1 = XLSX.utils.table_to_sheet(
+        document.getElementById("dataTable")
+      );
+
+      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
+      var filename = "List-of-Applications-" + currentDate + ".xlsx";
+      XLSX.writeFileXLSX(workbook, filename);
+      this.displayMsg(
+        "success",
+        "The List of Serial Numbers was successfully downloaded."
+      );
+    },
+    displayMsg(status, msg) {
+      this.$emit("displayAlert", status, msg);
+    },
   },
 };
 </script>

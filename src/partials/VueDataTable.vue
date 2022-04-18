@@ -99,7 +99,7 @@ export default {
   },
 
   mounted() {
-    $("#datatable2").DataTable().destroy();
+    $("#datatable").DataTable().destroy();
     this.setDatatable();
     // console.log(this.heis);
   },
