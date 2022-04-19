@@ -34,11 +34,11 @@
               <div class="text-sm text-gray-500">{{ hei.hei_type }}</div>
             </td>
             <td class="px-6 py-4 text-sm text-center text-gray-500">
-              {{ hei.email }}
+              {{ hei.id }}
             </td>
             <td class="px-6 py-4 text-center">
               <a
-                href="#"
+                href=""
                 class="px-4 py-1 text-sm text-white bg-blue-400 rounded"
                 >Edit</a
               >

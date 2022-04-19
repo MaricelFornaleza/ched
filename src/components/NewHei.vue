@@ -412,8 +412,6 @@ export default {
       //   // any logic to be executed after the object is saved.
       //   alert('New object created with objectId: ' + hei.id);
 
-
-
       // }).catch(function (error){
       //   alert('Failed to create new object, with error code: ' + error.message);
       // });
