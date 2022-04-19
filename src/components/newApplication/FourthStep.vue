@@ -47,7 +47,10 @@
       >
         For Revision
       </button>
-      <button @click="approve()" class="btn-sm text-light-100 bg-success">
+      <button
+        @click="approve()"
+        class="btn-sm text-light-100 bg-success"
+      >
         Approve
       </button>
     </div>
@@ -60,6 +63,7 @@
       </button>
 
       <button
+        v-if="show"
         @click="$emit('nextStep')"
         class="btn-sm text-light-100 bg-brand-blue"
       >
@@ -84,6 +88,7 @@ export default {
         male: 0,
         program: "",
         acadYear: "",
+        show: false,
       },
     };
   },
@@ -119,41 +124,42 @@ export default {
       return false;
     },
     async getData() {
-      let self = this;
       const Application = Parse.Object.extend("Application");
       const applicationQuery = new Parse.Query(Application);
       applicationQuery.equalTo("objectId", this.appId);
       var res = await applicationQuery.first();
+      this.data.status = res.get("status");
+      if (this.data.status == "4 of 5") this.show = true;
+      this.data.acadYear = res.get("academicYear");
+      this.data.dateApplied = res.get("dateApplied").toLocaleDateString("en", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
       const Students = Parse.Object.extend("Student");
       const innerquery = new Parse.Query(Students);
-
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo(
         "applicationId",
         new Parse.Object("Application", { id: this.appId })
       );
+
       query.include("applicationId");
       query.include("nstpId");
 
-      await query.find().then(function (results) {
-        self.data.graduates = results.length;	//to be updated
-        self.data.status = res.get("status");
-        self.data.acadYear = res.get("academicYear");
-        self.data.dateApplied = res
-          .get("dateApplied")
-          .toLocaleDateString("en", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-        self.data.program = results[0].get("nstpId").get("programName");
-      });
-
+      const results = await query.first();
+      if(results.length > 0) this.data.program = results.get("nstpId").get("programName");
+      
+      
+      query.equalTo("isGraduated", true);
+      this.data.graduates = await query.count();
+      
       const f = innerquery.equalTo("gender", "F");
       query.matchesQuery("studentId", f);
+      const self = this;
       await query.find().then(function (results) {
         self.data.female = results.length;
       });

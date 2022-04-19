@@ -197,7 +197,6 @@ export default {
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     var query2 = new Parse.Query(NstpEnrollment);
 
-    console.log(results);
     for (let i = 0; i < results.length; i++) {
       const object = results[i];
       var count = 0;
@@ -207,7 +206,7 @@ export default {
       await query2.find().then(function (res) {
         // count = res.length;
         for(let x = 0; x < res.length; x++) {
-          if(typeof res[x].get("serialNumber") !== "undefined")
+          if(typeof res[x].get("serialNumber") !== "undefined" && res[x].get("isGraduated"))
             count++;
         }
       });

@@ -1,6 +1,23 @@
 <template>
   <div class="py-5 w-full">
     <div class="overflow-x-auto">
+      <div class="flex space-x-5 absolute right-20 mt-5 z-10">
+        <div class="flex flex-col">
+          <button
+            @click="exportToExcel()"
+            class="
+              h-fit
+              p-2
+              rounded-sm
+              bg-dark-100
+              text-light-100
+              focus:ring-4 focus:ring-success-light focus:bg-success
+            "
+          >
+            <DownloadIcon class="h-5" />
+          </button>
+        </div>
+      </div>
       <div class="inline-block bg-light-200">
         <table
           :id="tableId"
@@ -61,19 +78,26 @@ import "jquery/dist/jquery.min.js";
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
-import $ from "jquery";
+import $ from "jquery";import {
+  DownloadIcon,
+} from "@heroicons/vue/outline";
+import * as XLSX from "xlsx";
 
 export default {
-  components: {},
   data() {
     return {
-      tableId: 'dataTable'
+      tableId: 'dataTable',
+      newFileName: this.fileName
     };
   },
-  props: { students: Array, newId: String },
+  components: {
+    DownloadIcon,
+  },
+  props: { students: Array, newId: String, fileName: String },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
+    this.newFileName = this.fileName;
   },
   watch: {
     students() {
@@ -102,6 +126,23 @@ export default {
           scrollX: true,
         });
       });
+    },
+    exportToExcel() {
+      var currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      var workbook = XLSX.utils.book_new();
+
+      var sheet1 = XLSX.utils.table_to_sheet(
+        document.getElementById("dataTable")
+      );
+
+      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
+      if(typeof this.newFileName == "undefined")
+        this.newFileName = `List-of-Applications_${currentDate}.xlsx`;
+      else 
+        this.newFilename = `${this.newFileName}_${currentDate}.xlsx`;
+      XLSX.writeFileXLSX(workbook, this.newFilename);
     },
   },
 };

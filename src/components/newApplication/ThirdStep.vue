@@ -24,8 +24,8 @@
               :href="templateUrl"
               class="font-bold underline hover:text-brand-blue"
               download
-              >template</a
-            >.
+              >template
+            </a>.
           </span>
         </DropZone>
         <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
@@ -68,7 +68,7 @@
 
       <div v-if="finishedStudents()" class="container mx-auto flex flex-col items-center justify-center">
         <SuccessAlert className="alert-success">
-          The list for the 2nd semester was successfully uploaded. An
+          The List of Graduates was successfully uploaded. An
           Acknowledgement letter was sent to the email address.
         </SuccessAlert>
 
@@ -91,6 +91,7 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          fileName="List-of-Graduates"
         ></StudentsDataTable>
       </div>
       
@@ -333,7 +334,7 @@ export default {
     async verifyStudents(studentData, nstpProgram) {
       //check first if student exists
       //get nstpEnrollment using the studentId, then check nstpId to get the nstpProgram
-      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 is true
+      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
       //if not, store in separate lists
       const studentSet = new Set(studentData);
       console.log(studentSet);
@@ -352,6 +353,8 @@ export default {
         var bday = results[i].get("studentId").get("birthdate");
         var program = results[i].get("nstpId").get("programName");
         var takenNstp1 = results[i].get("takenNstp1");
+        var takenNstp2 = results[i].get("takenNstp2");
+        var serialNum = results[i].get("serialNumber");
 
         for (let x = 0; x < studentData.length; x++) {
           //check student's name and bday
@@ -364,25 +367,18 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram && takenNstp1 == true) {
+            if(program == nstpProgram && takenNstp1 == true && takenNstp2 == true && serialNum == null) {
               studentSet.delete(studentData[x]);
-              results[i].set("takenNstp2", true);
+              results[i].set("isGraduated", true);
               await results[i].save();
             }
             else {
               //found the student but there are mismatch in stored info
+              //delete from set since it'll still be shown because of nstpTaken
               studentSet.delete(studentData[x]);
-              // this.storeStudents(studentData[x], results[i]);
             }
             break;
           }
-          // else {
-          //   //uniquely store all students who has missing records
-          //   missingSet.add(studentData[x]);
-          //   if(!missingSet.has(studentData[x])) {
-          //     this.storeStudents(studentData[x]);
-          //   }
-          // }
         }
       }
       const self = this;
@@ -466,7 +462,7 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        if(object.get("takenNstp1") == true && object.get("takenNstp2") == true) {
+        if(object.get("takenNstp1") == true && object.get("takenNstp2") == true && object.get("isGraduated") == true ) {
            studentList.push({
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),

@@ -91,6 +91,7 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          fileName="List-of-Students-2ndSem"
         ></StudentsDataTable>
       </div>
       
@@ -115,9 +116,11 @@
           </div>
         </div>
 
-        <StudentsDataTable newId="datatable2"
+        <StudentsDataTable 
           :key="componentKey"
           :students="studentsMissing"
+          newId="datatable2"
+          fileName="List-of-Students-Missing-2ndSem"
         ></StudentsDataTable>
       </div>
 
@@ -371,8 +374,8 @@ export default {
             }
             else {
               //found the student but there are mismatch in stored info
+              //delete from set since it'll still be shown because of nstpTaken2 == false
               studentSet.delete(studentData[x]);
-              // this.storeStudents(studentData[x], results[i]);
             }
             break;
           }
@@ -446,6 +449,7 @@ export default {
     },
     async getStudents() {
       var studentList = [], studentErrorList = [];
+      //reset the numbers to be sure
       this.femaleNum = 0;
       this.maleNum = 0;
       this.femaleNumError = 0;

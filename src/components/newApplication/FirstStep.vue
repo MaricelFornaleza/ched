@@ -80,8 +80,10 @@
       </div>
 
       <!-- pass props lists -->
-      <StudentsDataTable :key="componentKey"
+      <StudentsDataTable 
+        :key="componentKey"
         :students="students"
+        fileName="List-of-Students-1stSem"
       ></StudentsDataTable>
 
       <div class="flex items-center justify-center space-x-5 mt-5">

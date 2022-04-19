@@ -7,13 +7,27 @@
       <AlertWidget className="alert-info">
         Please Upload the List of Graduates. Follow the format provided in the
         Template.&nbsp;
-        <router-link to="/#" class="font-bold underline">
+        <a
+          :href="templateUrl"
+          class="font-bold underline hover:text-brand-blue"
+          download
+        >
           Download Template
-        </router-link>
+        </a>
       </AlertWidget>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <DropZone @drop.prevent="drop" @change="selectedFile" fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <span class="body-m">
+            Must be .xlsx file using this
+            <a
+              :href="templateUrl"
+              class="font-bold underline hover:text-brand-blue"
+              download
+              >template
+            </a>.
+          </span>
+        </DropZone>
         <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span>
       </div>
       <div
@@ -160,6 +174,7 @@ import Parse from "parse";
 export default {
   data() {
     return {
+      templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_GRADUATES.xlsx", //may switch to file-loader package to load files
       visible: false,
       completed: false,
       className: "alert-info",
@@ -247,7 +262,7 @@ export default {
 
         reader.readAsArrayBuffer(this.dropzoneFile);
       } else {
-        alert("Please upload a .xlsx file!");
+        alert("Please upload an .xlsx file!");
       }
     },
     storeStudents(data) {
