@@ -1,66 +1,69 @@
 <template>
   <div>
-    <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
-      <tbody>
-        <tr>
-          <td class="border p-2">Application Date</td>
-          <td class="border p-2">{{ data.dateApplied }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Application Status</td>
-          <td class="border p-2">
-            <span :class="variant(data.status)">{{ data.status }}</span>
-          </td>
-        </tr>
-        <tr>
-          <td class="border p-2">Number of Graduates</td>
-          <td class="border p-2">{{ data.graduates }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Number of Female</td>
-          <td class="border p-2">{{ data.female }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Number of Male</td>
-          <td class="border p-2">{{ data.male }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">NSTP Program</td>
-          <td class="border p-2">{{ data.program }}</td>
-        </tr>
-        <tr>
-          <td class="border p-2">Academic Year</td>
-          <td class="border p-2">{{ data.acadYear }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-if="!isCompleted" class="flex justify-center space-x-5">
-      <button
-        @click="$emit('previousStep')"
-        class="btn-sm btn-default btn-outline"
-      >
-        Back
-      </button>
-      <button
-        @click="setStatus('For Revision')"
-        class="btn-sm text-light-100 bg-error"
-      >
-        For Revision
-      </button>
-      <button
-        @click="approve()"
-        class="btn-sm text-light-100 bg-success"
-      >
-        Approve
-      </button>
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
+      </AlertWidget>
     </div>
-    <div v-else class="flex justify-center space-x-5">
-      <button
-        @click="$emit('previousStep')"
-        class="btn-sm btn-default btn-outline"
-      >
-        Back
-      </button>
+    <div v-else>
+      <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
+        <tbody>
+          <tr>
+            <td class="border p-2">Application Date</td>
+            <td class="border p-2">{{ data.dateApplied }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Application Status</td>
+            <td class="border p-2">
+              <span :class="variant(data.status)">{{ data.status }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="border p-2">Number of Graduates</td>
+            <td class="border p-2">{{ data.graduates }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Number of Female</td>
+            <td class="border p-2">{{ data.female }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Number of Male</td>
+            <td class="border p-2">{{ data.male }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">NSTP Program</td>
+            <td class="border p-2">{{ data.program }}</td>
+          </tr>
+          <tr>
+            <td class="border p-2">Academic Year</td>
+            <td class="border p-2">{{ data.acadYear }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-if="!isCompleted" class="flex justify-center space-x-5">
+        <button
+          @click="$emit('previousStep')"
+          class="btn-sm btn-default btn-outline"
+        >
+          Back
+        </button>
+        <button
+          @click="setStatus('For Revision')"
+          class="btn-sm text-light-100 bg-error"
+        >
+          For Revision
+        </button>
+        <button @click="approve()" class="btn-sm text-light-100 bg-success">
+          Approve
+        </button>
+      </div>
+      <div v-else class="flex justify-center space-x-5">
+        <button
+          @click="$emit('previousStep')"
+          class="btn-sm btn-default btn-outline"
+        >
+          Back
+        </button>
 
       <button
         v-if="show"
@@ -75,8 +78,12 @@
 
 <script>
 import Parse from "parse";
+import AlertWidget from "@/partials/AlertWidget.vue";
 
 export default {
+  components: {
+    AlertWidget,
+  },
   data() {
     return {
       completed: false,

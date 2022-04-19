@@ -20,13 +20,17 @@
               py-2
               text-center
               inline-flex
+              space-x-2
               items-center
               dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
             "
             type="button"
           >
-            Add Application
-            <ChevronDownIcon class="ml-2 h-5" />
+            <div>
+              Add <span class="hidden lg:inline-flex">Application</span>
+            </div>
+
+            <ChevronDownIcon class="h-5" />
           </button>
 
           <!-- Dropdown menu -->
@@ -44,6 +48,7 @@
               dark:bg-gray-700
             "
           >
+            <!-- xmhbiesbmfhykmwp -->
             <slot>
               <ul class="py-1" aria-labelledby="dropdownButton">
                 <li>
@@ -316,6 +321,8 @@ export default {
       }
     },
     exportToExcel() {
+      //this.displayMsg("success", "Application Deleted!");
+      // this.displayMsg("error", "Cannot delete application after step 1!");
       var currentDate = new Date()
         .toLocaleDateString()
         .replace(/[^\w\s]/gi, "-");
@@ -328,10 +335,15 @@ export default {
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "List-of-Applications-" + currentDate + ".xlsx";
       XLSX.writeFileXLSX(workbook, filename);
+      this.displayMsg(
+        "success",
+        "The List of Applications was successfully downloaded."
+      );
     },
-    displayMsg() {
-      this.$emit("displayMsg", "success", "Download successful!");
+    displayMsg(status, msg) {
+      this.$emit("displayAlert", status, msg);
     },
+
     variant(stats) {
       if (stats == "Approved") {
         return "badge-success";

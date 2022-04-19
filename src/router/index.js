@@ -26,6 +26,7 @@ import StepTwo from '../components/additionalApplication/StepTwo.vue'
 import StepThree from '../components/additionalApplication/StepThree.vue'
 import StepFour from '../components/additionalApplication/StepFour.vue'
 import StepFive from '../components/additionalApplication/StepFive.vue'
+import EditHei from '../components/EditHei.vue'
 import Parse from "parse";
 
 
@@ -76,6 +77,15 @@ const routes = [
         component: NewHei,
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "New" }],
+        },
+        
+      },
+      {
+        path: "/hei/edit/:id",
+        name: "editHei",
+        component: EditHei,
+        meta: {
+          breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "Edit" }],
         },
       },
       {

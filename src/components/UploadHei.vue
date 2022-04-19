@@ -2,7 +2,17 @@
   <div>
     <div
       v-if="!completed"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
+      class="
+        m-auto
+        mt-20
+        border border-1 border-light-300
+        shadow-sm
+        px-20
+        py-10
+        bg-light-100
+        w-4/5
+        xl:w-4/12
+      "
     >
       <div
         class="
@@ -44,7 +54,7 @@
       </div>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
-        <button class="btn-sm bg-light-300 font-bold" type="button">
+        <button class="btn-sm border-none bg-light-300 font-bold" type="button">
           Cancel
         </button>
         <button
@@ -183,7 +193,13 @@ export default {
                 _this.visible = false;
                 //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
-                _this.$router.push({ name: "hei" });
+                _this.$router.push({
+                  name: "hei",
+                  query: {
+                    status: "success",
+                    msg: "The HEIs were successfully added.",
+                  },
+                });
               }
             };
           }
@@ -193,7 +209,7 @@ export default {
         alert("Please upload a .xlsx file!");
       }
     },
-       storeHeis(data) {
+    storeHeis(data) {
       for (let i = 1; i < data.length; i++) {
         const user = new Parse.User();
         const password = Math.random().toString(36).slice(-12);
@@ -210,10 +226,10 @@ export default {
         user.set("email", data[i].I);
         user.set("contactNumber", data[i].J);
         user.set("type", data[i].K);
-        user.set("userType", "hei"); 
-        user.set("password", password); 
+        user.set("userType", "hei");
+        user.set("password", password);
         user.set("username", data[i].L);
-        user.set("password", "password");
+
         user.save().then(() => {
           console.log("success");
         });

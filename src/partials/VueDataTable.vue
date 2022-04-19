@@ -4,6 +4,7 @@
       <slot name="button"></slot>
 
       <button
+        @click="exportToExcel()"
         class="
           h-fit
           p-2
@@ -17,7 +18,7 @@
       </button>
     </div>
     <div class="overflow-x-auto">
-      <table id="dataTable2" class="p-4 w-full hover row-border">
+      <table id="dataTable" class="p-4 w-full hover row-border">
         <thead class="text-xs">
           <tr>
             <th
@@ -59,7 +60,7 @@
             </td>
             <td class="px-6 py-0">
               <EyeIcon
-                @click="viewApplication(application.id)"
+                @click="editHei(hei.id)"
                 class="h-6 mx-auto cursor-pointer"
               />
             </td>
@@ -79,6 +80,8 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
+import * as XLSX from "xlsx";
+import router from "../router";
 import { DownloadIcon, EyeIcon, TrashIcon } from "@heroicons/vue/outline";
 export default {
   components: {
@@ -96,14 +99,14 @@ export default {
   },
 
   mounted() {
-    $("#datatable2").DataTable().destroy();
+    $("#datatable").DataTable().destroy();
     this.setDatatable();
     // console.log(this.heis);
   },
   methods: {
     setDatatable() {
       $(document).ready(function () {
-        $("#dataTable2").DataTable({
+        $("#dataTable").DataTable({
           language: {
             searchPlaceholder: "Search",
             search: "",
@@ -111,6 +114,33 @@ export default {
           },
         });
       });
+    },
+    editHei(id) {
+      router.push({
+        name: "editHei",
+        params: { id: id },
+      });
+    },
+    exportToExcel() {
+      var currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      var workbook = XLSX.utils.book_new();
+
+      var sheet1 = XLSX.utils.table_to_sheet(
+        document.getElementById("dataTable")
+      );
+
+      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
+      var filename = "List-of-Applications-" + currentDate + ".xlsx";
+      XLSX.writeFileXLSX(workbook, filename);
+      this.displayMsg(
+        "success",
+        "The List of Higher Education Institutions was successfully downloaded."
+      );
+    },
+    displayMsg(status, msg) {
+      this.$emit("displayAlert", status, msg);
     },
   },
 };
