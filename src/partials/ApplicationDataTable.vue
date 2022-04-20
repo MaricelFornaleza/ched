@@ -161,10 +161,10 @@
                   application.application_type == 'New Application'
                   ? application.status == '1 of 5'
                       ? 'cursor-pointer'
-                      : 'opacity-50 cursor-not-allowed'
+                      : 'opacity-50 cursor-pointer'
                   : application.status == '4 of 5'
                     ? 'cursor-pointer'
-                    : 'opacity-50 cursor-not-allowed',
+                    : 'opacity-50 cursor-pointer',
                 ]"
               />
             </td>
@@ -312,11 +312,17 @@ export default {
             console.log("Application Deleted!");
           }
         }
+        else {
+          this.displayMsg("error", "Cannot delete application after step 1!");
+        }
       } else if (app_type == "For Additional Graduates") {
         if (app_status == "4 of 5") {
           if (confirm("Are you sure to delete?")) {
             // to be updated
           }
+        }
+        else {
+          this.displayMsg("error", "Cannot delete application after step 4!");
         }
       }
     },

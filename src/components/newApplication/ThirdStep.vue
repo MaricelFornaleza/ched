@@ -4,22 +4,8 @@
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
       </AlertWidget>
-
-      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-          <span class="body-m">
-            Must be .xlsx file using this
-            <a
-              :href="templateUrl"
-              class="font-bold underline hover:text-brand-blue"
-              download
-              >template
-            </a>.
-          </span>
-        </DropZone>
-        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
-      </div>
-
+    </div>
+    <div v-else>
       <div
         v-if="!isCompleted"
         class="
@@ -85,7 +71,7 @@
           </button>
           <button
             v-if="!isCompleted"
-            @click="upload(2)"
+            @click="upload(3)"
             class="btn-sm btn-default"
             type="submit"
           >
@@ -123,6 +109,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            fileName="List-of-Students-Graduates"
           ></StudentsDataTable>
         </div>
 
@@ -154,6 +141,7 @@
             newId="datatable2"
             :key="componentKey"
             :students="studentsMissing"
+            fileName="List-of-Students-Missing"
           ></StudentsDataTable>
         </div>
 
@@ -321,7 +309,7 @@ export default {
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "3 of 5");
+            self.$emit("setStatus", "4 of 5");
             // this.completed = !this.completed;
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
@@ -350,14 +338,12 @@ export default {
         reader.readAsArrayBuffer(this.dropzoneFile);
       }
     },
-    async setAcadYear(acadYear) {
+    async getHeiId() {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
       query.equalTo("objectId", this.appId);
       var results = await query.first();
-      results.set("academicYear", acadYear);
-      results.set("awardYear", acadYear); //acadYear is just the same with awardYear
-      results.save();
+      return results.get("heiId");
     },
     async getNstpId(nstp) {
       const Nstp = Parse.Object.extend("Nstp");
@@ -418,7 +404,7 @@ export default {
       const self = this;
       const students = studentSet.values();
       for (const student of students) {
-        await self.storeStudents(student, null, nstpProgram);
+        await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
       // studentSet.forEach (function(student) {
@@ -426,12 +412,11 @@ export default {
       // });
       await this.getStudents();
     },
-    async storeStudents(studentData, results, nstpProgram) {
-      var nstpId = "";
-      if (results == null) {
-        results = new Parse.Object("NstpEnrollment");
-        nstpId = await this.getNstpId(nstpProgram);
-      }
+    async storeStudents(studentData, nstpProgram) {
+      const nstpEnrollment = new Parse.Object("NstpEnrollment");
+      const nstpId = await this.getNstpId(nstpProgram);
+      const heiId = await this.getHeiId();
+
       const student = new Parse.Object("Student");
       student.set("name", {
         lastName: studentData.F,
@@ -453,21 +438,22 @@ export default {
         programLevelCode: studentData.R,
         programName: studentData.S,
       });
+      student.set("heiId", heiId);
 
       await student.save().then((student) => {
         // this.forceRerender(); //solution to updating DOM of child component
-        results.set(
+        nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        results.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
-        results.set(
+        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+        nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
         // nstpEnrollment.set("takenNstp1", false);   //defaults to false when the seeder is used
         // nstpEnrollment.set("takenNstp2", false);
-        results.save();
+        nstpEnrollment.save();
       });
     },
     async getStudents() {

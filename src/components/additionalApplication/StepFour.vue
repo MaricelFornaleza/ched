@@ -179,22 +179,35 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
-      query.descending("serialNumber");
-      const serialNumber = await query.first();
-      const endSerialNumber = serialNumber.get("serialNumber").end;
-      const newStart = endSerialNumber + 1;
-      const newEnd = endSerialNumber + this.data.graduates;
+      query.equalTo("objectId", this.appId);
+      const results = await query.first();
+      //get serialNumber, if undefined; set startSerialNum to 1
+      //if not, set startSerialNum to the last saved endSerialNumber + 1
+      var newStart = 0;
+      var newEnd = 0; 
+      
+      if (results.get("serialNumber") == null) {
+        newStart = 1;
+        newEnd = this.data.graduates;
+      } else {
+        query.descending("serialNumber");
+        const serialNumber = await query.first();
+        const endSerialNumber = serialNumber.get("serialNumber").end;
+        newStart = endSerialNumber + 1;
+        newEnd = endSerialNumber + this.data.graduates;   
+      }
+      console.log(newStart);
+      console.log(newEnd);
 
-      //get application details
-      const application = new Parse.Query(Application);
-      application.equalTo("objectId", this.appId);
-      await application.first().then(function (result) {
+      await query.first().then(function (result) {
         result.set("dateApproved", date);
         result.set("awardYear", fullyear.toString());
         result.set("serialNumber", { start: newStart, end: newEnd });
         result.save();
       });
-
+      
+      //TO-DO: set nstpTaken 1 & 2 to true -DONE
+      //as well as isGraduated to true
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(
@@ -214,6 +227,9 @@ export default {
             "-" +
             year;
           results[i].set("serialNumber", sn);
+          results[i].set("nstpTaken1", true);
+          results[i].set("nstpTaken2", true);
+          results[i].set("isGraduated", true);
           results[i].save();
           start++;
         }

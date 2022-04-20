@@ -105,12 +105,12 @@
           </div>
         </div>
 
-      <!-- pass props lists -->
-      <StudentsDataTable 
-        :key="componentKey"
-        :students="students"
-        fileName="List-of-Students-1stSem"
-      ></StudentsDataTable>
+        <!-- pass props lists -->
+        <StudentsDataTable 
+          :key="componentKey"
+          :students="students"
+          fileName="List-of-Students-1stSem"
+        ></StudentsDataTable>
 
         <div class="flex items-center justify-center space-x-5 mt-5">
           <button
@@ -196,6 +196,7 @@ export default {
       templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_1st_SEM.xlsx", //may switch to file-loader package to load files
       componentKey: 0,
       pending: false,
+      heiId: "",
       className: "alert-info",
       students: [],
       excelData: [],
@@ -204,7 +205,11 @@ export default {
       worker: undefined,
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean },
+  props: { 
+    isCompleted: Boolean, 
+    appId: String,
+    allow: Boolean 
+  },
   components: {
     AlertWidget,
     SuccessAlert,
@@ -281,6 +286,7 @@ export default {
       var results = await query.first();
       results.set("academicYear", acadYear);
       //results.set("awardYear", acadYear);
+      this.heiId = results.get("heiId");      //also get heiId
       results.save();
     },
     async getNstpId(nstp) {
@@ -320,6 +326,7 @@ export default {
           programLevelCode: studentData[i].R,
           programName: studentData[i].S,
         });
+        student.set("heiId", this.heiId);
 
         student.save().then((student) => {
           this.students.push({
@@ -409,7 +416,7 @@ export default {
       this.forceRerender();
     },
     nextStep() {
-      this.worker.terminate();
+      // this.worker.terminate();
       this.worker = undefined;
 
       this.$emit("nextStep");
