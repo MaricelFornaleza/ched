@@ -61,7 +61,6 @@
             id="acadyear"
             class="
               text-light-100
-              w-full
               px-3
               py-3
               block
@@ -90,7 +89,6 @@
             id="semester"
             class="
               text-light-100
-              w-full
               px-3
               py-3
               block

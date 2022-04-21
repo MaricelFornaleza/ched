@@ -153,7 +153,7 @@ export default {
       // currently, styling cell values is only supported in SheetJS pro version :(
       // although, there are community forks alternatives to make this possible such as xlsx-js-style 
       // ... to be updated
-      const headers = ["AWARD YEAR", "PROGRAM NAME", "LASTNAME", "FIRSTNAME", "MIDDLENAME", "EXTENSIONNAME", "SERIAL NUMBER"]
+      const headers = ["AWARD YEAR", "PROGRAM NAME", "LAST NAME", "FIRST NAME", "MIDDLE NAME", "EXTENSION NAME", "SERIAL NUMBER"]
       XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
        
       /* calculate max column width */

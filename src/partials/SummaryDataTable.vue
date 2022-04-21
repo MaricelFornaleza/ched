@@ -137,6 +137,8 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
+      // sheet1['!rows'] = [];
+      // sheet1['!rows'][1] = { hidden: true };
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
