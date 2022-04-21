@@ -62,11 +62,10 @@ export default {
       await Parse.User.logOut();
       const currentUser = await Parse.User.current();
       if (currentUser === null) {
-        alert("success");
         this.$router.push({ name: "landing" });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

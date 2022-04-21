@@ -28,11 +28,13 @@
         >
         or drag and drop a file
       </span>
-      <span class="body-m"
-        >Must be .xlsx file using this
-        <button class="font-bold underline">template</button>.</span>
-
-      <input type="file" id="dropzoneFile" class="dropzoneFile" />
+      <slot>
+        <span class="body-m">
+          Must be .xlsx file using this
+          <button class="font-bold underline">template</button>.
+        </span>
+      </slot>
+      <input type="file" id="dropzoneFile" class="dropzoneFile" :accept="fileType" />
     </div>
   </div>
 </template>
@@ -42,12 +44,7 @@
   display: none;
 }
 .active-dropzone {
-  color: #fff;
-  border-color: #fff;
-  background-color: theme("colors.brand.blue");
-}
-.active-dropzone .icon {
-  color: #fff;
+  background-color: theme("colors.info.light");
 }
 </style>
 
@@ -59,6 +56,7 @@ export default {
   components: {
     DocumentAddIcon,
   },
+  props: { fileType: String },
   setup() {
     const active = ref(false);
     const toggleActive = () => {

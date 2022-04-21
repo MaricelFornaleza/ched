@@ -143,6 +143,7 @@
                         focus:ring-1
                       "
                       placeholder="Enter password"
+                      v-on:keyup.enter="login"
                     />
                     <span class="text-xs text-error" id="password-error">{{
                       passwordError

@@ -1,10 +1,20 @@
 <template>
-<div>
-  <div
-    v-if="!completed"
-    class="container w-fit mx-auto flex flex-col items-center justify-center"
-  >
+  <div>
     <div
+      v-if="!completed"
+      class="
+        m-auto
+        mt-20
+        border border-1 border-light-300
+        shadow-sm
+        px-20
+        py-10
+        bg-light-100
+        w-4/5
+        xl:w-4/12
+      "
+    >
+      <div
         class="
           border-b-2
           text-center
@@ -24,27 +34,27 @@
         <p class="uppercase font-bold label-sm">Higher Education Institution</p>
       </div>
 
-    <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-      <DropZone @drop.prevent="drop" @change="selectedFile" />
-      <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
-    </div>
-
-    <div
-      v-else
-      class="my-20 w-fit flex justify-between p-5 border border-light-300"
-    >
-      <div class="flex space-x-5">
-        <img
-          src="@/assets/img/xls.png"
-          class="h-8"
-          alt="XLS Icon by Dimitry Miroliubov"
-        />
-        <div class="text-base">{{ dropzoneFile.name }}</div>
+      <div v-if="dropzoneFile === ''" class="mt-10 w-full">
+        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
       </div>
-    </div>
 
-    <div class="flex items-center justify-center space-x-5 mt-5">
-      <button class="btn-sm bg-light-300 font-bold" type="button">
+      <div
+        v-else
+        class="my-20 w-fit flex justify-between p-5 border border-light-300"
+      >
+        <div class="flex space-x-5">
+          <img
+            src="@/assets/img/xls.png"
+            class="h-8"
+            alt="XLS Icon by Dimitry Miroliubov"
+          />
+          <div class="text-base">{{ dropzoneFile.name }}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center space-x-5 mt-5">
+        <button class="btn-sm border-none bg-light-300 font-bold" type="button">
           Cancel
         </button>
         <button
@@ -55,13 +65,12 @@
         >
           Upload
         </button>
+      </div>
     </div>
-    </div>
-<div
-    v-else
-    class="container w-fit mx-auto flex flex-col items-center justify-center"
-  >
-  </div>
+    <div
+      v-else
+      class="container w-fit mx-auto flex flex-col items-center justify-center"
+    ></div>
     <ModalWidget v-show="visible">
       <template #body>
         <div
@@ -90,7 +99,7 @@
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-          >  
+          >
             <circle
               class="opacity-25"
               cx="12"
@@ -106,9 +115,9 @@
             ></path>
           </svg>
           Processing...
-        </div> 
+        </div>
       </template>
-    </ModalWidget>   
+    </ModalWidget>
   </div>
 </template>
 
@@ -135,7 +144,7 @@ export default {
   },
   components: {
     LibraryIcon,
-   // AlertWidget,
+    // AlertWidget,
     DropZone,
     ModalWidget,
   },
@@ -143,11 +152,11 @@ export default {
     let dropzoneFile = ref("");
     const drop = (e) => {
       dropzoneFile.value = e.dataTransfer.files[0];
-    }; 
+    };
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
-    };    
-    
+    };
+
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {
@@ -176,14 +185,21 @@ export default {
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
               var heis = event.data.rows;
+              console.log(_this.table_headers);
               console.log(heis);
-              _this.storeHeis(heis);
+              // _this.storeHeis(heis);
 
               if (event.data.complete) {
                 _this.visible = false;
-               //_this.$emit("complete", step);
+                //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
-                _this.$router.push({ name: "hei" });
+                _this.$router.push({
+                  name: "hei",
+                  query: {
+                    status: "success",
+                    msg: "The HEIs were successfully added.",
+                  },
+                });
               }
             };
           }
@@ -193,7 +209,7 @@ export default {
         alert("Please upload a .xlsx file!");
       }
     },
-       storeHeis(data) {
+    storeHeis(data) {
       for (let i = 1; i < data.length; i++) {
         const user = new Parse.User();
         const password = Math.random().toString(36).slice(-12);
@@ -210,11 +226,12 @@ export default {
         user.set("email", data[i].I);
         user.set("contactNumber", data[i].J);
         user.set("type", data[i].K);
-        user.set("userType", "hei"); 
-         user.set("password", password); 
+        user.set("userType", "hei");
+        user.set("password", password);
         user.set("username", data[i].L);
+
         user.save().then(() => {
-          alert("success");
+          console.log("success");
         });
       }
     },

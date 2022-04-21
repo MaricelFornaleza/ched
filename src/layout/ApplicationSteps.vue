@@ -46,8 +46,12 @@
         @previousStep="previousStep"
         @goToApplication="goToApplication"
         @setStatus="setStatus"
-        v-model:isCompleted="isCompleted"
+        @checkActive="checkActive"
+        :isCompleted="isCompleted"
         :appId="application_id"
+        :hei_username="hei_username"
+        :hei_region_code="hei_region_code"
+        :allow="allow"
       ></router-view>
     </div>
   </div>
@@ -59,10 +63,13 @@ export default {
   data() {
     return {
       hei: "",
+      hei_username: "",
+      hei_region_code: "",
       application_id: "",
       currentStep: 0,
       steps: [],
       isCompleted: false,
+      allow: false,
     };
   },
   async created() {
@@ -71,8 +78,12 @@ export default {
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.application_id);
+    query.include("heiId");
     var results = await query.first();
-    this.hei = results.get("hei");
+    this.hei = results.get("heiId").get("name");
+    this.hei_username = results.get("heiId").get("username");
+    this.hei_region_code = results.get("heiId").get("address").regionNo;
+
     this.steps = results.get("steps");
     this.getCompletedStep();
     this.isCompleted = this.findStep(this.currentStep);
@@ -81,6 +92,7 @@ export default {
     activeStep(step) {
       this.currentStep = step;
       this.isCompleted = this.findStep(step);
+      this.checkActive(step);
       router.push({
         name: "Step" + this.currentStep,
         params: { application: this.application_id },
@@ -105,7 +117,7 @@ export default {
         count++;
       }
       this.currentStep = count;
-      console.log(count);
+
       this.activeStep(count);
     },
     completeStep(currentStep) {
@@ -172,6 +184,22 @@ export default {
     },
     goToApplication() {
       this.$router.push({ name: "application" });
+    },
+    checkActive(step) {
+      var count = 0;
+      for (var i in this.steps) {
+        if (this.steps[i].completed == true) {
+          count++;
+        }
+      }
+      if (count < 5) {
+        count++;
+      }
+      if (step > count) {
+        this.allow = false;
+      } else {
+        this.allow = true;
+      }
     },
   },
   components: {},

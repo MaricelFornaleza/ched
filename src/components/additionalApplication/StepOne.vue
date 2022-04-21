@@ -1,7 +1,13 @@
 <template>
   <div>
+    <div v-if="!allow" class="w-fit mx-auto">
+      <AlertWidget className="alert-warning">
+        Please complete the previous steps.
+      </AlertWidget>
+    </div>
+
     <div
-      v-if="!isCompleted"
+      v-if="!isCompleted && allow"
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
       <AlertWidget className="alert-info">
@@ -118,7 +124,12 @@ export default {
       title: "NotarizedTransmittalLetter",
     };
   },
-  props: { isCompleted: Boolean, appId: String },
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    hei_username: String,
+    allow: Boolean,
+  },
 
   components: {
     SuccessAlert,
@@ -139,13 +150,14 @@ export default {
   },
   created() {
     this.getUrl(this.appId);
+    console.log(this.allow);
   },
   methods: {
     upload(step) {
       var currentDate = new Date()
         .toLocaleDateString()
         .replace(/[^\w\s]/gi, "");
-      var name = this.title + currentDate + ".pdf";
+      var name = this.hei_username + "-" + this.title + currentDate + ".pdf";
       this.filename = name;
       let _this = this;
       const parseFile = new Parse.File(this.filename, this.dropzoneFile);

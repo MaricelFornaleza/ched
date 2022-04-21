@@ -386,6 +386,7 @@ export default {
   },
   data() {
     return {
+      id: "",
       open: true,
       name: "",
       username: "",
@@ -401,10 +402,30 @@ export default {
       hei_type: "",
     };
   },
+  async mounted() {
+    this.id = this.$route.params.id;
+    console.log(this.id);
+    const query = new Parse.Query(Parse.User);
+    query.equalTo("objectId", this.id);
+    const result = await query.first({ useMasterKey: true });
+    console.log(result);
+    this.name = result.get("name");
+    this.username = result.get("username");
+    this.email = result.get("email");
+    this.contact_number = result.get("contactNumber");
+    this.institutional_code = result.get("institutionalCode");
+    this.hei_type = result.get("type");
+    this.street = result.get("address").street;
+    this.barangay = result.get("address").barangay;
+    this.city = result.get("address").city;
+    this.province = result.get("address").province;
+    this.regionNo = result.get("address").regionNo;
+    this.regionName = result.get("address").regionName;
+  },
   methods: {
-    addHei() {
-      var password = Math.random().toString(36).slice(-12);
-      const user = new Parse.User();
+    async addHei() {
+      const user = await Parse.User.current();
+      user.set("objectId", this.id);
       user.set("name", this.name);
       user.set("email", this.email);
       user.set("username", this.username);
@@ -419,14 +440,13 @@ export default {
       });
       user.set("institutionalCode", this.institutional_code);
       user.set("type", this.hei_type);
-      user.set("password", password);
-      user.set("userType", "hei");
-      user.save().then((user) => {
+
+      user.save({ useMasterKey: true }).then((user) => {
         router.push({
           name: "hei",
           query: {
             status: "success",
-            msg: user.get("name") + " was successfully added.",
+            msg: user.get("name") + " was successfully updated.",
           },
         });
       });
