@@ -183,7 +183,7 @@ export default {
   mounted() {
     this.getHeis();
     this.getApplications();
-    this.getGaduates();
+    this.getGraduates();
   },
   setup() {
     const testData = {
@@ -277,7 +277,7 @@ export default {
       ]);
       this.applications.pending = await query.count();
     },
-    async getGaduates() {
+    async getGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.exists("serialNumber");

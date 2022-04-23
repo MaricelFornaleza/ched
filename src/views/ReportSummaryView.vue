@@ -179,6 +179,7 @@ import {
   DocumentTextIcon,
   DownloadIcon,
 } from "@heroicons/vue/solid";
+// import Parse from "parse";
 Chart.register(...registerables);
 export default {
   components: {
@@ -214,12 +215,13 @@ export default {
       ],
     };
   },
+  async created() {
+  },
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
     },
   },
-
   setup() {
     const testData = {
       labels: [

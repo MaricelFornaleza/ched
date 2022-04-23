@@ -5,7 +5,14 @@
         <div class="flex flex-col">
           <button
             @click="exportToExcel()"
-            class="btn-sm h-fit px-4 bg-dark-100 text-light-100"
+            class="
+              h-fit
+              p-2
+              rounded-sm
+              bg-dark-100
+              text-light-100
+              focus:ring-4 focus:ring-success-light focus:bg-success
+            "
           >
             <DownloadIcon class="h-5" />
           </button>
@@ -94,10 +101,17 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
-      sheet1["!cols"] = [ { wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 },{ wch: 15 } ];
-      
+      sheet1["!cols"] = [
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+      ];
+
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-      var filename = "List-of-Applications-SerialNumbers" + currentDate + ".xlsx";
+      var filename =
+        "List-of-Applications-SerialNumbers" + currentDate + ".xlsx";
       XLSX.writeFileXLSX(workbook, filename);
       this.displayMsg(
         "success",

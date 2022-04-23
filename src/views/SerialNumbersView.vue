@@ -88,7 +88,7 @@ export default {
           region.padStart(2, "0") +
           "-" +
           start.padStart(6, "0") +
-          "-" +
+          " — " +
           end.padStart(6, "0") +
           "-" +
           date.toLocaleDateString("en", { year: "2-digit" }),

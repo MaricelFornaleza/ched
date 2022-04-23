@@ -206,8 +206,6 @@ export default {
         result.save();
       });
       
-      //TO-DO: set nstpTaken 1 & 2 to true -DONE
-      //as well as isGraduated to true
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(
@@ -227,8 +225,8 @@ export default {
             "-" +
             year;
           results[i].set("serialNumber", sn);
-          results[i].set("nstpTaken1", true);
-          results[i].set("nstpTaken2", true);
+          results[i].set("takenNstp1", true);
+          results[i].set("takenNstp2", true);
           results[i].set("isGraduated", true);
           results[i].save();
           start++;

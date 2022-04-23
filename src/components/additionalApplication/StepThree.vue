@@ -275,6 +275,25 @@ export default {
         };
       }
     },
+    upload(step) {
+      var validation = this.validate(this.dropzoneFile);
+      if (validation) {
+        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+        this.pending = true;
+        const self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          try {
+            self.createWorker(data, step, self);
+          } catch (e) {
+            console.log(e);
+            this.pending = false;
+          }
+        };
+        reader.readAsArrayBuffer(this.dropzoneFile);
+      }
+    },
     async setAcadYear(acadYear) {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
@@ -295,9 +314,6 @@ export default {
     async storeStudents(studentData, acadYear, nstpProgram) {
       await this.setAcadYear(acadYear);
       var nstpId = await this.getNstpId(nstpProgram);
-
-      //TO-DO: still need to check if student already exists in db
-      //if exists, dont save. if not, save
 
       for (let i = 0; i < studentData.length; i++) {
         const student = new Parse.Object("Student");
@@ -349,25 +365,6 @@ export default {
         });
       }
       this.pending = false;
-    },
-    upload(step) {
-      var validation = this.validate(this.dropzoneFile);
-      if (validation) {
-        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
-        this.pending = true;
-        const self = this;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var data = e.target.result;
-          try {
-            self.createWorker(data, step, self);
-          } catch (e) {
-            console.log(e);
-            this.pending = false;
-          }
-        };
-        reader.readAsArrayBuffer(this.dropzoneFile);
-      }
     },
     async getStudents() {
       var studentList = [];

@@ -279,6 +279,25 @@ export default {
         };
       }
     },
+    upload(step) {
+      var validation = this.validate(this.dropzoneFile);
+      if (validation) {
+        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+        this.pending = true;
+        const self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          try {
+            self.createWorker(data, step, self);
+          } catch (e) {
+            console.log(e);
+            this.pending = false;
+          }
+        };
+        reader.readAsArrayBuffer(this.dropzoneFile);
+      }
+    },
     async setAcadYear(acadYear) {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
@@ -353,25 +372,6 @@ export default {
         });
       }
       this.pending = false;
-    },
-    upload(step) {
-      var validation = this.validate(this.dropzoneFile);
-      if (validation) {
-        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
-        this.pending = true;
-        const self = this;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var data = e.target.result;
-          try {
-            self.createWorker(data, step, self);
-          } catch (e) {
-            console.log(e);
-            this.pending = false;
-          }
-        };
-        reader.readAsArrayBuffer(this.dropzoneFile);
-      }
     },
     async getStudents() {
       var studentList = [];
