@@ -400,7 +400,6 @@ export default {
       regionName: "",
       institutional_code: "",
       hei_type: "",
-      password: "",
     };
   },
   async mounted() {
@@ -422,12 +421,11 @@ export default {
     this.province = result.get("address").province;
     this.regionNo = result.get("address").regionNo;
     this.regionName = result.get("address").regionName;
-    this.password = result.get("password");
-    console.log(this.password);
   },
   methods: {
     async addHei() {
-      const user = await Parse.User.logIn(this.username, this.password);
+      const user = await Parse.User.current();
+      user.set("objectId", this.id);
       user.set("name", this.name);
       user.set("email", this.email);
       user.set("username", this.username);

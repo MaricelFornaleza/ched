@@ -4,7 +4,7 @@
     <!-- render empty state if there is no data found -->
     <!-- <EmptyState /> -->
     <div class="w-full text-center p-10">
-      <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+      <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
         <advanced-widget bgColor="bg-warning-light" textColor="text-warning">
           <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
           <template v-slot:count>{{ CWTS.maleNum + CWTS.femaleNum }}</template>
@@ -13,7 +13,10 @@
           >
           <template v-slot:data>
             <data-count :dataCount="CWTS.maleNum" dataLabel="Male"></data-count>
-            <data-count :dataCount="CWTS.femaleNum" dataLabel="Female"></data-count>
+            <data-count
+              :dataCount="CWTS.femaleNum"
+              dataLabel="Female"
+            ></data-count>
           </template>
         </advanced-widget>
         <advanced-widget bgColor="bg-info-light" textColor="text-info">
@@ -24,29 +27,30 @@
           >
           <template v-slot:data>
             <data-count :dataCount="LTS.maleNum" dataLabel="Male"></data-count>
-            <data-count :dataCount="LTS.femaleNum" dataLabel="Female"></data-count>
+            <data-count
+              :dataCount="LTS.femaleNum"
+              dataLabel="Female"
+            ></data-count>
           </template>
         </advanced-widget>
-        <advanced-widget bgColor="bg-success-light" textColor="text-success">
-          <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
-          <template v-slot:count>123k</template>
-          <template v-slot:label
-            >A/Y {{ year }} {{ sem }} <strong>ROTC</strong> Enrollees</template
-          >
-          <template v-slot:data>
-            <data-count dataCount="123" dataLabel="Male"></data-count>
-            <data-count dataCount="456" dataLabel="Female"></data-count>
-          </template>
-        </advanced-widget>
+
         <advanced-widget bgColor="bg-error-light" textColor="text-error">
           <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
-          <template v-slot:count>{{ this.TOTAL.femaleNum + this.TOTAL.maleNum }}</template>
+          <template v-slot:count>{{
+            this.TOTAL.femaleNum + this.TOTAL.maleNum
+          }}</template>
           <template v-slot:label
             >A/Y {{ year }} {{ sem }} <strong>Total</strong> Enrollees</template
           >
           <template v-slot:data>
-            <data-count :dataCount="TOTAL.maleNum" dataLabel="Male"></data-count>
-            <data-count :dataCount="TOTAL.femaleNum" dataLabel="Female"></data-count>
+            <data-count
+              :dataCount="TOTAL.maleNum"
+              dataLabel="Male"
+            ></data-count>
+            <data-count
+              :dataCount="TOTAL.femaleNum"
+              dataLabel="Female"
+            ></data-count>
           </template>
         </advanced-widget>
       </div>
@@ -82,7 +86,7 @@
             <option
               v-for="(academicYear, index) in academicYears"
               :key="index"
-              value="{{ academicYear }}"
+              :value="academicYear"
               class="bg-light-100 text-dark-300"
             >
               {{ academicYear }}
@@ -152,84 +156,7 @@ export default {
       academicYears: [],
       year: "",
       sem: "1st Sem",
-      // objects: [
-      //   {
-      //     id: 1,
-      //     hei_name: "Ateneo de Naga University",
-      //     cwts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     lts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     rotc: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //   },
-      //   {
-      //     id: 2,
-      //     hei_name: "Bicol State College of Applied Sciences and Technology",
-      //     cwts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     lts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     rotc: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //   },
-      //   {
-      //     id: 3,
-      //     hei_name: "University of Nueva Caceres",
-      //     cwts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     lts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     rotc: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //   },
-      //   {
-      //     id: 4,
-      //     hei_name: "Naga College Foundation, Inc.",
-      //     cwts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     lts: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //     rotc: {
-      //       male: 50,
-      //       female: 60,
-      //       total: 110,
-      //     },
-      //   },
-      // ],
+
       objects: [],
       loading: true,
       CWTS: { femaleNum: 0, maleNum: 0 },
@@ -241,6 +168,7 @@ export default {
   async created() {
     await this.getYear();
     await this.getHeis();
+
     this.loading = false;
   },
   methods: {
@@ -248,18 +176,19 @@ export default {
       this.dropdown = !this.dropdown;
     },
     async getYear() {
+      var acadYears = [];
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
-      query.notEqualTo("academicYear", null);
-      var results = await query.find();
-      var acadYears = [];
-      for (let index = 0; index < results.length; index++) {
-        const element = results[index];
-        acadYears.push(element.get("academicYear"));
-      }
-      this.year = acadYears[0];
+      query.exists("academicYear");
+      query.distinct("academicYear").then((results) => {
+        for (let index = 0; index < results.length; index++) {
+          const element = results[index];
+          acadYears.push(element);
+        }
+        this.year = results[0];
+      });
+
       this.academicYears = acadYears;
-      // console.log(this.academicYears);
     },
     reset() {
       this.CWTS.femaleNum = 0;
@@ -323,7 +252,7 @@ export default {
         student.equalTo("gender", "F");
         enrollment.matchesQuery("nstpId", nstp);
         enrollment.matchesQuery("studentId", student);
-        
+
         femaleNum = await enrollment.count();
         this.LTS.femaleNum += femaleNum;
         student.equalTo("gender", "M");

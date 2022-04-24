@@ -62,7 +62,7 @@
             <p class="body-s">
               Welcome back! Please provide the HEI's credentials.
             </p>
-
+            <div class="loader" v-if="loading"></div>
             <form @submit.prevent="login">
               <div class="mt-10">
                 <div class="w-full">
@@ -187,6 +187,7 @@ export default {
       open: false,
       email: "",
       password: "",
+      isLoading: false
     };
   },
   methods: {
@@ -194,6 +195,7 @@ export default {
       this.open = !this.open;
     },
     async login() {
+      this.isLoading = true;
       if (this.email.length === 0) {
         alert("Please enter an email");
         return;
@@ -204,6 +206,7 @@ export default {
       }
       Parse.User.logIn(this.email, this.password)
         .then(() => {
+          this.isLoading = false
           this.$router.push({ name: "home" });
         })
         .catch(function (err) {
@@ -238,4 +241,5 @@ export default {
   right: 0;
   padding: 0.5em;
 }
+
 </style>

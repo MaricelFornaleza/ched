@@ -65,7 +65,10 @@
               />
             </td>
             <td class="px-6 py-4">
-              <TrashIcon class="h-6 mx-auto text-error cursor-pointer" />
+              <TrashIcon 
+                @click="deleteHei(hei.id)"
+                class="h-6 mx-auto text-error cursor-pointer" 
+              />
             </td>
           </tr>
         </tbody>
@@ -83,6 +86,8 @@ import $ from "jquery";
 import * as XLSX from "xlsx";
 import router from "../router";
 import { DownloadIcon, EyeIcon, TrashIcon } from "@heroicons/vue/outline";
+import Parse from "parse";
+
 export default {
   components: {
     DownloadIcon,
@@ -120,6 +125,19 @@ export default {
         name: "editHei",
         params: { id: id },
       });
+    },
+    deleteHei(id) {
+      const query = new Parse.Query(Parse.User);
+      query.equalTo("objectId", id);
+      query.find({
+        success: function(yourObj) {
+          console.log('here')
+          yourObj[0].destroy({})
+        },
+        error: function() {
+          console.log('error')
+        }
+      }); 
     },
     exportToExcel() {
       var currentDate = new Date()
