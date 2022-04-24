@@ -159,7 +159,7 @@
                 class="h-6 mx-auto text-error"
                 :class="[
                   application.application_type == 'New Application'
-                  ? application.status == '1 of 5'
+                  ? application.status == '2 of 5'
                       ? 'cursor-pointer'
                       : 'opacity-50 cursor-pointer'
                   : application.status == '4 of 5'
