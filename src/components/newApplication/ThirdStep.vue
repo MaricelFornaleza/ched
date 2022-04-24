@@ -309,7 +309,7 @@ export default {
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "4 of 5");
+            self.$emit("setStatus", "For Approval");
             // this.completed = !this.completed;
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
@@ -388,7 +388,12 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram && takenNstp1 == true && takenNstp2 == true && serialNum == null) {
+            if (
+              program == nstpProgram &&
+              takenNstp1 == true &&
+              takenNstp2 == true &&
+              serialNum == null
+            ) {
               studentSet.delete(studentData[x]);
               results[i].set("isGraduated", true);
               await results[i].save();
@@ -479,8 +484,12 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        if(object.get("takenNstp1") == true && object.get("takenNstp2") == true && object.get("isGraduated") == true ) {
-           studentList.push({
+        if (
+          object.get("takenNstp1") == true &&
+          object.get("takenNstp2") == true &&
+          object.get("isGraduated") == true
+        ) {
+          studentList.push({
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
