@@ -71,7 +71,7 @@
           </button>
           <button
             v-if="!isCompleted"
-            @click="upload(2)"
+            @click="upload(3)"
             class="btn-sm btn-default"
             type="submit"
           >
@@ -109,6 +109,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            fileName="List-of-Students-Graduates"
           ></StudentsDataTable>
         </div>
 
@@ -140,6 +141,7 @@
             newId="datatable2"
             :key="componentKey"
             :students="studentsMissing"
+            fileName="List-of-Students-Missing"
           ></StudentsDataTable>
         </div>
 
@@ -307,7 +309,7 @@ export default {
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "3 of 5");
+            self.$emit("setStatus", "4 of 5");
             // this.completed = !this.completed;
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
@@ -336,14 +338,12 @@ export default {
         reader.readAsArrayBuffer(this.dropzoneFile);
       }
     },
-    async setAcadYear(acadYear) {
+    async getHeiId() {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
       query.equalTo("objectId", this.appId);
       var results = await query.first();
-      results.set("academicYear", acadYear);
-      results.set("awardYear", acadYear); //acadYear is just the same with awardYear
-      results.save();
+      return results.get("heiId");
     },
     async getNstpId(nstp) {
       const Nstp = Parse.Object.extend("Nstp");
@@ -355,7 +355,7 @@ export default {
     async verifyStudents(studentData, nstpProgram) {
       //check first if student exists
       //get nstpEnrollment using the studentId, then check nstpId to get the nstpProgram
-      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 is true
+      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
       //if not, store in separate lists
       const studentSet = new Set(studentData);
       console.log(studentSet);
@@ -374,6 +374,8 @@ export default {
         var bday = results[i].get("studentId").get("birthdate");
         var program = results[i].get("nstpId").get("programName");
         var takenNstp1 = results[i].get("takenNstp1");
+        var takenNstp2 = results[i].get("takenNstp2");
+        var serialNum = results[i].get("serialNumber");
 
         for (let x = 0; x < studentData.length; x++) {
           //check student's name and bday
@@ -386,30 +388,23 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if (program == nstpProgram && takenNstp1 == true) {
+            if(program == nstpProgram && takenNstp1 == true && takenNstp2 == true && serialNum == null) {
               studentSet.delete(studentData[x]);
-              results[i].set("takenNstp2", true);
+              results[i].set("isGraduated", true);
               await results[i].save();
             } else {
               //found the student but there are mismatch in stored info
+              //delete from set since it'll still be shown because of nstpTaken
               studentSet.delete(studentData[x]);
-              // this.storeStudents(studentData[x], results[i]);
             }
             break;
           }
-          // else {
-          //   //uniquely store all students who has missing records
-          //   missingSet.add(studentData[x]);
-          //   if(!missingSet.has(studentData[x])) {
-          //     this.storeStudents(studentData[x]);
-          //   }
-          // }
         }
       }
       const self = this;
       const students = studentSet.values();
       for (const student of students) {
-        await self.storeStudents(student, null, nstpProgram);
+        await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
       // studentSet.forEach (function(student) {
@@ -417,12 +412,11 @@ export default {
       // });
       await this.getStudents();
     },
-    async storeStudents(studentData, results, nstpProgram) {
-      var nstpId = "";
-      if (results == null) {
-        results = new Parse.Object("NstpEnrollment");
-        nstpId = await this.getNstpId(nstpProgram);
-      }
+    async storeStudents(studentData, nstpProgram) {
+      const nstpEnrollment = new Parse.Object("NstpEnrollment");
+      const nstpId = await this.getNstpId(nstpProgram);
+      const heiId = await this.getHeiId();
+
       const student = new Parse.Object("Student");
       student.set("name", {
         lastName: studentData.F,
@@ -444,21 +438,22 @@ export default {
         programLevelCode: studentData.R,
         programName: studentData.S,
       });
+      student.set("heiId", heiId);
 
       await student.save().then((student) => {
         // this.forceRerender(); //solution to updating DOM of child component
-        results.set(
+        nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        results.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
-        results.set(
+        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+        nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
         // nstpEnrollment.set("takenNstp1", false);   //defaults to false when the seeder is used
         // nstpEnrollment.set("takenNstp2", false);
-        results.save();
+        nstpEnrollment.save();
       });
     },
     async getStudents() {
@@ -484,11 +479,8 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        if (
-          object.get("takenNstp1") == true &&
-          object.get("takenNstp2") == true
-        ) {
-          studentList.push({
+        if(object.get("takenNstp1") == true && object.get("takenNstp2") == true && object.get("isGraduated") == true ) {
+           studentList.push({
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

@@ -32,12 +32,21 @@
           </tr>
           <tr>
             <td class="border p-2">Serial Number Range</td>
-            <td class="border p-2">{{ data.snRange }}</td>
+            <td class="border p-2">
+              {{ data.snRange }}
+            </td>
           </tr>
 
           <tr>
             <td class="border p-2">Students's Serial Number</td>
-            <td class="border p-2">Download</td>
+            <td class="border p-2">
+              <button 
+                class="underline font-bold hover:text-brand-blue cursor-pointer"
+                @click="downloadSN()"
+              >
+                 Download
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -51,7 +60,7 @@
         </button>
 
         <button
-          @click="$emit('complete', 5)"
+          @click="goToApplication()"
           class="btn-sm text-light-100 bg-brand-blue"
         >
           Done
@@ -64,6 +73,7 @@
 <script>
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
+import * as XLSX from 'xlsx';
 
 export default {
   components: {
@@ -78,15 +88,18 @@ export default {
         graduates: 0,
         program: "",
         awardYear: "",
-        snRange: "",
+        snRange: ""
       },
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean },
+  props: { isCompleted: Boolean, appId: String, allow: Boolean, hei_username: String },
 
   mounted() {
     this.getData();
     console.log(this.isCompleted);
+    // var user = Parse.User.current();
+    // var name= user.get("username");
+    // console.log(name);
   },
   methods: {
     variant(stats) {
@@ -100,6 +113,56 @@ export default {
         //Ongoing
         return "badge";
       }
+    },
+    async downloadSN() {
+      console.log("download starting...");
+      // console.log(this.hei_username);
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.include("applicationId");
+      query.include("studentId");
+      query.include("nstpId");
+      const results = await query.find();
+
+      let students = [];
+      for (let index = 0; index < results.length; index++) {
+        const element = results[index];
+        students.push({
+          awardYear: element.get("applicationId").get("awardYear"),
+          programName: element.get("nstpId").get("programName"),
+          lastName: element.get("studentId").get("name").lastName,
+          firstName: element.get("studentId").get("name").firstName,
+          middleName: element.get("studentId").get("name").middleName,
+          extensionName: element.get("studentId").get("name").extensionName,
+          serialNumber: element.get("serialNumber"),
+        });
+      }
+       /* generate worksheet and workbook */
+      const worksheet = XLSX.utils.json_to_sheet(students);
+      const worksheetName = "List of Students";
+      const workbook = XLSX.utils.book_new();
+      const currentDate = new Date().toLocaleDateString().replace(/[^\w\s]/gi, "-");
+      const workbookName = `Issued-SN-${this.hei_username}_${currentDate}.xlsx`;    //update to include name of HEI
+      XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName);
+
+      /* fix headers */
+      // currently, styling cell values is only supported in SheetJS pro version :(
+      // although, there are community forks alternatives to make this possible such as xlsx-js-style 
+      // ... to be updated
+      const headers = ["AWARD YEAR", "PROGRAM NAME", "LAST NAME", "FIRST NAME", "MIDDLE NAME", "EXTENSION NAME", "SERIAL NUMBER"]
+      XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
+       
+      /* calculate max column width */
+      const max_width = students.reduce((w, r) => Math.max(w, r.serialNumber.length), 10);
+      worksheet["!cols"] = [ { wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width } ];
+
+      /* create an XLSX file and try to save to xlsx file*/
+      XLSX.writeFileXLSX(workbook, workbookName);
+
     },
     async getData() {
       let _this = this;
@@ -140,11 +203,11 @@ export default {
         const sn = results[0].get("applicationId").get("serialNumber");
         _this.data.snRange =
           _this.data.program.charAt(0) +
-          "-" +
+          " - " +
           (sn.start + "").padStart(6, "0") +
-          "-" +
+          " — " +
           (sn.end + "").padStart(6, "0") +
-          "-" +
+          " - " +
           _this.data.awardYear.slice(-2);
       });
     },
@@ -157,9 +220,10 @@ export default {
       }
       this.getData();
     },
+    goToApplication() {
+      this.$emit('complete', 5);
+      this.$emit("goToApplication");
+    }
   },
 };
 </script>
-
-<style>
-</style>

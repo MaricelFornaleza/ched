@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <!-- alert message -->
     <div class="w-fit mx-10">
       <AlertWidget :className="alert.className">
@@ -37,6 +38,7 @@ export default {
         { title: "Date Approved" },
       ],
       applications: [],
+      loading: true,
       alert: {},
     };
   },
@@ -86,7 +88,7 @@ export default {
           region.padStart(2, "0") +
           "-" +
           start.padStart(6, "0") +
-          "-" +
+          " — " +
           end.padStart(6, "0") +
           "-" +
           date.toLocaleDateString("en", { year: "2-digit" }),
@@ -103,6 +105,7 @@ export default {
     }
 
     this.applications = data;
+    this.loading = false;
   },
   methods: {
     displayAlert(status, msg) {

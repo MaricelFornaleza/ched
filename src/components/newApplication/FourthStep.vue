@@ -5,7 +5,7 @@
         Please complete the previous steps.
       </AlertWidget>
     </div>
-    <div v-else>
+    <div v-if="allow">
       <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
         <tbody>
           <tr>
@@ -98,7 +98,13 @@ export default {
       },
     };
   },
-  props: { isCompleted: Boolean, appId: String, hei_region_code: String },
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    hei_region_code: String,
+    allow: Boolean,
+  },
+
   mounted() {
     this.getData();
   },
@@ -115,44 +121,28 @@ export default {
         return "badge";
       }
     },
-    async countData() {
-      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-      const query = new Parse.Query(NstpEnrollment);
-      // query.equalTo("applicationId", this.appId);
-      query.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
-      const results = await query.find();
-      for (let i = 0; i < results.length; i++) {
-        if (typeof results.get("serialNumber") !== "undefined") return true;
-      }
-      return false;
-    },
     async getData() {
-      let self = this;
+      let _this = this;
       const Application = Parse.Object.extend("Application");
-      const applicationQuery = new Parse.Query(Application);
-      applicationQuery.equalTo("objectId", this.appId);
-      var res = await applicationQuery.first();
-
+      const application = new Application();
+      application.id = this.appId;
       const Students = Parse.Object.extend("Student");
       const innerquery = new Parse.Query(Students);
 
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
-      query.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
+      query.equalTo("applicationId", application);
       query.include("applicationId");
       query.include("nstpId");
 
       await query.find().then(function (results) {
-        self.data.graduates = results.length; //to be updated
-        self.data.status = res.get("status");
-        self.data.acadYear = res.get("academicYear");
-        self.data.dateApplied = res
+        _this.data.graduates = results.length;
+        _this.data.status = results[0].get("applicationId").get("status");
+        _this.data.acadYear = results[0]
+          .get("applicationId")
+          .get("academicYear");
+        _this.data.dateApplied = results[0]
+          .get("applicationId")
           .get("dateApplied")
           .toLocaleDateString("en", {
             weekday: "long",
@@ -160,18 +150,18 @@ export default {
             month: "long",
             day: "numeric",
           });
-        self.data.program = results[0].get("nstpId").get("programName");
+        _this.data.program = results[0].get("nstpId").get("programName");
       });
 
       const f = innerquery.equalTo("gender", "F");
       query.matchesQuery("studentId", f);
       await query.find().then(function (results) {
-        self.data.female = results.length;
+        _this.data.female = results.length;
       });
       const m = innerquery.equalTo("gender", "M");
       query.matchesQuery("studentId", m);
       await query.find().then(function (results) {
-        self.data.male = results.length;
+        _this.data.male = results.length;
       });
     },
     setStatus(status) {
@@ -180,7 +170,7 @@ export default {
       this.getData();
     },
     async approve() {
-      let self = this;
+      let _this = this;
       const date = new Date();
       const fullyear = new Date().getFullYear();
       const year = new Date().toLocaleDateString("en", { year: "2-digit" });
@@ -189,22 +179,35 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
-      query.descending("serialNumber");
-      const serialNumber = await query.first();
-      const endSerialNumber = serialNumber.get("serialNumber").end;
-      const newStart = endSerialNumber + 1;
-      const newEnd = endSerialNumber + this.data.graduates;
+      query.equalTo("objectId", this.appId);
+      const results = await query.first();
+      //get serialNumber, if undefined; set startSerialNum to 1
+      //if not, set startSerialNum to the last saved endSerialNumber + 1
+      var newStart = 0;
+      var newEnd = 0; 
+      
+      if (results.get("serialNumber") == null) {
+        newStart = 1;
+        newEnd = this.data.graduates;
+      } else {
+        query.descending("serialNumber");
+        const serialNumber = await query.first();
+        const endSerialNumber = serialNumber.get("serialNumber").end;
+        newStart = endSerialNumber + 1;
+        newEnd = endSerialNumber + this.data.graduates;   
+      }
+      console.log(newStart);
+      console.log(newEnd);
 
-      //get application details
-      const application = new Parse.Query(Application);
-      application.equalTo("objectId", this.appId);
-      await application.first().then(function (result) {
+      await query.first().then(function (result) {
         result.set("dateApproved", date);
         result.set("awardYear", fullyear.toString());
         result.set("serialNumber", { start: newStart, end: newEnd });
         result.save();
       });
-
+      
+      //TO-DO: set nstpTaken 1 & 2 to true
+      //as well as isGraduated to true
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(
@@ -218,12 +221,15 @@ export default {
           var sn =
             program +
             "-" +
-            self.hei_region_code.padStart(2, "0") +
+            _this.hei_region_code.padStart(2, "0") +
             "-" +
             (start + "").padStart(6, "0") +
             "-" +
             year;
           results[i].set("serialNumber", sn);
+          results[i].set("nstpTaken1", true);
+          results[i].set("nstpTaken2", true);
+          results[i].set("isGraduated", true);
           results[i].save();
           start++;
         }

@@ -62,8 +62,8 @@
             "
             :class="
               monthly
-                ? ' bg-dark-200 text-light-100 border border-2 border-dark-200'
-                : 'bg-transparent border border-2 border-dark-200   hover:text-light-100'
+                ? ' bg-dark-200 text-light-100 border-2 border-dark-200'
+                : 'bg-transparent border-2 border-dark-200   hover:text-light-100'
             "
           >
             Monthly
@@ -73,7 +73,7 @@
             class="
               transition
               duration-200
-              border border-2 border-dark-200
+              border-2 border-dark-200
               hover:bg-dark-100 hover:border-dark-100 hover:text-light-100
               font-bold
               py-2
@@ -179,6 +179,7 @@ import {
   DocumentTextIcon,
   DownloadIcon,
 } from "@heroicons/vue/solid";
+// import Parse from "parse";
 Chart.register(...registerables);
 export default {
   components: {
@@ -214,12 +215,13 @@ export default {
       ],
     };
   },
+  async created() {
+  },
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
     },
   },
-
   setup() {
     const testData = {
       labels: [

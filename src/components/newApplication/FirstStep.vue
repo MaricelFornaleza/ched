@@ -106,9 +106,10 @@
         </div>
 
         <!-- pass props lists -->
-        <StudentsDataTable
+        <StudentsDataTable 
           :key="componentKey"
           :students="students"
+          fileName="List-of-Students-1stSem"
         ></StudentsDataTable>
 
         <div class="flex items-center justify-center space-x-5 mt-5">
@@ -195,6 +196,7 @@ export default {
       templateUrl: "/files/NTSP-REGIONAL-DATABASE-TEMPLATE_1st_SEM.xlsx", //may switch to file-loader package to load files
       componentKey: 0,
       pending: false,
+      heiId: "",
       className: "alert-info",
       students: [],
       excelData: [],
@@ -203,7 +205,11 @@ export default {
       worker: undefined,
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean },
+  props: { 
+    isCompleted: Boolean, 
+    appId: String,
+    allow: Boolean 
+  },
   components: {
     AlertWidget,
     SuccessAlert,
@@ -273,6 +279,25 @@ export default {
         };
       }
     },
+    upload(step) {
+      var validation = this.validate(this.dropzoneFile);
+      if (validation) {
+        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
+        this.pending = true;
+        const self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          try {
+            self.createWorker(data, step, self);
+          } catch (e) {
+            console.log(e);
+            this.pending = false;
+          }
+        };
+        reader.readAsArrayBuffer(this.dropzoneFile);
+      }
+    },
     async setAcadYear(acadYear) {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
@@ -280,6 +305,7 @@ export default {
       var results = await query.first();
       results.set("academicYear", acadYear);
       //results.set("awardYear", acadYear);
+      this.heiId = results.get("heiId");      //also get heiId
       results.save();
     },
     async getNstpId(nstp) {
@@ -319,6 +345,7 @@ export default {
           programLevelCode: studentData[i].R,
           programName: studentData[i].S,
         });
+        student.set("heiId", this.heiId);
 
         student.save().then((student) => {
           this.students.push({
@@ -345,25 +372,6 @@ export default {
         });
       }
       this.pending = false;
-    },
-    upload(step) {
-      var validation = this.validate(this.dropzoneFile);
-      if (validation) {
-        // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
-        this.pending = true;
-        const self = this;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var data = e.target.result;
-          try {
-            self.createWorker(data, step, self);
-          } catch (e) {
-            console.log(e);
-            this.pending = false;
-          }
-        };
-        reader.readAsArrayBuffer(this.dropzoneFile);
-      }
     },
     async getStudents() {
       var studentList = [];
@@ -408,7 +416,7 @@ export default {
       this.forceRerender();
     },
     nextStep() {
-      this.worker.terminate();
+      // this.worker.terminate();
       this.worker = undefined;
 
       this.$emit("nextStep");

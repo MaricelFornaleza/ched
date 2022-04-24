@@ -6,7 +6,14 @@
 
         <button
           @click="exportToExcel"
-          class="btn-sm h-fit px-4 bg-dark-100 text-light-100"
+          class="
+            h-fit
+            p-2
+            rounded-sm
+            bg-dark-100
+            text-light-100
+            focus:ring-4 focus:ring-success-light focus:bg-success
+          "
         >
           <DownloadIcon class="h-5" />
         </button>
@@ -88,7 +95,15 @@
             </td>
             <td class="px-6 py-4">
               <div class="">
-                <EyeIcon class="h-6 mx-auto text-dark-100 hover:text-warning" />
+                <EyeIcon
+                  class="
+                    h-6
+                    mx-auto
+                    text-dark-100
+                    hover:text-warning
+                    cursor-pointer
+                  "
+                />
               </div>
             </td>
           </tr>
@@ -137,6 +152,8 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
+      // sheet1['!rows'] = [];
+      // sheet1['!rows'][1] = { hidden: true };
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";

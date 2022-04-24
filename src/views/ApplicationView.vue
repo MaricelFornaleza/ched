@@ -218,8 +218,9 @@ export default {
       query2.include("nstpId");
       await query2.find().then(function (res) {
         // count = res.length;
-        for (let x = 0; x < res.length; x++) {
-          if (typeof res[x].get("serialNumber") !== "undefined") count++;
+        for(let x = 0; x < res.length; x++) {
+          if(typeof res[x].get("serialNumber") !== "undefined" && res[x].get("isGraduated"))
+            count++;
         }
       });
       if (
