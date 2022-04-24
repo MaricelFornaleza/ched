@@ -80,6 +80,7 @@
               text-light-100
               focus:ring-4 focus:ring-success-light focus:bg-success
             "
+            title="Download to excel"
           >
             <DownloadIcon class="h-5" />
           </button>
@@ -159,7 +160,7 @@
                 class="h-6 mx-auto text-error"
                 :class="[
                   application.application_type == 'New Application'
-                  ? application.status == '2 of 5'
+                  ? application.status == '1 of 5' || application.status == '2 of 5'
                       ? 'cursor-pointer'
                       : 'opacity-50 cursor-pointer'
                   : application.status == '4 of 5'
@@ -242,7 +243,7 @@ export default {
     deleteApplication(app_id, app_type, app_status) {
       //to be updated
       if (app_type == "New Application") {
-        if (app_status == "2 of 5") {
+        if (app_status == "1 of 5" || app_status == "2 of 5") {
           if (confirm("Are you sure to delete?")) {
             // Application
             const Application = Parse.Object.extend("Application");
@@ -313,7 +314,7 @@ export default {
           }
         }
         else {
-          this.displayMsg("error", "Cannot delete application after step 1!");
+          this.displayMsg("error", "Cannot delete application after step 2!");
         }
       } else if (app_type == "For Additional Graduates") {
         if (app_status == "4 of 5") {
