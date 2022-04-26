@@ -85,92 +85,105 @@
           </button>
         </div>
       </div>
-
-      <table id="dataTable" class="p-4 hover text-center w-full row-border">
-        <thead class="text-xs">
-          <tr>
-            <th v-for="table_header in table_headers" :key="table_header">
-              {{ table_header.title }}
-            </th>
-            <th class="px-6 py-2 text-xs text-gray-500">View</th>
-            <th class="px-6 py-2 text-xs text-gray-500">Delete</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white text-sm">
-          <tr
-            v-for="application in applications"
-            :key="application.id"
-            class="whitespace-nowrap"
-          >
-            <td class="px-6 py-4 text-left">{{ application.hei_name }}</td>
-            <td class="px-6 py-4">
-              <div class="text-gray-900">
-                {{ application.application_type }}
-              </div>
-            </td>
-            <td v-if="application.program == ''" class="px-6 py-4">
-              <div class="">Not Indicated</div>
-            </td>
-            <td v-else class="px-6 py-4">
-              <div class="">{{ application.program }}</div>
-            </td>
-            <td v-if="application.no_of_graduates == ''" class="px-6 py-4">
-              0
-            </td>
-            <td v-else class="px-6 py-4">{{ application.no_of_graduates }}</td>
-            <td class="px-6 py-4">
-              {{ application.date_applied }}
-            </td>
-            <td v-if="application.date_approved == undefined" class="px-6 py-4">
-              NA
-            </td>
-            <td v-else class="px-6 py-4">
-              {{
-                application.date_approved.toLocaleDateString("en", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }}
-            </td>
-            <td class="px-6 py-4">
-              <span :class="variant(application.status)">{{
-                application.status
-              }}</span>
-            </td>
-            <td class="px-6 py-0">
-              <EyeIcon
-                @click="
-                  viewApplication(application.id, application.application_type)
-                "
-                class="h-6 mx-auto cursor-pointer"
-              />
-            </td>
-            <td class="px-6 py-4">
-              <TrashIcon
-                @click="
-                  deleteApplication(
-                    application.id,
-                    application.application_type,
-                    application.status
-                  )
-                "
-                class="h-6 mx-auto text-error"
-                :class="[
-                  application.application_type == 'New Application'
-                    ? application.status == '1 of 5'
+      <div class="bg-light-200">
+        <table
+          id="dataTable"
+          width="100%"
+          class="p-4 hover text-center w-full row-border"
+        >
+          <thead class="text-xs">
+            <tr>
+              <th v-for="table_header in table_headers" :key="table_header">
+                {{ table_header.title }}
+              </th>
+              <th class="px-6 py-2 text-xs text-gray-500">View</th>
+              <th class="px-6 py-2 text-xs text-gray-500">Delete</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-sm">
+            <tr
+              v-for="application in applications"
+              :key="application.id"
+              class="whitespace-nowrap"
+            >
+              <td class="px-6 py-4 text-left">{{ application.hei_name }}</td>
+              <td class="px-6 py-4">
+                <div class="text-gray-900">
+                  {{ application.application_type }}
+                </div>
+              </td>
+              <td v-if="application.program == ''" class="px-6 py-4">
+                <div class="">Not Indicated</div>
+              </td>
+              <td v-else class="px-6 py-4">
+                <div class="">{{ application.program }}</div>
+              </td>
+              <td v-if="application.no_of_graduates == ''" class="px-6 py-4">
+                0
+              </td>
+              <td v-else class="px-6 py-4">
+                {{ application.no_of_graduates }}
+              </td>
+              <td class="px-6 py-4">
+                {{ application.date_applied }}
+              </td>
+              <td
+                v-if="application.date_approved == undefined"
+                class="px-6 py-4"
+              >
+                NA
+              </td>
+              <td v-else class="px-6 py-4">
+                {{
+                  application.date_approved.toLocaleDateString("en", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                }}
+              </td>
+              <td class="px-6 py-4">
+                <span :class="variant(application.status)">{{
+                  application.status
+                }}</span>
+              </td>
+              <td class="px-6 py-0">
+                <EyeIcon
+                  @click="
+                    viewApplication(
+                      application.id,
+                      application.application_type
+                    )
+                  "
+                  class="h-6 mx-auto cursor-pointer"
+                />
+              </td>
+              <td class="px-6 py-4">
+                <TrashIcon
+                  @click="
+                    deleteApplication(
+                      application.id,
+                      application.application_type,
+                      application.status
+                    )
+                  "
+                  class="h-6 mx-auto text-error"
+                  :class="[
+                    application.application_type == 'New Application'
+                      ? application.status == '1 of 5'
+                        ? 'cursor-pointer'
+                        : 'opacity-50 cursor-pointer'
+                      : application.status == '4 of 5'
                       ? 'cursor-pointer'
-                      : 'opacity-50 cursor-pointer'
-                    : application.status == '4 of 5'
-                    ? 'cursor-pointer'
-                    : 'opacity-50 cursor-pointer',
-                ]"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                      : 'opacity-50 cursor-pointer',
+                  ]"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -208,12 +221,15 @@ export default {
   mounted() {
     $(document).ready(function () {
       $("#dataTable").DataTable({
+        processing: true,
+        retrieve: true,
         language: {
           searchPlaceholder: "Search",
           search: "",
           sLengthMenu: "_MENU_",
         },
         order: [],
+        scrollX: true,
       });
     });
   },
