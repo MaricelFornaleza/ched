@@ -206,8 +206,6 @@ export default {
         result.save();
       });
       
-      //TO-DO: set nstpTaken 1 & 2 to true
-      //as well as isGraduated to true
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(

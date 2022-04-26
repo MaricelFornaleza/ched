@@ -309,7 +309,7 @@ export default {
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "4 of 5");
+            self.$emit("setStatus", "For Approval");
             // this.completed = !this.completed;
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
