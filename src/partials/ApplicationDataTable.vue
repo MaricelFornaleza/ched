@@ -159,10 +159,10 @@
                 class="h-6 mx-auto text-error"
                 :class="[
                   application.application_type == 'New Application'
-                  ? application.status == '1 of 5'
+                    ? application.status == '1 of 5'
                       ? 'cursor-pointer'
                       : 'opacity-50 cursor-pointer'
-                  : application.status == '4 of 5'
+                    : application.status == '4 of 5'
                     ? 'cursor-pointer'
                     : 'opacity-50 cursor-pointer',
                 ]"
@@ -242,7 +242,7 @@ export default {
     deleteApplication(app_id, app_type, app_status) {
       //to be updated
       if (app_type == "New Application") {
-        if (app_status == "2 of 5") {
+        if (app_status == "1 of 5") {
           if (confirm("Are you sure to delete?")) {
             // Application
             const Application = Parse.Object.extend("Application");
@@ -311,8 +311,7 @@ export default {
             }
             console.log("Application Deleted!");
           }
-        }
-        else {
+        } else {
           this.displayMsg("error", "Cannot delete application after step 1!");
         }
       } else if (app_type == "For Additional Graduates") {
@@ -320,8 +319,7 @@ export default {
           if (confirm("Are you sure to delete?")) {
             // to be updated
           }
-        }
-        else {
+        } else {
           this.displayMsg("error", "Cannot delete application after step 4!");
         }
       }

@@ -8,6 +8,8 @@ import EnrollmentView from "../views/EnrollmentView.vue";
 import GraduatesView from "../views/GraduatesView.vue";
 import SerialNumbersView from "../views/SerialNumbersView.vue";
 import ReportSummaryView from "../views/ReportSummaryView.vue";
+import StudentsView from "../views/StudentsView.vue";
+  
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
 
@@ -257,6 +259,7 @@ const routes = [
           breadcrumb: [{ name: "Summary of Enrollment" }],
         },
       },
+    
       {
         path: "/graduates",
         name: "graduates",
@@ -265,6 +268,15 @@ const routes = [
           breadcrumb: [{ name: "Summary of Graduates" }],
         },
       },
+      {
+        path: "/view-students",
+        name: "viewStudents",
+        component: StudentsView,
+        meta: {
+          breadcrumb:[{name: "View Students"}],
+        }
+      },
+    
       {
         path: "/serial-numbers",
         name: "serial-numbers",

@@ -18,7 +18,7 @@
           <DownloadIcon class="h-5" />
         </button>
       </div>
-      <table id="dataTable" width="100%" class="p-4 hover w-fit lg:w-full">
+      <table id="dataTable" class="p-4 hover w-fit lg:w-full">
         <thead class="bg-gray-50 text-xs">
           <tr>
             <th rowspan="2" class="p-8 text-left">HEI Name</th>
@@ -96,6 +96,7 @@
             <td class="px-6 py-4">
               <div class="">
                 <EyeIcon
+                  @click="viewStudents()"
                   class="
                     h-6
                     mx-auto
@@ -129,6 +130,7 @@ import "datatables.net-buttons/js/buttons.html5.js";
 import "datatables.net-buttons/js/buttons.print.js";
 import $ from "jquery";
 import * as XLSX from "xlsx";
+import router from "../router";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 export default {
   name: "EnrollmentDataTable",
@@ -158,6 +160,11 @@ export default {
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
       XLSX.writeFileXLSX(workbook, filename);
+    },
+    viewStudents() {
+      router.push({
+        name: "viewStudents",
+      });
     },
   },
 

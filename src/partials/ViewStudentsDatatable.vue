@@ -18,7 +18,7 @@
           </button>
         </div>
       </div>
-      <div class="inline-block bg-light-200">
+      <div class="bg-light-200">
         <table :id="tableId" class="p-4 hover text-center w-full row-border">
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>

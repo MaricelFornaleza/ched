@@ -106,7 +106,7 @@
         </div>
 
         <!-- pass props lists -->
-        <StudentsDataTable 
+        <StudentsDataTable
           :key="componentKey"
           :students="students"
           fileName="List-of-Students-1stSem"
@@ -265,7 +265,7 @@ export default {
             );
             // self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "4 of 5");
+            self.$emit("setStatus", "For Approval");
             // this.completed = !this.completed;
           } else {
             //console.log("Something went wrong while parsing xlsx file!");
@@ -301,7 +301,7 @@ export default {
       var results = await query.first();
       results.set("academicYear", acadYear);
       //results.set("awardYear", acadYear);
-      this.heiId = results.get("heiId");      //also get heiId
+      this.heiId = results.get("heiId"); //also get heiId
       results.save();
     },
     async getNstpId(nstp) {

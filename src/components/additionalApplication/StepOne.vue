@@ -15,7 +15,13 @@
       </AlertWidget>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
+        <drop-zone @drop.prevent="drop" @change="selectedFile">
+          <span class="body-m">
+            Must be .pdf file using this
+            <button class="font-bold underline">template</button>.
+          </span>
+        </drop-zone>
+
         <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
       </div>
       <div
