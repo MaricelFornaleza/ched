@@ -10,7 +10,7 @@
       v-if="!isCompleted && allow"
       class="container w-fit mx-auto flex flex-col items-center justify-center"
     >
-      <AlertWidget className="alert-info">
+      <AlertWidget :className="className">
         Please Upload a Notarized Transmittal Letter.
       </AlertWidget>
 
@@ -28,13 +28,21 @@
         v-else
         class="my-20 w-full flex justify-between p-5 border border-light-300"
       >
-        <div class="flex space-x-5">
-          <img
-            src="@/assets/img/pdf.png"
-            class="h-8"
-            alt="PDF Icon by Dimitry Miroliubov"
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center space-x-5">
+            <img
+              src="@/assets/img/pdf.png"
+              class="h-8"
+              alt="PDF Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">{{ dropzoneFile.name }}</div>
+          </div>
+
+          <XCircleIcon
+            @click="removeFile()"
+            class="h-5 text-error cursor-pointer"
+            title="Remove File"
           />
-          <div class="text-base">{{ dropzoneFile.name }}</div>
         </div>
       </div>
 
@@ -116,7 +124,7 @@
 import DropZone from "@/partials/DropZone.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
-import { EyeIcon, DownloadIcon } from "@heroicons/vue/outline";
+import { EyeIcon, DownloadIcon, XCircleIcon } from "@heroicons/vue/outline";
 import "jquery/dist/jquery.min.js";
 import { ref } from "vue";
 import Parse from "parse";
@@ -128,6 +136,7 @@ export default {
       filename: "",
       fileurl: "",
       title: "NotarizedTransmittalLetter",
+      className: "alert-info",
     };
   },
   props: {
@@ -143,6 +152,7 @@ export default {
     DropZone,
     EyeIcon,
     DownloadIcon,
+    XCircleIcon,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -160,44 +170,50 @@ export default {
   },
   methods: {
     upload(step) {
-      var currentDate = new Date()
-        .toLocaleDateString()
-        .replace(/[^\w\s]/gi, "");
-      var name = this.hei_username + "-" + this.title + currentDate + ".pdf";
-      this.filename = name;
-      let _this = this;
-      const parseFile = new Parse.File(this.filename, this.dropzoneFile);
-      parseFile.save().then(
-        function () {
-          // The file has been saved to Parse.
-          // set application document attributes:
-          // documentType, filename, document, applicationId
-          //applicationId - reference to the parent application
-          var ApplicationDocument = new Parse.Object("ApplicationDocument");
-          ApplicationDocument.set("documentType", _this.title);
-          ApplicationDocument.set("filename", name);
-          ApplicationDocument.set("document", parseFile);
-          ApplicationDocument.set(
-            "applicationId",
-            new Parse.Object("Application", { id: _this.appId })
-          );
-          ApplicationDocument.save().then(() => {
-            // get the url of the document saved in parse
-            // then set it as the href of element with id=fileurl
-            const docs = ApplicationDocument.get("document");
-            document.getElementById("fileurl").setAttribute("href", docs.url());
-          });
+      if (this.dropzoneFile == "") {
+        this.className = "alert-warning";
+      } else {
+        var currentDate = new Date()
+          .toLocaleDateString()
+          .replace(/[^\w\s]/gi, "");
+        var name = this.hei_username + "-" + this.title + currentDate + ".pdf";
+        this.filename = name;
+        let _this = this;
+        const parseFile = new Parse.File(this.filename, this.dropzoneFile);
+        parseFile.save().then(
+          function () {
+            // The file has been saved to Parse.
+            // set application document attributes:
+            // documentType, filename, document, applicationId
+            //applicationId - reference to the parent application
+            var ApplicationDocument = new Parse.Object("ApplicationDocument");
+            ApplicationDocument.set("documentType", _this.title);
+            ApplicationDocument.set("filename", name);
+            ApplicationDocument.set("document", parseFile);
+            ApplicationDocument.set(
+              "applicationId",
+              new Parse.Object("Application", { id: _this.appId })
+            );
+            ApplicationDocument.save().then(() => {
+              // get the url of the document saved in parse
+              // then set it as the href of element with id=fileurl
+              const docs = ApplicationDocument.get("document");
+              document
+                .getElementById("fileurl")
+                .setAttribute("href", docs.url());
+            });
 
-          console.log("File has been uploaded! ");
-        },
-        function (error) {
-          // The file either could not be read, or could not be saved to Parse.
-          console.log("Error: " + error);
-        }
-      );
+            console.log("File has been uploaded! ");
+          },
+          function (error) {
+            // The file either could not be read, or could not be saved to Parse.
+            console.log("Error: " + error);
+          }
+        );
 
-      this.$emit("complete", step);
-      this.$emit("setStatus", "2 of 5");
+        this.$emit("complete", step);
+        this.$emit("setStatus", "2 of 5");
+      }
     },
     async getUrl(appId) {
       // this function gets the url of the uploaded document in parse
@@ -215,6 +231,9 @@ export default {
       var docs = results.get("document");
       this.filename = results.get("filename");
       document.getElementById("fileurl").setAttribute("href", docs.url());
+    },
+    removeFile() {
+      this.dropzoneFile = "";
     },
 
     nextStep() {
