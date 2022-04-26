@@ -169,10 +169,25 @@ export default {
     console.log(this.allow);
   },
   methods: {
+    validate(filename) {
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.pdf)$/;
+      if (filename === "") {
+        this.className = "alert-error";
+        return false;
+      } else if (regex.test(filename.name)) {
+        return true;
+      } else {
+        alert("Please upload a .pdf file!");
+        this.removeFile();
+        return false;
+      }
+    },
     upload(step) {
+      var validation = this.validate(this.dropzoneFile);
+
       if (this.dropzoneFile == "") {
         this.className = "alert-warning";
-      } else {
+      } else if (validation) {
         var currentDate = new Date()
           .toLocaleDateString()
           .replace(/[^\w\s]/gi, "");
