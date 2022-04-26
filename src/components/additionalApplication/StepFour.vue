@@ -199,6 +199,7 @@ export default {
       console.log(newStart);
       console.log(newEnd);
 
+      query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
         result.set("dateApproved", date);
         result.set("awardYear", fullyear.toString());
