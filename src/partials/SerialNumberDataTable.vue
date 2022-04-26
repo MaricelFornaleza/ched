@@ -18,7 +18,11 @@
           </button>
         </div>
       </div>
-      <table id="dataTable" class="p-4 hover text-center w-full row-border">
+      <table
+        id="dataTable"
+        width="100%"
+        class="p-4 hover text-center w-full row-border"
+      >
         <thead class="text-xs uppercase">
           <tr>
             <th
@@ -89,6 +93,7 @@ export default {
             search: "",
             sLengthMenu: "_MENU_",
           },
+          scrollX: true,
         });
       });
     },
