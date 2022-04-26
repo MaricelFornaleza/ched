@@ -49,15 +49,23 @@
         </div>
         <div
           v-else
-          class="my-20 w-fit flex justify-between p-5 border border-light-300"
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
         >
-          <div class="flex space-x-5">
-            <img
-              src="@/assets/img/xls.png"
-              class="h-8"
-              alt="XLS Icon by Dimitry Miroliubov"
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-5">
+              <img
+                src="@/assets/img/xls.png"
+                class="h-8"
+                alt="PDF Icon by Dimitry Miroliubov"
+              />
+              <div class="text-base">{{ dropzoneFile.name }}</div>
+            </div>
+
+            <XCircleIcon
+              @click="removeFile()"
+              class="h-5 text-error cursor-pointer"
+              title="Remove File"
             />
-            <div class="text-base">{{ dropzoneFile.name }}</div>
           </div>
         </div>
 
@@ -223,6 +231,8 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import { XCircleIcon } from "@heroicons/vue/outline";
+
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from "parse";
@@ -252,6 +262,7 @@ export default {
     DropZone,
     StudentsDataTable,
     ModalWidget,
+    XCircleIcon,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -388,7 +399,12 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram && takenNstp1 == true && takenNstp2 == true && serialNum == null) {
+            if (
+              program == nstpProgram &&
+              takenNstp1 == true &&
+              takenNstp2 == true &&
+              serialNum == null
+            ) {
               studentSet.delete(studentData[x]);
               results[i].set("isGraduated", true);
               await results[i].save();
@@ -479,8 +495,12 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
 
-        if(object.get("takenNstp1") == true && object.get("takenNstp2") == true && object.get("isGraduated") == true ) {
-           studentList.push({
+        if (
+          object.get("takenNstp1") == true &&
+          object.get("takenNstp2") == true &&
+          object.get("isGraduated") == true
+        ) {
+          studentList.push({
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
@@ -526,6 +546,9 @@ export default {
       console.log(this.students);
       console.log(this.studentsMissing);
       this.forceRerender();
+    },
+    removeFile() {
+      this.dropzoneFile = "";
     },
     nextStep() {
       this.worker.terminate();

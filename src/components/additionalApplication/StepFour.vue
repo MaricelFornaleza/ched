@@ -179,13 +179,13 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
-      query.equalTo("objectId", this.appId);
+      // query.equalTo("objectId", this.appId);
       const results = await query.first();
       //get serialNumber, if undefined; set startSerialNum to 1
       //if not, set startSerialNum to the last saved endSerialNumber + 1
       var newStart = 0;
-      var newEnd = 0; 
-      
+      var newEnd = 0;
+
       if (results.get("serialNumber") == null) {
         newStart = 1;
         newEnd = this.data.graduates;
@@ -194,18 +194,19 @@ export default {
         const serialNumber = await query.first();
         const endSerialNumber = serialNumber.get("serialNumber").end;
         newStart = endSerialNumber + 1;
-        newEnd = endSerialNumber + this.data.graduates;   
+        newEnd = endSerialNumber + this.data.graduates;
       }
       console.log(newStart);
       console.log(newEnd);
 
+      query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
         result.set("dateApproved", date);
         result.set("awardYear", fullyear.toString());
         result.set("serialNumber", { start: newStart, end: newEnd });
         result.save();
       });
-      
+
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(

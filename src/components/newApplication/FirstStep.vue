@@ -50,15 +50,23 @@
 
         <div
           v-else
-          class="my-20 w-fit flex justify-between p-5 border border-light-300"
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
         >
-          <div class="flex space-x-5">
-            <img
-              src="@/assets/img/xls.png"
-              class="h-8"
-              alt="XLS Icon by Dimitry Miroliubov"
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-5">
+              <img
+                src="@/assets/img/xls.png"
+                class="h-8"
+                alt="PDF Icon by Dimitry Miroliubov"
+              />
+              <div class="text-base">{{ dropzoneFile.name }}</div>
+            </div>
+
+            <XCircleIcon
+              @click="removeFile()"
+              class="h-5 text-error cursor-pointer"
+              title="Remove File"
             />
-            <div class="text-base">{{ dropzoneFile.name }}</div>
           </div>
         </div>
 
@@ -106,7 +114,7 @@
         </div>
 
         <!-- pass props lists -->
-        <StudentsDataTable 
+        <StudentsDataTable
           :key="componentKey"
           :students="students"
           fileName="List-of-Students-1stSem"
@@ -185,6 +193,8 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import { XCircleIcon } from "@heroicons/vue/outline";
+
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from "parse";
@@ -205,10 +215,10 @@ export default {
       worker: undefined,
     };
   },
-  props: { 
-    isCompleted: Boolean, 
+  props: {
+    isCompleted: Boolean,
     appId: String,
-    allow: Boolean 
+    allow: Boolean,
   },
   components: {
     AlertWidget,
@@ -216,6 +226,7 @@ export default {
     DropZone,
     StudentsDataTable,
     ModalWidget,
+    XCircleIcon,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -305,7 +316,7 @@ export default {
       var results = await query.first();
       results.set("academicYear", acadYear);
       //results.set("awardYear", acadYear);
-      this.heiId = results.get("heiId");      //also get heiId
+      this.heiId = results.get("heiId"); //also get heiId
       results.save();
     },
     async getNstpId(nstp) {
@@ -338,8 +349,8 @@ export default {
         var bday = results[i].get("studentId").get("birthdate");
         var program = results[i].get("nstpId").get("programName");
         var takenNstp1 = results[i].get("takenNstp1");
-        var takenNstp2 = results[i].get("takenNstp2");
-        var serialNum = results[i].get("serialNumber");
+        // var takenNstp2 = results[i].get("takenNstp2");
+        // var serialNum = results[i].get("serialNumber");
 
         for (let x = 0; x < studentData.length; x++) {
           //check student's name and bday
@@ -477,6 +488,9 @@ export default {
       }
       this.students = studentList;
       this.forceRerender();
+    },
+    removeFile() {
+      this.dropzoneFile = "";
     },
     nextStep() {
       // this.worker.terminate();

@@ -34,7 +34,12 @@
           <button class="font-bold underline">template</button>.
         </span>
       </slot>
-      <input type="file" id="dropzoneFile" class="dropzoneFile" :accept="fileType" />
+      <input
+        type="file"
+        id="dropzoneFile"
+        class="dropzoneFile"
+        :accept="fileType"
+      />
     </div>
   </div>
 </template>

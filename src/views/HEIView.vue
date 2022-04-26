@@ -77,7 +77,7 @@
 
       <!-- dataTables  -->
       <div>
-        <vue-data-table
+        <hei-data-table
           :heis="heis"
           :table_headers="table_headers"
           @displayAlert="displayAlert"
@@ -146,7 +146,7 @@
               </div>
             </div>
           </template>
-        </vue-data-table>
+        </hei-data-table>
       </div>
     </div>
   </div>
@@ -158,7 +158,7 @@
 import SimpleWidget from "@/partials/SimpleWidget.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import { LibraryIcon } from "@heroicons/vue/solid";
-import VueDataTable from "@/partials/VueDataTable.vue";
+import HeiDataTable from "@/partials/HeiDataTable.vue";
 import { ChevronDownIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
@@ -234,7 +234,7 @@ export default {
     EmptyState,
     SimpleWidget,
     LibraryIcon,
-    VueDataTable,
+    HeiDataTable,
     AlertWidget,
 
     ChevronDownIcon,
