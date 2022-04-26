@@ -50,15 +50,23 @@
 
         <div
           v-else
-          class="my-20 w-fit flex justify-between p-5 border border-light-300"
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
         >
-          <div class="flex space-x-5">
-            <img
-              src="@/assets/img/xls.png"
-              class="h-8"
-              alt="XLS Icon by Dimitry Miroliubov"
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-5">
+              <img
+                src="@/assets/img/xls.png"
+                class="h-8"
+                alt="PDF Icon by Dimitry Miroliubov"
+              />
+              <div class="text-base">{{ dropzoneFile.name }}</div>
+            </div>
+
+            <XCircleIcon
+              @click="removeFile()"
+              class="h-5 text-error cursor-pointer"
+              title="Remove File"
             />
-            <div class="text-base">{{ dropzoneFile.name }}</div>
           </div>
         </div>
 
@@ -113,37 +121,43 @@
           ></StudentsDataTable>
         </div>
       </div>
-      
-      <div v-if="errorStudents()" class="container mx-auto flex flex-col items-center justify-center">
+
+      <div
+        v-if="errorStudents()"
+        class="container mx-auto flex flex-col items-center justify-center"
+      >
         <AlertWidget className="alert-warning">
-          The following students' record for the 1st Semester were not found. 
+          The following students' record for the 1st Semester were not found.
           Please ensure the students have taken the same NSTP 1 program.
         </AlertWidget>
 
-          <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ femaleNumError }}</h2>
-              <p class="uppercase">female</p>
-            </div>
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ maleNumError }}</h2>
-              <p class="uppercase">male</p>
-            </div>
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ maleNumError + femaleNumError }}</h2>
-              <p class="uppercase">total</p>
-            </div>
+        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ femaleNumError }}</h2>
+            <p class="uppercase">female</p>
           </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNumError }}</h2>
+            <p class="uppercase">male</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNumError + femaleNumError }}</h2>
+            <p class="uppercase">total</p>
+          </div>
+        </div>
 
-          <StudentsDataTable
-            :key="componentKey"
-            :students="studentsMissing"
-            newId="datatable2"
-            fileName="List-of-Students-Missing-2ndSem"
-          ></StudentsDataTable>
+        <StudentsDataTable
+          :key="componentKey"
+          :students="studentsMissing"
+          newId="datatable2"
+          fileName="List-of-Students-Missing-2ndSem"
+        ></StudentsDataTable>
       </div>
 
-      <div class="flex items-center justify-center space-x-5 mt-5">
+      <div
+        v-if="finishedStudents()"
+        class="flex items-center justify-center space-x-5 mt-5"
+      >
         <button
           @click="goToApplication()"
           class="btn-sm btn-default btn-outline"
@@ -152,12 +166,7 @@
           Cancel
         </button>
 
-        <button
-          v-if="finishedStudents()"
-          @click="nextStep()"
-          class="btn-sm btn-default"
-          type="submit"
-        >
+        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
           Next
         </button>
       </div>
@@ -220,6 +229,8 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import { XCircleIcon } from "@heroicons/vue/outline";
+
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from "parse";
@@ -249,6 +260,7 @@ export default {
     DropZone,
     StudentsDataTable,
     ModalWidget,
+    XCircleIcon,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -410,7 +422,7 @@ export default {
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
       const nstpId = await this.getNstpId(nstpProgram);
       const heiId = await this.getHeiId();
-      
+
       const student = new Parse.Object("Student");
       student.set("name", {
         lastName: studentData.F,
@@ -451,7 +463,8 @@ export default {
       });
     },
     async getStudents() {
-      var studentList = [], studentErrorList = [];
+      var studentList = [],
+        studentErrorList = [];
       //reset the numbers to be sure
       this.femaleNum = 0;
       this.maleNum = 0;
@@ -522,6 +535,9 @@ export default {
       console.log(this.students);
       console.log(this.studentsMissing);
       this.forceRerender();
+    },
+    removeFile() {
+      this.dropzoneFile = "";
     },
     nextStep() {
       // this.worker.terminate();
