@@ -88,35 +88,69 @@
       </div>
     </div>
 
-    <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
+    <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
       <advanced-widget bgColor="bg-info-light" textColor="text-info">
         <template v-slot:icon><LibraryIcon class="h-8" /></template>
-        <template v-slot:count>123k</template>
+        <template v-slot:count>{{ hei.total }}</template>
         <template v-slot:label>Higher Education Institutions</template>
         <template v-slot:data>
-          <data-count dataCount="345" dataLabel="SUC"></data-count>
-          <data-count dataCount="45" dataLabel="LUC"></data-count>
-          <data-count dataCount="345" dataLabel="Private"></data-count>
-          <data-count dataCount="967" dataLabel="OGS"></data-count>
+          <data-count :dataCount="hei.countSuc" dataLabel="SUC"></data-count>
+          <data-count :dataCount="hei.countLuc" dataLabel="LUC"></data-count>
+          <data-count
+            :dataCount="hei.countPrivate"
+            dataLabel="Private"
+          ></data-count>
+          <data-count :dataCount="hei.countOgs" dataLabel="OGS"></data-count>
         </template>
       </advanced-widget>
       <advanced-widget bgColor="bg-error-light" textColor="text-error">
+        <template v-slot:icon><UsersIcon class="h-8" /></template>
+        <template v-slot:count>{{ enrollees.total }}</template>
+        <template v-slot:label>NSTP Enrollees</template>
+        <template v-slot:data
+          ><data-count
+            :dataCount="enrollees.first"
+            dataLabel="1st Semester"
+          ></data-count>
+          <data-count
+            :dataCount="enrollees.second"
+            dataLabel="2nd Semester"
+          ></data-count>
+        </template>
+      </advanced-widget>
+      <advanced-widget bgColor="bg-success-light" textColor="text-success">
         <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
-        <template v-slot:count>456k</template>
+        <template v-slot:count>{{ graduates.total }}</template>
         <template v-slot:label>NSTP Graduates</template>
         <template v-slot:data
-          ><data-count dataCount="345" dataLabel="CWTS"></data-count>
-          <data-count dataCount="45" dataLabel="LTS"></data-count>
+          ><data-count
+            :dataCount="graduates.cwts"
+            dataLabel="CWTS"
+          ></data-count>
+          <data-count :dataCount="graduates.lts" dataLabel="LTS"></data-count>
         </template>
       </advanced-widget>
       <advanced-widget bgColor="bg-warning-light" textColor="text-warning">
         <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
-        <template v-slot:count>789k</template>
+        <template v-slot:count>{{ applications.total }}</template>
         <template v-slot:label>Total Applications</template>
         <template v-slot:data
-          ><data-count dataCount="345" dataLabel="For Approval"></data-count>
-          <data-count dataCount="45" dataLabel="For Revision"></data-count>
-          <data-count dataCount="345" dataLabel="Approved"></data-count>
+          ><data-count
+            :dataCount="applications.pending"
+            dataLabel="Pending"
+          ></data-count>
+          <data-count
+            :dataCount="applications.forApproval"
+            dataLabel="For Approval"
+          ></data-count>
+          <data-count
+            :dataCount="applications.forRevision"
+            dataLabel="For Revision"
+          ></data-count>
+          <data-count
+            :dataCount="applications.approved"
+            dataLabel="Approved"
+          ></data-count>
         </template>
       </advanced-widget>
     </div>
@@ -173,11 +207,13 @@ import ProgressBar from "@/partials/ProgressBar.vue";
 import { ref } from "vue";
 import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
+import Parse from "parse";
 import {
   AcademicCapIcon,
   LibraryIcon,
   DocumentTextIcon,
   DownloadIcon,
+  UsersIcon,
 } from "@heroicons/vue/solid";
 // import Parse from "parse";
 Chart.register(...registerables);
@@ -191,9 +227,34 @@ export default {
     DataCount,
     BarChart,
     ProgressBar,
+    UsersIcon,
   },
   data() {
     return {
+      hei: {
+        total: 0,
+        countSuc: 0,
+        countLuc: 0,
+        countPrivate: 0,
+        countOgs: 0,
+      },
+      graduates: {
+        total: 0,
+        cwts: 0,
+        lts: 0,
+      },
+      applications: {
+        total: 0,
+        forApproval: 0,
+        forRevision: 0,
+        approved: 0,
+        pending: 0,
+      },
+      enrollees: {
+        total: 0,
+        first: 0,
+        second: 0,
+      },
       monthly: true,
       months: [
         "January",
@@ -215,11 +276,82 @@ export default {
       ],
     };
   },
-  async created() {
+  created() {
+    this.getHeis();
+    this.getApplications();
+    this.getGraduates();
   },
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
+    },
+    async getHeis() {
+      const query = new Parse.Query(Parse.User);
+      query.equalTo("userType", "hei");
+      this.hei.total = await query.count();
+      query.equalTo("type", "LUC");
+      this.hei.countLuc = await query.count();
+      query.equalTo("type", "SUC");
+      this.hei.countSuc = await query.count();
+      query.equalTo("type", "Private");
+      this.hei.countPrivate = await query.count();
+      query.equalTo("type", "OGS");
+      this.hei.countOgs = await query.count();
+    },
+    async getApplications() {
+      var list = [];
+      const Applications = Parse.Object.extend("Application");
+      const query = new Parse.Query(Applications);
+      query.limit(9);
+      query.include("heiId");
+      query.descending("dateApplied");
+
+      var results = await query.find();
+      for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+        list.push({
+          id: object.id,
+          dateApplied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "short",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          hei: object.get("heiId").get("name"),
+          type: object.get("applicationType"),
+        });
+      }
+      this.recentApplications = list;
+
+      this.applications.total = await query.count();
+      query.equalTo("status", "For Approval");
+      this.applications.forApproval = await query.count();
+      query.equalTo("status", "For Revision");
+      this.applications.forRevision = await query.count();
+      query.equalTo("status", "Approved");
+      this.applications.approved = await query.count();
+      query.notContainedIn("status", [
+        "For Approval",
+        "For Revision",
+        "Approved",
+      ]);
+      this.applications.pending = await query.count();
+    },
+    async getGraduates() {
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      this.enrollees.total = await query.count();
+      query.equalTo("takenNstp1", true);
+      this.enrollees.first = await query.count();
+      query.equalTo("takenNstp2", true);
+      this.enrollees.second = await query.count();
+
+      query.exists("serialNumber");
+      this.graduates.total = await query.count();
+      query.startsWith("serialNumber", "C");
+      this.graduates.cwts = await query.count();
+      query.startsWith("serialNumber", "L");
+      this.graduates.lts = await query.count();
     },
   },
   setup() {
