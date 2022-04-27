@@ -111,10 +111,11 @@
             <list-item
               v-for="application in recentApplications"
               :key="application"
-              class="list-item"
+              class="list-item cursor-pointer"
               :school="application.hei"
               :type="application.type"
               :date="application.dateApplied"
+              @click="viewApplication(application.type, application.id)"
             ></list-item>
           </ul>
         </div>
@@ -293,6 +294,7 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
         list.push({
+          id: object.id,
           dateApplied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "short",
             year: "numeric",
@@ -328,6 +330,19 @@ export default {
       this.graduates.cwts = await query.count();
       query.startsWith("serialNumber", "L");
       this.graduates.lts = await query.count();
+    },
+    viewApplication(type, id) {
+      if (type == "New Application") {
+        router.push({
+          name: "1stStep",
+          params: { application: id },
+        });
+      } else if (type == "For Additional Graduates") {
+        router.push({
+          name: "Step1",
+          params: { application: id },
+        });
+      }
     },
     goToApplications() {
       router.push({ name: "application" });
