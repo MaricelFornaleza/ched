@@ -55,17 +55,21 @@
 
       <div class="mt-16 grid gap-10 md:grid-cols-1 xl:grid-cols-3">
         <div
+          ref="document"
           class="col-span-2 w-full bg-light-100 p-10 shadow-sm overflow-hidden"
         >
           <div class="flex justify-between mb-3 items-center">
             <div class="text-left">
               <div class="font-bold text-lg">NSTP Graudates</div>
-              <div class="text-sm text-dark-100">Academic Year 2001-2011</div>
+              <div class="text-sm text-dark-100">
+                Academic Year {{ academicYear }}
+              </div>
             </div>
             <button class="bg-info p-2 rounded text-light-100 h-fit">
-              <DownloadIcon class="h-4" />
+              <DownloadIcon @click="exportToPDF" class="h-4" />
             </button>
           </div>
+
           <BarChart :chartData="testData" :options="options" />
           <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
             <progress-bar
@@ -135,6 +139,7 @@ import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import Parse from "parse";
 import router from "../router";
+import html2pdf from "html2pdf.js";
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -179,6 +184,7 @@ export default {
       },
       recentApplications: [],
       years: [],
+      academicYear: "",
 
       testData: null,
       cwts: [],
@@ -193,6 +199,15 @@ export default {
     this.getData();
   },
   methods: {
+    exportToPDF() {
+      html2pdf(this.$refs.document, {
+        margin: 1,
+        filename: "document.pdf",
+        image: { type: "png", quality: 1 },
+        html2canvas: { scale: 5, letterRendering: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
+      });
+    },
     async getData() {
       const Applications = Parse.Object.extend("Application");
       const query = new Parse.Query(Applications);
@@ -245,6 +260,10 @@ export default {
           },
         },
       });
+      const start = this.years[0].substring(0, 4);
+      const end = this.years[this.years.length - 1].slice(-4);
+
+      this.academicYear = start + "-" + end;
 
       this.testData = testData;
       this.options = options;
