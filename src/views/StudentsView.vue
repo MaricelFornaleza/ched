@@ -5,7 +5,7 @@
         <div class="uppercase">{{ hei }}</div>
         <div class="flex space-x-2 text-sm">
           <span>{{ year }}</span>
-          <span> | {{ sem }}</span>
+          <span v-if="sem != 0"> | {{ sem }}</span>
         </div>
       </div>
       <view-students-datatable
@@ -63,6 +63,9 @@ export default {
       if (this.sem == "1st Sem") {
         students.equalTo("takenNstp1", true);
       } else if (this.sem == "2nd Sem") {
+        students.equalTo("takenNstp2", true);
+      } else if (this.sem == "0") {
+        students.equalTo("takenNstp1", true);
         students.equalTo("takenNstp2", true);
       }
       var results = await students.find();
