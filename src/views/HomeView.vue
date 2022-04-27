@@ -70,15 +70,15 @@
           <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
             <progress-bar
               label="CWTS Graduates"
-              count="345"
-              total="500"
+              :count="graduates.cwts"
+              :total="graduates.total"
               bgColor="bg-warning-dark"
             />
 
             <progress-bar
               label="LTS Graduates"
-              count="123"
-              total="500"
+              :count="graduates.lts"
+              :total="graduates.total"
               bgColor="bg-error"
             />
           </div>
@@ -178,54 +178,77 @@ export default {
         pending: 0,
       },
       recentApplications: [],
+      years: [],
+
+      testData: null,
+      cwts: [],
+      lts: [],
+      options: null,
     };
   },
   mounted() {
     this.getHeis();
     this.getApplications();
     this.getGraduates();
+    this.getData();
   },
-  setup() {
-    const testData = {
-      labels: [
-        "2001-02",
-        "2002-03",
-        "2003-04",
-        "2004-05",
-        "2005-06",
-        "2006-07",
-        "2007-08",
-        "2008-09",
-        "2009-10",
-        "2010-11",
-      ],
-      datasets: [
-        {
-          label: "CWTS",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54],
-          backgroundColor: ["#FECA84"],
-        },
-        {
-          label: "LTS",
-          data: [10, 40, 90, 123, 54, 130, 140, 160, 170, 15],
-          backgroundColor: ["#E93B5A"],
-        },
-      ],
-    };
-
-    const options = ref({
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    });
-
-    return { testData, options };
-  },
-
   methods: {
+    async getData() {
+      const Applications = Parse.Object.extend("Application");
+      const query = new Parse.Query(Applications);
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const nstpenrollment = new Parse.Query(NstpEnrollment);
+      nstpenrollment.exists("serialNumber");
+
+      query.descending("academicYear");
+      query.limit(10);
+      query.ascending("academicYear");
+      query.distinct("academicYear").then(async (res) => {
+        this.years = res;
+        for (let i = 0; i < res.length; i++) {
+          query.equalTo("academicYear", res[i]);
+          // const result = await query.find();
+          nstpenrollment.matchesKeyInQuery("applicationId", "objectId", query);
+
+          nstpenrollment.startsWith("serialNumber", "C");
+          this.cwts.push(await nstpenrollment.count());
+          nstpenrollment.startsWith("serialNumber", "L");
+          this.lts.push(await nstpenrollment.count());
+        }
+
+        this.setData();
+      });
+    },
+    setData() {
+      const testData = {
+        labels: this.years,
+        datasets: [
+          {
+            label: "CWTS",
+            data: Object.values(this.cwts),
+            backgroundColor: ["#FECA84"],
+          },
+          {
+            label: "LTS",
+            data: Object.values(this.lts),
+            backgroundColor: ["#E93B5A"],
+          },
+        ],
+      };
+
+      const options = ref({
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      });
+
+      this.testData = testData;
+      this.options = options;
+    },
     async getHeis() {
       const query = new Parse.Query(Parse.User);
       query.equalTo("userType", "hei");
