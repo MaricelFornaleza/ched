@@ -56,10 +56,10 @@
               class="whitespace-nowrap"
             >
               <td class="px-6 py-4">{{ index + 1 }}</td>
-              <td>award year</td>
-              <td>nstp program</td>
-              <td>region</td>
-              <td>serial number</td>
+              <td>{{ student.awardYear }}</td>
+              <td>{{ student.nstpProgram }}</td>
+              <td>{{ student.region }}</td>
+              <td>{{ student.serialNumber }}</td>
 
               <td>{{ student.name.lastName }}</td>
               <td>{{ student.name.firstName }}</td>
@@ -70,13 +70,13 @@
               <td>{{ student.address.street }}</td>
               <td>{{ student.address.city }}</td>
               <td>{{ student.address.province }}</td>
-              <td>hei name</td>
-              <td>institutional code</td>
-              <td>type of hei</td>
-              <td>program level code</td>
-              <td>main program name</td>
-              <td>email address</td>
-              <td>contact number</td>
+              <td>{{ student.heiName }}</td>
+              <td>{{ student.institutionalCode }}</td>
+              <td>{{ student.heiType }}</td>
+              <td>{{ student.program.programLevelCode }}</td>
+              <td>{{ student.program.programName }}</td>
+              <td>{{ student.emailAddress }}</td>
+              <td>{{ student.contactNumber }}</td>
             </tr>
           </tbody>
         </table>
@@ -100,17 +100,15 @@ export default {
   data() {
     return {
       tableId: "dataTable",
-      newFileName: this.fileName,
     };
   },
   components: {
     DownloadIcon,
   },
-  props: { students: Array, newId: String, fileName: String },
+  props: { students: Array, newId: String },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
-    this.newFileName = this.fileName;
   },
   watch: {
     students() {
@@ -153,7 +151,7 @@ export default {
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       if (typeof this.newFileName == "undefined")
-        this.newFileName = `List-of-Applications_${currentDate}.xlsx`;
+        this.newFileName = `List-of-Students_${currentDate}.xlsx`;
       else this.newFilename = `${this.newFileName}_${currentDate}.xlsx`;
       XLSX.writeFileXLSX(workbook, this.newFilename);
     },
