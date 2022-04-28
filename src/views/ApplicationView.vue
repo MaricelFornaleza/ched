@@ -60,8 +60,8 @@
             </simple-widget>
             <simple-widget bgColor="bg-error-light" textColor="text-error">
               <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
-              <template v-slot:count>{{ for_revision }}</template>
-              <template v-slot:label>For Revision</template>
+              <template v-slot:count>{{ rejected }}</template>
+              <template v-slot:label>Rejected</template>
             </simple-widget>
             <simple-widget bgColor="bg-info-light" textColor="text-info">
               <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
@@ -162,7 +162,7 @@ export default {
       ],
       for_approval: 0,
       approved: 0,
-      for_revision: 0,
+      rejected: 0,
       total_applications: 0,
       status: "",
       message: "",
@@ -225,7 +225,7 @@ export default {
       });
       if (
         object.get("status") == "For Approval" ||
-        object.get("status") == "For Revision" ||
+        object.get("status") == "Rejected" ||
         object.get("status") == "Approved"
       ) {
         await query2.first().then(function (res) {
@@ -257,9 +257,9 @@ export default {
     query.equalTo("status", "Approved");
     const count2 = await query.find();
     this.approved = count2.length;
-    query.equalTo("status", "For Revision");
+    query.equalTo("status", "Rejected");
     const count3 = await query.find();
-    this.for_revision = count3.length;
+    this.rejected = count3.length;
 
     this.applications = data;
 

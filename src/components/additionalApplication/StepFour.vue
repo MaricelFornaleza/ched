@@ -48,10 +48,10 @@
           Back
         </button>
         <button
-          @click="setStatus('For Revision')"
+          @click="setStatus('Rejected')"
           class="btn-sm text-light-100 bg-error"
         >
-          For Revision
+          Reject
         </button>
         <button @click="approve()" class="btn-sm text-light-100 bg-success">
           Approve
@@ -114,7 +114,7 @@ export default {
         return "badge-success";
       } else if (stats == "For Approval") {
         return "badge-warning";
-      } else if (stats == "For Revision") {
+      } else if (stats == "Rejected") {
         return "badge-error";
       } else {
         //Ongoing

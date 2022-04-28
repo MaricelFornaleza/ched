@@ -363,7 +363,7 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram && takenNstp1 == false) {
+            if(program == nstpProgram) {
               studentSet.delete(studentData[x]);
               results[i].set(
                 "applicationId",
@@ -371,10 +371,15 @@ export default {
               );
               results[i].set("takenNstp1", true);
               await results[i].save();
-            } else {
+            } else if(program != nstpProgram && !takenNstp1){
               //found the student but there are mismatch in stored info
-              //delete from set since it'll still be shown because of nstpTaken
-              studentSet.delete(studentData[x]);
+              const newEnrollment = new Parse.Object.extend("NstpEnrollment");
+              newEnrollment.set(
+                "applicationId",
+                new Parse.Object("Application", { id: this.appId })
+              );
+              newEnrollment.set("takenNstp1", true);
+              newEnrollment.save();
             }
             break;
           }

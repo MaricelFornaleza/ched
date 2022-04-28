@@ -42,8 +42,8 @@
               dataLabel="For Approval"
             ></data-count>
             <data-count
-              :dataCount="applications.forRevision"
-              dataLabel="For Revision"
+              :dataCount="applications.rejected"
+              dataLabel="Rejected"
             ></data-count>
             <data-count
               :dataCount="applications.approved"
@@ -173,7 +173,7 @@ export default {
       applications: {
         total: 0,
         forApproval: 0,
-        forRevision: 0,
+        rejected: 0,
         approved: 0,
         pending: 0,
       },
@@ -266,13 +266,13 @@ export default {
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");
       this.applications.forApproval = await query.count();
-      query.equalTo("status", "For Revision");
-      this.applications.forRevision = await query.count();
+      query.equalTo("status", "Rejected");
+      this.applications.rejected = await query.count();
       query.equalTo("status", "Approved");
       this.applications.approved = await query.count();
       query.notContainedIn("status", [
         "For Approval",
-        "For Revision",
+        "Rejected",
         "Approved",
       ]);
       this.applications.pending = await query.count();
