@@ -60,7 +60,7 @@
         >
           <div class="flex justify-between mb-3 items-center">
             <div class="text-left">
-              <div class="font-bold text-lg">NSTP Graudates</div>
+              <div class="font-bold text-lg">NSTP Graduates</div>
               <div class="text-sm text-dark-100">
                 Academic Year {{ academicYear }}
               </div>

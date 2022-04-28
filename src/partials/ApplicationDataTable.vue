@@ -349,7 +349,7 @@ export default {
 
             // May remove this since application can't be deleted after step 3
             // NstpEnrollment
-            const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+            /*const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
             const query3 = new Parse.Query(NstpEnrollment);
             query3.equalTo(
               "applicationId",
@@ -384,7 +384,7 @@ export default {
                   console.log(error);
                 }
               );
-            }
+            }*/
             console.log("Application Deleted!");
           }
         } else {

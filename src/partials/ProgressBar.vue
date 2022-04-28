@@ -20,6 +20,7 @@ export default {
       };
     },
     computedPercent() {
+      if(this.total == 0) return 0;
       return (this.count / this.total) * 100;
     },
   },
