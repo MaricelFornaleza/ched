@@ -422,6 +422,9 @@ export default {
       user.set("password", password);
       user.set("userType", "hei");
       user.save().then((user) => {
+        const params = {email:this.email, password:password, type:"Account", approved:true};
+        Parse.Cloud.run("accountCredential", params);
+
         router.push({
           name: "hei",
           query: {
@@ -430,14 +433,7 @@ export default {
           },
         });
       });
-      // .then(function(hei) {
-      //   // any logic to be executed after the object is saved.
-      //   alert('New object created with objectId: ' + hei.id);
-
-      // }).catch(function (error){
-      //   alert('Failed to create new object, with error code: ' + error.message);
-      // });
     },
-  },
+  },  
 };
 </script>
