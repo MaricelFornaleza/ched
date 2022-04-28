@@ -181,6 +181,7 @@ export default {
       const query = new Parse.Query(Application);
       query.exists("academicYear");
       query.distinct("academicYear").then((results) => {
+        results.reverse();
         for (let index = 0; index < results.length; index++) {
           const element = results[index];
           acadYears.push(element);
