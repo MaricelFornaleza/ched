@@ -96,7 +96,7 @@
             <td class="px-6 py-4">
               <div class="">
                 <EyeIcon
-                  @click="viewStudents()"
+                  @click="viewStudents(semester, acadYear, object.hei_id)"
                   class="
                     h-6
                     mx-auto
@@ -130,7 +130,7 @@ import router from "../router";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 export default {
   name: "EnrollmentDataTable",
-  props: { objects: Object, table_headers: Array },
+  props: { objects: Object, table_headers: Array, sem: String, year: String },
   components: {
     DownloadIcon,
     EyeIcon,
@@ -138,7 +138,17 @@ export default {
   data: function () {
     return {
       dropdown: false,
+      semester: "",
+      acadYear: "",
     };
+  },
+  watch: {
+    sem: function (newSem) {
+      this.semester = newSem;
+    },
+    year: function (newYear) {
+      this.acadYear = newYear;
+    },
   },
   methods: {
     exportToExcel() {
@@ -157,14 +167,22 @@ export default {
       var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
       XLSX.writeFileXLSX(workbook, filename);
     },
-    viewStudents() {
+    viewStudents(sem, year, id) {
       router.push({
         name: "viewStudents",
+        params: {
+          sem: sem,
+          year: year,
+          id: id,
+        },
       });
     },
   },
 
   mounted() {
+    this.semester = this.sem;
+    this.acadYear = this.year;
+
     $(document).ready(function () {
       $("#dataTable").DataTable({
         language: {

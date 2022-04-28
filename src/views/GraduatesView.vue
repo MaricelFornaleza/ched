@@ -58,7 +58,7 @@
 
     <!-- dataTables  -->
     <div>
-      <summary-data-table :objects="objects">
+      <summary-data-table :objects="objects" :sem="sem" :year="year">
         <template v-slot:button>
           <select
             @change="setYear($event)"
@@ -120,7 +120,7 @@ export default {
     return {
       academicYears: [],
       year: "",
-
+      sem: 0,
       objects: [],
       loading: true,
       CWTS: { femaleNum: 0, maleNum: 0 },
@@ -143,6 +143,7 @@ export default {
 
       query.exists("academicYear");
       query.distinct("academicYear").then((results) => {
+        results.reverse();
         for (let index = 0; index < results.length; index++) {
           const element = results[index];
           acadYears.push(element);
@@ -231,6 +232,7 @@ export default {
         var heiObject = {
           id: hei.id,
           hei_name: hei.get("name"),
+          hei_id: hei.id,
           cwts: cwtsObject,
           lts: ltsObject,
           rotc: ltsObject,

@@ -3,12 +3,39 @@
     <div class="uppercase text-sm font-semibold tracking-wider">
       Philippine Standard Time
     </div>
-    <div class="text-4xl font-bold uppercase tracking-wider">04:29:22 pm</div>
+    <div class="text-4xl font-bold uppercase tracking-wider">{{ time }}</div>
     <div class="text-sm font-light tracking-wider">
-      12 February 2022 Saturday
+      {{ date }}
     </div>
   </div>
 </template>
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      interval: null,
+      time: null,
+      date: null,
+    };
+  },
+  beforeUnmount() {
+    // prevent memory leak
+    clearInterval(this.interval);
+  },
+  created() {
+    this.interval = setInterval(() => {
+      this.time = Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      }).format();
+    }, 1000);
+    this.date = new Date().toLocaleDateString("en", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      weekday: "long",
+    });
+  },
+};
 </script>

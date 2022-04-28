@@ -55,30 +55,34 @@
 
       <div class="mt-16 grid gap-10 md:grid-cols-1 xl:grid-cols-3">
         <div
+          ref="document"
           class="col-span-2 w-full bg-light-100 p-10 shadow-sm overflow-hidden"
         >
           <div class="flex justify-between mb-3 items-center">
             <div class="text-left">
               <div class="font-bold text-lg">NSTP Graudates</div>
-              <div class="text-sm text-dark-100">Academic Year 2001-2011</div>
+              <div class="text-sm text-dark-100">
+                Academic Year {{ academicYear }}
+              </div>
             </div>
             <button class="bg-info p-2 rounded text-light-100 h-fit">
-              <DownloadIcon class="h-4" />
+              <DownloadIcon @click="exportToPDF" class="h-4" />
             </button>
           </div>
+
           <BarChart :chartData="testData" :options="options" />
           <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
             <progress-bar
               label="CWTS Graduates"
-              count="345"
-              total="500"
+              :count="graduates.cwts"
+              :total="graduates.total"
               bgColor="bg-warning-dark"
             />
 
             <progress-bar
               label="LTS Graduates"
-              count="123"
-              total="500"
+              :count="graduates.lts"
+              :total="graduates.total"
               bgColor="bg-error"
             />
           </div>
@@ -107,10 +111,11 @@
             <list-item
               v-for="application in recentApplications"
               :key="application"
-              class="list-item"
+              class="list-item cursor-pointer"
               :school="application.hei"
               :type="application.type"
               :date="application.dateApplied"
+              @click="viewApplication(application.type, application.id)"
             ></list-item>
           </ul>
         </div>
@@ -135,6 +140,7 @@ import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import Parse from "parse";
 import router from "../router";
+import html2pdf from "html2pdf.js";
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -178,54 +184,91 @@ export default {
         pending: 0,
       },
       recentApplications: [],
+      years: [],
+      academicYear: "",
+
+      testData: null,
+      cwts: [],
+      lts: [],
+      options: null,
     };
   },
   mounted() {
     this.getHeis();
     this.getApplications();
     this.getGraduates();
+    this.getData();
   },
-  setup() {
-    const testData = {
-      labels: [
-        "2001-02",
-        "2002-03",
-        "2003-04",
-        "2004-05",
-        "2005-06",
-        "2006-07",
-        "2007-08",
-        "2008-09",
-        "2009-10",
-        "2010-11",
-      ],
-      datasets: [
-        {
-          label: "CWTS",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54],
-          backgroundColor: ["#FECA84"],
-        },
-        {
-          label: "LTS",
-          data: [10, 40, 90, 123, 54, 130, 140, 160, 170, 15],
-          backgroundColor: ["#E93B5A"],
-        },
-      ],
-    };
-
-    const options = ref({
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    });
-
-    return { testData, options };
-  },
-
   methods: {
+    exportToPDF() {
+      html2pdf(this.$refs.document, {
+        margin: 1,
+        filename: "document.pdf",
+        image: { type: "png", quality: 1 },
+        html2canvas: { scale: 5, letterRendering: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
+      });
+    },
+    async getData() {
+      const Applications = Parse.Object.extend("Application");
+      const query = new Parse.Query(Applications);
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const nstpenrollment = new Parse.Query(NstpEnrollment);
+      nstpenrollment.exists("serialNumber");
+
+      query.descending("academicYear");
+      query.limit(10);
+      query.ascending("academicYear");
+      query.distinct("academicYear").then(async (res) => {
+        this.years = res;
+        for (let i = 0; i < res.length; i++) {
+          query.equalTo("academicYear", res[i]);
+          // const result = await query.find();
+          nstpenrollment.matchesKeyInQuery("applicationId", "objectId", query);
+
+          nstpenrollment.startsWith("serialNumber", "C");
+          this.cwts.push(await nstpenrollment.count());
+          nstpenrollment.startsWith("serialNumber", "L");
+          this.lts.push(await nstpenrollment.count());
+        }
+
+        this.setData();
+      });
+    },
+    setData() {
+      const testData = {
+        labels: this.years,
+        datasets: [
+          {
+            label: "CWTS",
+            data: Object.values(this.cwts),
+            backgroundColor: ["#FECA84"],
+          },
+          {
+            label: "LTS",
+            data: Object.values(this.lts),
+            backgroundColor: ["#E93B5A"],
+          },
+        ],
+      };
+
+      const options = ref({
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      });
+      const start = this.years[0].substring(0, 4);
+      const end = this.years[this.years.length - 1].slice(-4);
+
+      this.academicYear = start + "-" + end;
+
+      this.testData = testData;
+      this.options = options;
+    },
     async getHeis() {
       const query = new Parse.Query(Parse.User);
       query.equalTo("userType", "hei");
@@ -251,6 +294,7 @@ export default {
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
         list.push({
+          id: object.id,
           dateApplied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "short",
             year: "numeric",
@@ -286,6 +330,19 @@ export default {
       this.graduates.cwts = await query.count();
       query.startsWith("serialNumber", "L");
       this.graduates.lts = await query.count();
+    },
+    viewApplication(type, id) {
+      if (type == "New Application") {
+        router.push({
+          name: "1stStep",
+          params: { application: id },
+        });
+      } else if (type == "For Additional Graduates") {
+        router.push({
+          name: "Step1",
+          params: { application: id },
+        });
+      }
     },
     goToApplications() {
       router.push({ name: "application" });

@@ -269,7 +269,7 @@ const routes = [
         },
       },
       {
-        path: "/view-students",
+        path: "/view-students/:sem/:year/:id",
         name: "viewStudents",
         component: StudentsView,
         meta: {
