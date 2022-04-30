@@ -1,53 +1,7 @@
 <template>
   <div class="p-10">
     <div class="">
-      <div class="flex justify-end space-x-5 mb-5">
-        <select
-          v-if="monthly"
-          name="month"
-          id="month"
-          class="
-            text-light-100
-            px-3
-            py-3
-            block
-            rounded-md
-            sm:text-sm
-            bg-brand-blue
-          "
-        >
-          <option
-            v-for="month in months"
-            :key="month"
-            value="{{month}}"
-            class="bg-light-100 text-dark-300"
-          >
-            {{ month }}
-          </option>
-        </select>
-        <select
-          v-if="!monthly"
-          name="year"
-          id="year"
-          class="
-            text-light-100
-            px-3
-            py-3
-            block
-            rounded-md
-            sm:text-sm
-            bg-brand-blue
-          "
-        >
-          <option
-            v-for="year in years"
-            :key="year"
-            value="{{year}}"
-            class="bg-light-100 text-dark-300"
-          >
-            {{ year }}
-          </option>
-        </select>
+      <div class="flex justify-start space-x-5 mb-5">
         <div class="inline-flex">
           <button
             @click="setToMonth"
@@ -55,10 +9,9 @@
               transition
               duration-200
               hover:bg-dark-100 hover:border-dark-100
-              font-bold
               py-2
               px-4
-              rounded-l-lg
+              rounded-l-md
             "
             :class="
               monthly
@@ -75,16 +28,63 @@
               duration-200
               border-2 border-dark-200
               hover:bg-dark-100 hover:border-dark-100 hover:text-light-100
-              font-bold
               py-2
               px-4
-              rounded-r-lg
+              rounded-r-md
             "
             :class="monthly ? '' : ' bg-dark-200 text-light-100'"
           >
             Annual
           </button>
         </div>
+        <select
+          @change="setCondition"
+          v-model="month"
+          v-if="monthly"
+          name="month"
+          id="month"
+          class="
+            text-light-100
+            px-3
+            py-3
+            block
+            rounded-sm
+            sm:text-sm
+            bg-brand-blue
+          "
+        >
+          <option
+            v-for="(month, index) in months"
+            :key="index"
+            class="bg-light-100 text-dark-300"
+          >
+            {{ month }}
+          </option>
+        </select>
+        <select
+          @change="setCondition"
+          v-if="!monthly"
+          v-model="year"
+          name="year"
+          id="year"
+          class="
+            text-light-100
+            px-3
+            py-3
+            block
+            rounded-md
+            sm:text-sm
+            bg-brand-blue
+          "
+        >
+          <option
+            v-for="year in years"
+            :key="year"
+            class="bg-light-100 text-dark-300"
+          >
+            {{ year }}
+          </option>
+        </select>
       </div>
     </div>
 
@@ -144,12 +144,12 @@
             dataLabel="For Approval"
           ></data-count>
           <data-count
-            :dataCount="applications.forRevision"
-            dataLabel="For Revision"
-          ></data-count>
-          <data-count
             :dataCount="applications.approved"
             dataLabel="Approved"
+          ></data-count>
+          <data-count
+            :dataCount="applications.rejected"
+            dataLabel="Rejected"
           ></data-count>
         </template>
       </advanced-widget>
@@ -167,33 +167,40 @@
     >
       <div class="flex justify-between mb-3 items-center">
         <div class="text-left">
-          <div class="font-bold text-lg">NSTP Graudates</div>
-          <div class="text-sm text-dark-100">Academic Year 2001-2011</div>
+          <div class="font-bold text-lg">Serial Number Applications</div>
+          <div class="text-sm text-dark-100">
+            {{ filter.type }}: {{ filter.condition }}
+          </div>
         </div>
         <button class="bg-info p-2 rounded text-light-100 h-fit">
           <DownloadIcon class="h-4" />
         </button>
       </div>
       <BarChart :chartData="testData" :options="options" />
-      <div class="grid grid-cols-3 gap-10 py-5 px-20 mt-10">
+      <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
+        <progress-bar
+          label="Pending"
+          :count="count.pending"
+          :total="count.total"
+          bgColor="bg-info-dark"
+        />
         <progress-bar
           label="For Approval"
-          count="345"
-          total="1000"
+          :count="count.forApproval"
+          :total="count.total"
           bgColor="bg-warning-dark"
-        />
-
-        <progress-bar
-          label="For Revision"
-          count="123"
-          total="1000"
-          bgColor="bg-error"
         />
         <progress-bar
           label="Approved"
-          count="456"
-          total="1000"
+          :count="count.approved"
+          :total="count.total"
           bgColor="bg-success-dark"
+        />
+        <progress-bar
+          label="Rejected"
+          :count="count.rejected"
+          :total="count.total"
+          bgColor="bg-error"
         />
       </div>
     </div>
@@ -246,9 +253,9 @@ export default {
       applications: {
         total: 0,
         forApproval: 0,
-        forRevision: 0,
         approved: 0,
         pending: 0,
+        rejected: 0,
       },
       enrollees: {
         total: 0,
@@ -270,20 +277,157 @@ export default {
         "November",
         "December",
       ],
-      years: [
-        2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
-        2022,
-      ],
+      years: [],
+      labels: [],
+      count: [],
+      filter: { type: "Month", condition: null },
+      testData: null,
+      options: null,
+      approved: [],
+      forApproval: [],
+      pending: [],
+      rejected: [],
+      month: null,
+      year: null,
     };
   },
   created() {
+    this.filter.condition = new Date().toLocaleString("en", { month: "long" });
+    this.year = new Date().toLocaleString("en", {
+      year: "numeric",
+    });
+    this.setYears();
+
+    this.month = new Date().toLocaleString("en", { month: "long" });
     this.getHeis();
     this.getApplications();
     this.getGraduates();
+    this.getMonthlyData();
   },
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
+      this.getMonthlyData();
+    },
+    setYears() {
+      var year = this.year;
+      for (let i = 0; i < 10; i++) {
+        this.years.push(year);
+        year--;
+      }
+    },
+
+    setCondition(e) {
+      this.filter.condition = e.target.value;
+      this.getMonthlyData();
+    },
+    async getMonthlyData() {
+      // reset all variables
+      this.reset();
+      var data = [];
+      // get all of the Applications
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      var res = await query.find();
+      // put all applications in array.
+      // include: status and date updated
+      for (let i = 0; i < res.length; i++) {
+        data.push({
+          status: res[i].get("status"),
+          updatedAt: res[i].updatedAt.toLocaleDateString("en", {
+            month: "long",
+            year: "numeric",
+          }),
+        });
+      }
+      // set labels
+      if (this.monthly) {
+        this.labels.push(this.month);
+        this.filter.type = "Month";
+        this.filter.condition = this.month;
+      } else {
+        this.labels = this.months;
+        this.filter.type = "Year";
+        this.filter.condition = this.year;
+      }
+
+      // if filtered MONTHLY make sure to include only the applications on the current year
+      if (this.monthly) {
+        data = data.filter((data) => data.updatedAt.match(this.year));
+      }
+      // filter according to condition
+      data = data.filter((data) => data.updatedAt.match(this.filter.condition));
+
+      for (let i = 0; i < this.labels.length; i++) {
+        this.forApproval.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/For Approval/)
+          ).length
+        );
+
+        // this.forRevision.push(
+        //   data.filter(
+        //     (data) =>
+        //       data.updatedAt.match(this.labels[i]) &&
+        //       data.status.match(/For Revision/)
+        //   ).length
+        // );
+
+        this.approved.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/Approved/)
+          ).length
+        );
+        this.pending.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) && data.status.match(/of 5/)
+          ).length
+        );
+
+        this.rejected.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) && 
+              data.status.match(/Rejected/)
+          ).length
+        );
+      }
+      const fa = this.sum(this.forApproval);
+      const a = this.sum(this.approved);
+      const p = this.sum(this.pending);
+      const r = this.sum(this.rejected);
+      this.count = {
+        forApproval: fa,
+        approved: a,
+        pending: p,
+        rejected: r,
+        total: fa + a + p + r,
+      };
+
+      this.setData();
+    },
+    reset() {
+      this.approved = [];
+      this.forApproval = [];
+      this.pending = [];
+      this.rejected = [];
+      this.labels = [];
+      this.count = [];
+      this.year = new Date().toLocaleString("en", {
+        year: "numeric",
+      });
+    },
+    sum(array) {
+      var count = 0;
+      for (let i = 0; i < array.length; i++) {
+        count += array[i];
+      }
+      return count;
     },
     async getHeis() {
       const query = new Parse.Query(Parse.User);
@@ -326,14 +470,16 @@ export default {
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");
       this.applications.forApproval = await query.count();
-      query.equalTo("status", "For Revision");
-      this.applications.forRevision = await query.count();
+      // query.equalTo("status", "For Revision");
+      // this.applications.forRevision = await query.count();
       query.equalTo("status", "Approved");
       this.applications.approved = await query.count();
+      query.equalTo("status", "Rejected");
+      this.applications.rejected = await query.count();
       query.notContainedIn("status", [
         "For Approval",
-        "For Revision",
         "Approved",
+        "Rejected"
       ]);
       this.applications.pending = await query.count();
     },
@@ -353,53 +499,47 @@ export default {
       query.startsWith("serialNumber", "L");
       this.graduates.lts = await query.count();
     },
-  },
-  setup() {
-    const testData = {
-      labels: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-      datasets: [
-        {
-          label: "For Approval",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54, 54, 54],
-          backgroundColor: ["#FECA84"],
-        },
-        {
-          label: "For Revision",
-          data: [10, 40, 90, 123, 54, 130, 140, 160, 170, 15, 15, 15],
-          backgroundColor: ["#FF5C5C"],
-        },
-        {
-          label: "Approved",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54, 54, 54],
-          backgroundColor: ["#47D28F"],
-        },
-      ],
-    };
 
-    const options = ref({
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    });
+    setData() {
+      const testData = {
+        labels: this.labels,
+        datasets: [
+          {
+            label: "Pending",
+            data: Object.values(this.pending),
+            backgroundColor: ["#23AAE3"],
+          },
+          {
+            label: "For Approval",
+            data: Object.values(this.forApproval),
+            backgroundColor: ["#FECA84"],
+          },
+          {
+            label: "Approved",
+            data: Object.values(this.approved),
+            backgroundColor: ["#47D28F"],
+          },
+          {
+            label: "Rejected",
+            data: Object.values(this.rejected),
+            backgroundColor: ["#FF5C5C"],
+          },
+        ],
+      };
 
-    return { testData, options };
+      const options = ref({
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      });
+      this.testData = testData;
+      this.options = options;
+    },
   },
+  computed: {},
 };
 </script>
 
