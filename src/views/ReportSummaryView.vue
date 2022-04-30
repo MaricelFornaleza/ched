@@ -1,7 +1,42 @@
 <template>
   <div class="p-10">
     <div class="">
-      <div class="flex justify-end space-x-5 mb-5">
+      <div class="flex justify-start space-x-5 mb-5">
+        <div class="inline-flex">
+          <button
+            @click="setToMonth"
+            class="
+              transition
+              duration-200
+              hover:bg-dark-100 hover:border-dark-100
+              py-2
+              px-4
+              rounded-l-md
+            "
+            :class="
+              monthly
+                ? ' bg-dark-200 text-light-100 border-2 border-dark-200'
+                : 'bg-transparent border-2 border-dark-200   hover:text-light-100'
+            "
+          >
+            Monthly
+          </button>
+          <button
+            @click="setToMonth"
+            class="
+              transition
+              duration-200
+              border-2 border-dark-200
+              hover:bg-dark-100 hover:border-dark-100 hover:text-light-100
+              py-2
+              px-4
+              rounded-r-md
+            "
+            :class="monthly ? '' : ' bg-dark-200 text-light-100'"
+          >
+            Annual
+          </button>
+        </div>
         <select
           @change="setCondition"
           v-model="month"
@@ -13,7 +48,7 @@
             px-3
             py-3
             block
-            rounded-md
+            rounded-sm
             sm:text-sm
             bg-brand-blue
           "
@@ -50,43 +85,6 @@
             {{ year }}
           </option>
         </select>
-        <div class="inline-flex">
-          <button
-            @click="setToMonth"
-            class="
-              transition
-              duration-200
-              hover:bg-dark-100 hover:border-dark-100
-              font-bold
-              py-2
-              px-4
-              rounded-l-lg
-            "
-            :class="
-              monthly
-                ? ' bg-dark-200 text-light-100 border-2 border-dark-200'
-                : 'bg-transparent border-2 border-dark-200   hover:text-light-100'
-            "
-          >
-            Monthly
-          </button>
-          <button
-            @click="setToMonth"
-            class="
-              transition
-              duration-200
-              border-2 border-dark-200
-              hover:bg-dark-100 hover:border-dark-100 hover:text-light-100
-              font-bold
-              py-2
-              px-4
-              rounded-r-lg
-            "
-            :class="monthly ? '' : ' bg-dark-200 text-light-100'"
-          >
-            Annual
-          </button>
-        </div>
       </div>
     </div>
 
