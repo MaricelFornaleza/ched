@@ -179,7 +179,13 @@
         </button>
       </div>
       <BarChart :chartData="testData" :options="options" />
-      <div class="grid grid-cols-3 gap-10 py-5 px-20 mt-10">
+      <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
+        <progress-bar
+          label="Pending"
+          :count="count.pending"
+          :total="count.total"
+          bgColor="bg-info-dark"
+        />
         <progress-bar
           label="For Approval"
           :count="count.forApproval"
@@ -379,15 +385,23 @@ export default {
               data.status.match(/Approved/)
           ).length
         );
+        this.pending.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) && data.status.match(/OF 5/)
+          ).length
+        );
       }
       const fa = this.sum(this.forApproval);
       const fr = this.sum(this.forRevision);
       const a = this.sum(this.approved);
+      const p = this.sum(this.pending);
       this.count = {
         forApproval: fa,
         forRevision: fr,
         approved: a,
-        total: fa + fr + a,
+        pending: p,
+        total: fa + fr + a + p,
       };
 
       this.setData();
@@ -396,8 +410,12 @@ export default {
       this.approved = [];
       this.forRevision = [];
       this.forApproval = [];
+      this.pending = [];
       this.labels = [];
       this.count = [];
+      this.year = new Date().toLocaleString("en", {
+        year: "numeric",
+      });
     },
     sum(array) {
       var count = 0;
@@ -479,6 +497,11 @@ export default {
       const testData = {
         labels: this.labels,
         datasets: [
+          {
+            label: "Pending",
+            data: Object.values(this.pending),
+            backgroundColor: ["#23AAE3"],
+          },
           {
             label: "For Approval",
             data: Object.values(this.forApproval),
