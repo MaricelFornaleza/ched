@@ -3,6 +3,8 @@
     <div class="">
       <div class="flex justify-end space-x-5 mb-5">
         <select
+          @change="setMonth"
+          v-model="month"
           v-if="monthly"
           name="month"
           id="month"
@@ -17,9 +19,8 @@
           "
         >
           <option
-            v-for="month in months"
-            :key="month"
-            value="{{month}}"
+            v-for="(month, index) in months"
+            :key="index"
             class="bg-light-100 text-dark-300"
           >
             {{ month }}
@@ -167,8 +168,8 @@
     >
       <div class="flex justify-between mb-3 items-center">
         <div class="text-left">
-          <div class="font-bold text-lg">NSTP Graudates</div>
-          <div class="text-sm text-dark-100">Academic Year 2001-2011</div>
+          <div class="font-bold text-lg">Serial Number Applications</div>
+          <div class="text-sm text-dark-100">Month: January</div>
         </div>
         <button class="bg-info p-2 rounded text-light-100 h-fit">
           <DownloadIcon class="h-4" />
@@ -178,21 +179,21 @@
       <div class="grid grid-cols-3 gap-10 py-5 px-20 mt-10">
         <progress-bar
           label="For Approval"
-          count="345"
-          total="1000"
+          :count="count.forApproval"
+          :total="count.total"
           bgColor="bg-warning-dark"
         />
 
         <progress-bar
           label="For Revision"
-          count="123"
-          total="1000"
+          :count="count.forRevision"
+          :total="count.total"
           bgColor="bg-error"
         />
         <progress-bar
           label="Approved"
-          count="456"
-          total="1000"
+          :count="count.approved"
+          :total="count.total"
           bgColor="bg-success-dark"
         />
       </div>
@@ -270,20 +271,88 @@ export default {
         "November",
         "December",
       ],
-      years: [
-        2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021,
-        2022,
-      ],
+      years: [],
+      labels: [],
+      count: [],
+
+      testData: null,
+      options: null,
+      approved: [],
+      forRevision: [],
+      forApproval: [],
+      pending: [],
+      month: null,
     };
   },
   created() {
+    this.month = new Date().toLocaleString("en", { month: "long" });
     this.getHeis();
     this.getApplications();
     this.getGraduates();
+    this.getMonthlyData();
   },
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
+    },
+    setMonth(e) {
+      this.month = e.target.value;
+
+      this.getMonthlyData();
+    },
+    async getMonthlyData() {
+      // reset all variables
+      this.reset();
+      var data = [];
+
+      // get all of the Applications
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
+      var res = await query.find();
+      // put all applications in array.
+      // include: status and date updated
+      for (let i = 0; i < res.length; i++) {
+        data.push({
+          status: res[i].get("status"),
+          updatedAt: res[i].updatedAt.toLocaleDateString("en", {
+            month: "long",
+            year: "numeric",
+          }),
+        });
+      }
+      // set label to current month
+      this.labels.push(this.month);
+      // filter according to selected month
+      data = data.filter((data) => data.updatedAt.match(this.month));
+
+      this.forApproval = data.filter((data) =>
+        data.status.match(/For Approval/)
+      ).length;
+
+      this.forRevision = data.filter((data) =>
+        data.status.match(/For Revision/)
+      ).length;
+
+      this.approved = data.filter((data) =>
+        data.status.match(/Approved/)
+      ).length;
+
+      this.count = {
+        forApproval: this.forApproval,
+        forRevision: this.forRevision,
+        approved: this.approved,
+        total: this.approved + this.forRevision + this.forApproval,
+      };
+      console.log(this.count);
+
+      this.setData();
+    },
+    reset() {
+      this.approved = [];
+      this.forRevision = [];
+      this.forApproval = [];
+      this.labels = [];
+      this.count = [];
     },
     async getHeis() {
       const query = new Parse.Query(Parse.User);
@@ -353,53 +422,43 @@ export default {
       query.startsWith("serialNumber", "L");
       this.graduates.lts = await query.count();
     },
-  },
-  setup() {
-    const testData = {
-      labels: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-      datasets: [
-        {
-          label: "For Approval",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54, 54, 54],
-          backgroundColor: ["#FECA84"],
-        },
-        {
-          label: "For Revision",
-          data: [10, 40, 90, 123, 54, 130, 140, 160, 170, 15, 15, 15],
-          backgroundColor: ["#FF5C5C"],
-        },
-        {
-          label: "Approved",
-          data: [130, 140, 160, 170, 15, 10, 40, 90, 123, 54, 54, 54],
-          backgroundColor: ["#47D28F"],
-        },
-      ],
-    };
 
-    const options = ref({
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    });
+    setData() {
+      const testData = {
+        labels: this.labels,
+        datasets: [
+          {
+            label: "For Approval",
+            data: Object.values(this.forApproval),
+            backgroundColor: ["#FECA84"],
+          },
 
-    return { testData, options };
+          {
+            label: "For Revision",
+            data: Object.values(this.forRevision),
+            backgroundColor: ["#FF5C5C"],
+          },
+          {
+            label: "Approved",
+            data: Object.values(this.approved),
+            backgroundColor: ["#47D28F"],
+          },
+        ],
+      };
+
+      const options = ref({
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      });
+      this.testData = testData;
+      this.options = options;
+    },
   },
+  computed: {},
 };
 </script>
 

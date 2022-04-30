@@ -9,6 +9,7 @@ import GraduatesView from "../views/GraduatesView.vue";
 import SerialNumbersView from "../views/SerialNumbersView.vue";
 import ReportSummaryView from "../views/ReportSummaryView.vue";
 import StudentsView from "../views/StudentsView.vue";
+import SampleView from "../views/SampleView.vue";
   
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
@@ -29,6 +30,7 @@ import StepThree from '../components/additionalApplication/StepThree.vue'
 import StepFour from '../components/additionalApplication/StepFour.vue'
 import StepFive from '../components/additionalApplication/StepFive.vue'
 import EditHei from '../components/EditHei.vue'
+
 import Parse from "parse";
 
 
@@ -52,6 +54,16 @@ const routes = [
         } 
       }, 
     children: [
+      {
+        path: "/sample",
+        name: "sample",
+        component: SampleView,
+        meta:{
+          breadcrumb: [
+            {name: 'sample'},
+          ]
+        }
+      },
       {
         path: "/home",
         name: "home",
