@@ -339,7 +339,7 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
-
+      
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
@@ -395,9 +395,6 @@ export default {
     async storeStudents(studentData, nstpProgram) {
       var nstpId = await this.getNstpId(nstpProgram);
 
-      //TO-DO: still need to check if student already exists in db
-      //if exists, dont save. if not, save
-
       const student = new Parse.Object("Student");
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
       student.set("name", {
@@ -422,14 +419,14 @@ export default {
       });
       student.set("heiId", this.heiId);
 
-      student.save().then((student) => {
-        this.students.push({
-          name: student.get("name"),
-          birthdate: student.get("birthdate"),
-          gender: student.get("gender"),
-          address: student.get("address"),
-        });
-        this.forceRerender(); //solution to updating DOM of child component
+      await student.save().then((student) => {
+        // this.students.push({
+        //   name: student.get("name"),
+        //   birthdate: student.get("birthdate"),
+        //   gender: student.get("gender"),
+        //   address: student.get("address"),
+        // });
+        // this.forceRerender(); //solution to updating DOM of child component
         nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })
@@ -442,7 +439,7 @@ export default {
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
-        nstpEnrollment.set("takenNstp1", true);
+        // nstpEnrollment.set("takenNstp1", true);
         nstpEnrollment.save();
       });
       
