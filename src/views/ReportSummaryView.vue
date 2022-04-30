@@ -3,7 +3,7 @@
     <div class="">
       <div class="flex justify-end space-x-5 mb-5">
         <select
-          @change="setMonth"
+          @change="setCondition"
           v-model="month"
           v-if="monthly"
           name="month"
@@ -27,7 +27,9 @@
           </option>
         </select>
         <select
+          @change="setCondition"
           v-if="!monthly"
+          v-model="year"
           name="year"
           id="year"
           class="
@@ -43,7 +45,6 @@
           <option
             v-for="year in years"
             :key="year"
-            value="{{year}}"
             class="bg-light-100 text-dark-300"
           >
             {{ year }}
@@ -169,7 +170,9 @@
       <div class="flex justify-between mb-3 items-center">
         <div class="text-left">
           <div class="font-bold text-lg">Serial Number Applications</div>
-          <div class="text-sm text-dark-100">Month: January</div>
+          <div class="text-sm text-dark-100">
+            {{ filter.type }}: {{ filter.condition }}
+          </div>
         </div>
         <button class="bg-info p-2 rounded text-light-100 h-fit">
           <DownloadIcon class="h-4" />
@@ -274,7 +277,7 @@ export default {
       years: [],
       labels: [],
       count: [],
-
+      filter: { type: "Month", condition: null },
       testData: null,
       options: null,
       approved: [],
@@ -282,9 +285,16 @@ export default {
       forApproval: [],
       pending: [],
       month: null,
+      year: null,
     };
   },
   created() {
+    this.filter.condition = new Date().toLocaleString("en", { month: "long" });
+    this.year = new Date().toLocaleString("en", {
+      year: "numeric",
+    });
+    this.setYears();
+
     this.month = new Date().toLocaleString("en", { month: "long" });
     this.getHeis();
     this.getApplications();
@@ -294,17 +304,24 @@ export default {
   methods: {
     setToMonth() {
       this.monthly = !this.monthly;
+      this.getMonthlyData();
     },
-    setMonth(e) {
-      this.month = e.target.value;
+    setYears() {
+      var year = this.year;
+      for (let i = 0; i < 10; i++) {
+        this.years.push(year);
+        year--;
+      }
+    },
 
+    setCondition(e) {
+      this.filter.condition = e.target.value;
       this.getMonthlyData();
     },
     async getMonthlyData() {
       // reset all variables
       this.reset();
       var data = [];
-
       // get all of the Applications
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
@@ -320,30 +337,58 @@ export default {
           }),
         });
       }
-      // set label to current month
-      this.labels.push(this.month);
-      // filter according to selected month
-      data = data.filter((data) => data.updatedAt.match(this.month));
+      // set labels
+      if (this.monthly) {
+        this.labels.push(this.month);
+        this.filter.type = "Month";
+        this.filter.condition = this.month;
+      } else {
+        this.labels = this.months;
+        this.filter.type = "Year";
+        this.filter.condition = this.year;
+      }
 
-      this.forApproval = data.filter((data) =>
-        data.status.match(/For Approval/)
-      ).length;
+      // if filtered MONTHLY make sure to include only the applications on the current year
+      if (this.monthly) {
+        data = data.filter((data) => data.updatedAt.match(this.year));
+      }
+      // filter according to condition
+      data = data.filter((data) => data.updatedAt.match(this.filter.condition));
 
-      this.forRevision = data.filter((data) =>
-        data.status.match(/For Revision/)
-      ).length;
+      for (let i = 0; i < this.labels.length; i++) {
+        this.forApproval.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/For Approval/)
+          ).length
+        );
 
-      this.approved = data.filter((data) =>
-        data.status.match(/Approved/)
-      ).length;
+        this.forRevision.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/For Revision/)
+          ).length
+        );
 
+        this.approved.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/Approved/)
+          ).length
+        );
+      }
+      const fa = this.sum(this.forApproval);
+      const fr = this.sum(this.forRevision);
+      const a = this.sum(this.approved);
       this.count = {
-        forApproval: this.forApproval,
-        forRevision: this.forRevision,
-        approved: this.approved,
-        total: this.approved + this.forRevision + this.forApproval,
+        forApproval: fa,
+        forRevision: fr,
+        approved: a,
+        total: fa + fr + a,
       };
-      console.log(this.count);
 
       this.setData();
     },
@@ -353,6 +398,13 @@ export default {
       this.forApproval = [];
       this.labels = [];
       this.count = [];
+    },
+    sum(array) {
+      var count = 0;
+      for (let i = 0; i < array.length; i++) {
+        count += array[i];
+      }
+      return count;
     },
     async getHeis() {
       const query = new Parse.Query(Parse.User);
