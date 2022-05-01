@@ -410,7 +410,7 @@ export default {
               await results[i].save();
             } else {
               //found the student but there are mismatch in stored info
-              //delete from set since it'll still be shown because of nstpTaken
+              //delete from set since it'll still be shown because of takenNstp
               studentSet.delete(studentData[x]);
             }
             break;

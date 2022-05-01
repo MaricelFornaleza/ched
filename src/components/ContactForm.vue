@@ -23,7 +23,6 @@
                 v-model="province"
                 class="
                   text-dark-200
-                  w-full
                   px-5
                   py-3
                   mt-1
@@ -190,21 +189,10 @@ export default {
   },
   methods: {
     sendEmail() {
-      // this.$loadScript("https://smtpjs.com/v3/smtp.js")
-      //   .then(() => {
-      //     window.Email.send({
-      //       Host: "smtp.mailtrap.io",
-      //       Username: "549ff22556db2e",
-      //       Password: "5e912b7305c72b",
-      //       To: this.email,
-      //       From: "ched.nstp@gmail.com",
-      //       Subject: "Test email",
-      //       Body: "<html><h2>Header</h2><strong>Bold text</strong><br></br><em>Italic</em></html>",
-      //     }).then((message) => alert(message));
-      //   })
-      //   .catch(() => {
-      //     alert("failed");
-      //   });
+      //just commented out to work, pass is not defined error
+      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true}; 
+      // Parse.Cloud.run("contactForm", params);
+
       this.province = "";
       this.name = "";
       this.email = "";
