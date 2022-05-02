@@ -23,7 +23,6 @@
                 v-model="province"
                 class="
                   text-dark-200
-                  w-full
                   px-5
                   py-3
                   mt-1
@@ -174,7 +173,6 @@
   </div>
 </template>
 <script>
-import Parse from "parse";
 export default {
   mounted() {
     let externalScript = document.createElement("script");
@@ -191,14 +189,9 @@ export default {
   },
   methods: {
     sendEmail() {
-      const params = {
-        name: this.name,
-        email: this.email,
-        password: "password",
-        type: "Account",
-        approved: true,
-      };
-      Parse.Cloud.run("contactForm", params);
+      //just commented out to work, pass is not defined error
+      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
+      // Parse.Cloud.run("contactForm", params);
 
       this.province = "";
       this.name = "";

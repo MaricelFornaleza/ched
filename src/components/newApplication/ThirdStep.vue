@@ -372,10 +372,10 @@ export default {
       console.log(studentSet);
       const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(nstpEnrollment);
-      query.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
+      // query.equalTo(
+      //   "applicationId",
+      //   new Parse.Object("Application", { id: this.appId })
+      // );
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
@@ -410,7 +410,7 @@ export default {
               await results[i].save();
             } else {
               //found the student but there are mismatch in stored info
-              //delete from set since it'll still be shown because of nstpTaken
+              //delete from set since it'll still be shown because of takenNstp
               studentSet.delete(studentData[x]);
             }
             break;

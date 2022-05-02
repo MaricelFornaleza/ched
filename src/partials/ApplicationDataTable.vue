@@ -80,6 +80,7 @@
               text-light-100
               focus:ring-4 focus:ring-success-light focus:bg-success
             "
+            title="Download to excel"
           >
             <DownloadIcon class="h-5" />
           </button>
@@ -174,7 +175,7 @@
                       ? application.status == '1 of 5'
                         ? 'cursor-pointer'
                         : 'opacity-50 cursor-pointer'
-                      : application.status == '4 of 5'
+                      : application.status == '1 of 5' || application.status == '2 of 5' || application.status == '3 of 5'
                       ? 'cursor-pointer'
                       : 'opacity-50 cursor-pointer',
                   ]"
@@ -271,23 +272,6 @@ export default {
                 console.log(error);
               }
             );
-            // ApplicationDocument
-            const Document = Parse.Object.extend("ApplicationDocument");
-            const query2 = new Parse.Query(Document);
-            query2.equalTo(
-              "applicationId",
-              new Parse.Object("Application", { id: app_id })
-            );
-            query2.find().then(
-              (results) => {
-                for (let i = 0; i < results.length; i++) {
-                  results[i].destroy();
-                }
-              },
-              (error) => {
-                console.log(error);
-              }
-            );
 
             // NstpEnrollment
             const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
@@ -331,12 +315,80 @@ export default {
           this.displayMsg("error", "Cannot delete application after step 1!");
         }
       } else if (app_type == "For Additional Graduates") {
-        if (app_status == "4 of 5") {
+        if (app_status == "1 of 5" || app_status == "2 of 5" || app_status == "3 of 5") {
           if (confirm("Are you sure to delete?")) {
             // to be updated
+            // Application
+            const Application = Parse.Object.extend("Application");
+            const query1 = new Parse.Query(Application);
+            query1.get(app_id).then(
+              (object) => {
+                object.destroy();
+              },
+              (error) => {
+                console.log(error);
+              }
+            );
+            // ApplicationDocument
+            const Document = Parse.Object.extend("ApplicationDocument");
+            const query2 = new Parse.Query(Document);
+            query2.equalTo(
+              "applicationId",
+              new Parse.Object("Application", { id: app_id })
+            );
+            query2.find().then(
+              (results) => {
+                for (let i = 0; i < results.length; i++) {
+                  results[i].destroy();
+                }
+              },
+              (error) => {
+                console.log(error);
+              }
+            );
+
+            // May remove this since application can't be deleted after step 3
+            // NstpEnrollment
+            /*const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+            const query3 = new Parse.Query(NstpEnrollment);
+            query3.equalTo(
+              "applicationId",
+              new Parse.Object("Application", { id: app_id })
+            );
+            // query3.include("studentId");
+            let studentList = [];
+            query3.find().then(
+              (results) => {
+                for (let i = 0; i < results.length; i++) {
+                  studentList.push(results[i].get("studentId"));
+                  results[i].destroy();
+                }
+              },
+              (error) => {
+                console.log(error);
+              }
+            );
+            console.log("studentList: " + studentList);
+
+            // Student
+            const Student = Parse.Object.extend("Student");
+            const query4 = new Parse.Query(Student);
+
+            for (let i = 0; i < studentList.length; i++) {
+              console.log("student id: " + studentList[i]);
+              query4.get(studentList[i]).then(
+                (object) => {
+                  object.destroy();
+                },
+                (error) => {
+                  console.log(error);
+                }
+              );
+            }*/
+            console.log("Application Deleted!");
           }
         } else {
-          this.displayMsg("error", "Cannot delete application after step 4!");
+          this.displayMsg("error", "Cannot delete application after step 3!");
         }
       }
     },
@@ -369,7 +421,7 @@ export default {
         return "badge-success";
       } else if (stats == "For Approval") {
         return "badge-warning";
-      } else if (stats == "For Revision") {
+      } else if (stats == "Rejected") {
         return "badge-error";
       } else {
         //Ongoing

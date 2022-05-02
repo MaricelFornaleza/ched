@@ -35,31 +35,56 @@
       </div>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <DropZone @drop.prevent="drop" @change="selectedFile" />
-        <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->
+        <DropZone
+          @drop.prevent="drop"
+          @change="selectedFile"
+          fileType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        >
+          <span class="body-m">
+            Must be .xlsx file using this
+            <a
+              :href="templateUrl"
+              class="font-bold underline hover:text-brand-blue"
+              download
+              >template</a
+            >.
+          </span>
+        </DropZone>
       </div>
 
       <div
         v-else
-        class="my-20 w-fit flex justify-between p-5 border border-light-300"
+        class="my-20 w-full flex justify-between p-5 border border-light-300"
       >
-        <div class="flex space-x-5">
-          <img
-            src="@/assets/img/xls.png"
-            class="h-8"
-            alt="XLS Icon by Dimitry Miroliubov"
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center space-x-5">
+            <img
+              src="@/assets/img/xls.png"
+              class="h-8"
+              alt="PDF Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">{{ dropzoneFile.name }}</div>
+          </div>
+
+          <XCircleIcon
+            @click="removeFile()"
+            class="h-5 text-error cursor-pointer"
+            title="Remove File"
           />
-          <div class="text-base">{{ dropzoneFile.name }}</div>
         </div>
       </div>
 
       <div class="flex items-center justify-center space-x-5 mt-5">
-        <button class="btn-sm border-none bg-light-300 font-bold" type="button">
+        <button
+          @click="goToHei()"
+          class="btn-sm btn-default btn-outline"
+          type="button"
+        >
           Cancel
         </button>
         <button
           v-if="!completed"
-          class="btn-sm bg-brand-blue text-light-100 font-bold"
+          class="btn-sm btn-default"
           type="submit"
           @click="upload()"
         >
@@ -128,6 +153,7 @@ import ModalWidget from "@/partials/ModalWidget.vue";
 import { ref } from "vue";
 import Worker from "@/assets/js/parseHei.worker.js";
 import { LibraryIcon } from "@heroicons/vue/solid";
+import { XCircleIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
 
 export default {
@@ -145,6 +171,7 @@ export default {
   },
   components: {
     LibraryIcon,
+    XCircleIcon,
     // AlertWidget,
     DropZone,
     ModalWidget,
@@ -232,12 +259,23 @@ export default {
         user.set("username", data[i].L);
 
         user.save().then(() => {
-          const params = {email:data[i].I, password:password, type:"Account", approved:true};
+          const params = {
+            email: data[i].I,
+            password: password,
+            type: "Account",
+            approved: true,
+          };
           Parse.Cloud.run("accountCredential", params);
 
           console.log("success");
         });
       }
+    },
+    removeFile() {
+      this.dropzoneFile = "";
+    },
+    goToHei() {
+      this.$router.push({ name: "hei" });
     },
   },
 };

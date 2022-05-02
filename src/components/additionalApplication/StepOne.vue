@@ -15,7 +15,11 @@
       </AlertWidget>
 
       <div v-if="dropzoneFile === ''" class="mt-10 w-full">
-        <drop-zone @drop.prevent="drop" @change="selectedFile">
+        <drop-zone
+          @drop.prevent="drop"
+          @change="selectedFile"
+          fileType="application/pdf"
+        >
           <span class="body-m">
             Must be .pdf file using this
             <button class="font-bold underline">template</button>.
@@ -170,7 +174,7 @@ export default {
   },
   methods: {
     validate(filename) {
-      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.pdf)$/;
+      var regex = /^.*\.(pdf|PDF)$/;
       if (filename === "") {
         this.className = "alert-error";
         return false;

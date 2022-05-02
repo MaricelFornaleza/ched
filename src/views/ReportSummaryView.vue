@@ -165,8 +165,8 @@
               dataLabel="For Approval"
             ></data-count>
             <data-count
-              :dataCount="applications.forRevision"
-              dataLabel="For Revision"
+              :dataCount="applications.rejected"
+              dataLabel="Rejected"
             ></data-count>
             <data-count
               :dataCount="applications.approved"
@@ -217,8 +217,8 @@
           />
 
           <progress-bar
-            label="For Revision"
-            :count="count.forRevision"
+            label="Rejected"
+            :count="count.rejected"
             :total="count.total"
             bgColor="bg-error"
           />
@@ -281,9 +281,9 @@ export default {
       applications: {
         total: 0,
         forApproval: 0,
-        forRevision: 0,
         approved: 0,
         pending: 0,
+        rejected: 0,
       },
       enrollees: {
         total: 0,
@@ -312,9 +312,9 @@ export default {
       testData: null,
       options: null,
       approved: [],
-      forRevision: [],
       forApproval: [],
       pending: [],
+      rejected: [],
       month: null,
       year: null,
     };
@@ -429,13 +429,13 @@ export default {
           ).length
         );
 
-        this.forRevision.push(
-          data.filter(
-            (data) =>
-              data.updatedAt.match(this.labels[i]) &&
-              data.status.match(/For Revision/)
-          ).length
-        );
+        // this.forRevision.push(
+        //   data.filter(
+        //     (data) =>
+        //       data.updatedAt.match(this.labels[i]) &&
+        //       data.status.match(/For Revision/)
+        //   ).length
+        // );
 
         this.approved.push(
           data.filter(
@@ -447,29 +447,37 @@ export default {
         this.pending.push(
           data.filter(
             (data) =>
-              data.updatedAt.match(this.labels[i]) && data.status.match(/OF 5/)
+              data.updatedAt.match(this.labels[i]) && data.status.match(/of 5/)
+          ).length
+        );
+
+        this.rejected.push(
+          data.filter(
+            (data) =>
+              data.updatedAt.match(this.labels[i]) &&
+              data.status.match(/Rejected/)
           ).length
         );
       }
       const fa = this.sum(this.forApproval);
-      const fr = this.sum(this.forRevision);
       const a = this.sum(this.approved);
       const p = this.sum(this.pending);
+      const r = this.sum(this.rejected);
       this.count = {
         forApproval: fa,
-        forRevision: fr,
         approved: a,
         pending: p,
-        total: fa + fr + a + p,
+        rejected: r,
+        total: fa + a + p + r,
       };
 
       this.setData();
     },
     reset() {
       this.approved = [];
-      this.forRevision = [];
       this.forApproval = [];
       this.pending = [];
+      this.rejected = [];
       this.labels = [];
       this.count = [];
       this.year = new Date().toLocaleString("en", {
@@ -524,15 +532,13 @@ export default {
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");
       this.applications.forApproval = await query.count();
-      query.equalTo("status", "For Revision");
-      this.applications.forRevision = await query.count();
+      // query.equalTo("status", "For Revision");
+      // this.applications.forRevision = await query.count();
       query.equalTo("status", "Approved");
       this.applications.approved = await query.count();
-      query.notContainedIn("status", [
-        "For Approval",
-        "For Revision",
-        "Approved",
-      ]);
+      query.equalTo("status", "Rejected");
+      this.applications.rejected = await query.count();
+      query.notContainedIn("status", ["For Approval", "Approved", "Rejected"]);
       this.applications.pending = await query.count();
     },
     async getGraduates() {
@@ -566,16 +572,15 @@ export default {
             data: Object.values(this.forApproval),
             backgroundColor: ["#FECA84"],
           },
-
-          {
-            label: "For Revision",
-            data: Object.values(this.forRevision),
-            backgroundColor: ["#FF5C5C"],
-          },
           {
             label: "Approved",
             data: Object.values(this.approved),
             backgroundColor: ["#47D28F"],
+          },
+          {
+            label: "Rejected",
+            data: Object.values(this.rejected),
+            backgroundColor: ["#FF5C5C"],
           },
         ],
       };

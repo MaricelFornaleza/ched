@@ -269,7 +269,7 @@ export default {
             self.maleNum = event.data.male;
             self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.storeStudents(
+            self.verifyStudents(
               event.data.rows,
               event.data.acadYear,
               event.data.nstp
@@ -322,59 +322,127 @@ export default {
       var result = await query.first();
       return result.id;
     },
-    async storeStudents(studentData, acadYear, nstpProgram) {
+    async verifyStudents(studentData, acadYear, nstpProgram) {
       await this.setAcadYear(acadYear);
+      //check first if student exists
+      //get nstpEnrollment using the studentId, then check nstpId to get the nstpProgram
+      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
+      //if not, store in separate lists
+      const studentSet = new Set(studentData);
+      console.log(studentSet);
+      const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(nstpEnrollment);
+      // query.equalTo(
+      //   "applicationId",
+      //   new Parse.Object("Application", { id: this.appId })
+      // );
+      query.include("studentId");
+      query.include("nstpId");
+      const results = await query.find();
+      
+      for (let i = 0; i < results.length; i++) {
+        var name = results[i].get("studentId").get("name");
+        var bday = results[i].get("studentId").get("birthdate");
+        var program = results[i].get("nstpId").get("programName");
+        var takenNstp1 = results[i].get("takenNstp1");
+        // var takenNstp2 = results[i].get("takenNstp2");
+        // var serialNum = results[i].get("serialNumber");
+
+        for (let x = 0; x < studentData.length; x++) {
+          //check student's name and bday
+          //PROBLEM: THIS LOOPS OVER ALL THE STUDENTS AND COMPARES ALL OF THEM
+          if (
+            name.lastName == studentData[x].F &&
+            name.firstName == studentData[x].G &&
+            name.extensionName == studentData[x].H &&
+            name.middleName == studentData[x].I &&
+            bday == studentData[x].J
+          ) {
+            //check program
+            if(program == nstpProgram) {
+              studentSet.delete(studentData[x]);
+              results[i].set(
+                "applicationId",
+                new Parse.Object("Application", { id: this.appId })
+              );
+              results[i].set("takenNstp1", true);
+              await results[i].save();
+            } else if(program != nstpProgram && !takenNstp1){
+              //found the student but there are mismatch in stored info
+              const newEnrollment = new Parse.Object.extend("NstpEnrollment");
+              newEnrollment.set(
+                "applicationId",
+                new Parse.Object("Application", { id: this.appId })
+              );
+              newEnrollment.set("takenNstp1", true);
+              newEnrollment.save();
+            }
+            break;
+          }
+        }
+      }
+      const self = this;
+      const students = studentSet.values();
+      for (const student of students) {
+        await self.storeStudents(student, nstpProgram);
+        console.log(student);
+      }
+      // studentSet.forEach (function(student) {
+      //   self.storeStudents(student, null , nstpProgram);
+      // });
+      await this.getStudents();
+    },
+    async storeStudents(studentData, nstpProgram) {
       var nstpId = await this.getNstpId(nstpProgram);
 
-      for (let i = 0; i < studentData.length; i++) {
-        const student = new Parse.Object("Student");
-        const nstpEnrollment = new Parse.Object("NstpEnrollment");
-        student.set("name", {
-          lastName: studentData[i].F,
-          firstName: studentData[i].G,
-          extensionName: studentData[i].H,
-          middleName: studentData[i].I,
-        });
-        student.set("birthdate", studentData[i].J);
-        student.set("gender", studentData[i].K);
-        student.set("emailAddress", studentData[i].T);
-        student.set("contactNumber", studentData[i].U);
-        student.set("address", {
-          street: studentData[i].L,
-          city: studentData[i].M,
-          province: studentData[i].N,
-          region: studentData[i].D,
-        });
-        student.set("program", {
-          programLevelCode: studentData[i].R,
-          programName: studentData[i].S,
-        });
-        student.set("heiId", this.heiId);
+      const student = new Parse.Object("Student");
+      const nstpEnrollment = new Parse.Object("NstpEnrollment");
+      student.set("name", {
+        lastName: studentData.F,
+        firstName: studentData.G,
+        extensionName: studentData.H,
+        middleName: studentData.I,
+      });
+      student.set("birthdate", studentData.J);
+      student.set("gender", studentData.K);
+      student.set("emailAddress", studentData.T);
+      student.set("contactNumber", studentData.U);
+      student.set("address", {
+        street: studentData.L,
+        city: studentData.M,
+        province: studentData.N,
+        region: studentData.D,
+      });
+      student.set("program", {
+        programLevelCode: studentData.R,
+        programName: studentData.S,
+      });
+      student.set("heiId", this.heiId);
 
-        student.save().then((student) => {
-          this.students.push({
-            name: student.get("name"),
-            birthdate: student.get("birthdate"),
-            gender: student.get("gender"),
-            address: student.get("address"),
-          });
-          this.forceRerender(); //solution to updating DOM of child component
-          nstpEnrollment.set(
-            "studentId",
-            new Parse.Object("Student", { id: student.id })
-          );
-          nstpEnrollment.set(
-            "nstpId",
-            new Parse.Object("Nstp", { id: nstpId })
-          );
-          nstpEnrollment.set(
-            "applicationId",
-            new Parse.Object("Application", { id: this.appId })
-          );
-          // nstpEnrollment.set("takenNstp1", true);
-          nstpEnrollment.save();
-        });
-      }
+      await student.save().then((student) => {
+        // this.students.push({
+        //   name: student.get("name"),
+        //   birthdate: student.get("birthdate"),
+        //   gender: student.get("gender"),
+        //   address: student.get("address"),
+        // });
+        // this.forceRerender(); //solution to updating DOM of child component
+        nstpEnrollment.set(
+          "studentId",
+          new Parse.Object("Student", { id: student.id })
+        );
+        nstpEnrollment.set(
+          "nstpId",
+          new Parse.Object("Nstp", { id: nstpId })
+        );
+        nstpEnrollment.set(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        // nstpEnrollment.set("takenNstp1", true);
+        nstpEnrollment.save();
+      });
+      
       this.pending = false;
     },
     async getStudents() {
