@@ -176,6 +176,7 @@
         </advanced-widget>
       </div>
       <div
+        ref="graph"
         class="
           col-span-2
           w-full
@@ -193,7 +194,10 @@
               {{ filter.type }}: {{ filter.condition }}
             </div>
           </div>
-          <button class="bg-info p-2 rounded text-light-100 h-fit">
+          <button
+            @click="exportGraphToPdf"
+            class="bg-info p-2 rounded text-light-100 h-fit"
+          >
             <DownloadIcon class="h-4" />
           </button>
         </div>
@@ -330,15 +334,8 @@ export default {
   },
   methods: {
     exportToPDF() {
-      // console.log("hello");
-      const date = new Date().toLocaleString("en", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
       var opt = {
         margin: 0.5,
-        filename: "Report-Summary-" + date + ".pdf",
         image: { type: "jpeg", quality: 1 },
         html2canvas: { scale: 5, letterRendering: true },
         jsPDF: { unit: "in", format: "legal", orientation: "portrait" },
@@ -347,6 +344,23 @@ export default {
       html2pdf()
         .set(opt)
         .from(this.$refs.report)
+        .toPdf()
+        .get("pdf")
+        .then(function (pdf) {
+          window.open(pdf.output("bloburl"), "_blank");
+        });
+    },
+    exportGraphToPdf() {
+      var opt = {
+        margin: 0.5,
+        image: { type: "jpeg", quality: 1 },
+        html2canvas: { scale: 5, letterRendering: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(this.$refs.graph)
         .toPdf()
         .get("pdf")
         .then(function (pdf) {
