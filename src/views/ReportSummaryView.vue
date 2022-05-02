@@ -9,9 +9,10 @@
               transition
               duration-200
               hover:bg-dark-100 hover:border-dark-100
-              py-2
-              px-4
-              rounded-l-md
+              py-1
+              px-3
+              text-sm
+              rounded-l-sm
             "
             :class="
               monthly
@@ -28,9 +29,10 @@
               duration-200
               border-2 border-dark-200
               hover:bg-dark-100 hover:border-dark-100 hover:text-light-100
-              py-2
-              px-4
-              rounded-r-md
+              py-1
+              px-3
+              text-sm
+              rounded-r-sm
             "
             :class="monthly ? '' : ' bg-dark-200 text-light-100'"
           >
@@ -46,7 +48,7 @@
           class="
             text-light-100
             px-3
-            py-3
+            py-1
             block
             rounded-sm
             sm:text-sm
@@ -70,9 +72,9 @@
           class="
             text-light-100
             px-3
-            py-3
+            py-1
             block
-            rounded-md
+            rounded-sm
             sm:text-sm
             bg-brand-blue
           "
