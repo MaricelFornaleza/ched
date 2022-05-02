@@ -133,6 +133,7 @@ import Parse from "parse";
 export default {
   data() {
     return {
+      templateUrl: "/files/NTSP-LIST-OF-HEI-TEMPLATE.xlsx", //may switch to file-loader package to load files
       visible: false,
       completed: false,
       className: "alert-info",
@@ -231,6 +232,9 @@ export default {
         user.set("username", data[i].L);
 
         user.save().then(() => {
+          const params = {email:data[i].I, password:password, type:"Account", approved:true};
+          Parse.Cloud.run("accountCredential", params);
+
           console.log("success");
         });
       }
