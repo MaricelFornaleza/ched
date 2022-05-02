@@ -1,6 +1,6 @@
 <template>
   <div class="p-10">
-    <div class="">
+    <div class="flex justify-between">
       <div class="flex justify-start space-x-5 mb-5">
         <div class="inline-flex">
           <button
@@ -88,123 +88,143 @@
           </option>
         </select>
       </div>
-    </div>
-
-    <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
-      <advanced-widget bgColor="bg-info-light" textColor="text-info">
-        <template v-slot:icon><LibraryIcon class="h-8" /></template>
-        <template v-slot:count>{{ hei.total }}</template>
-        <template v-slot:label>Higher Education Institutions</template>
-        <template v-slot:data>
-          <data-count :dataCount="hei.countSuc" dataLabel="SUC"></data-count>
-          <data-count :dataCount="hei.countLuc" dataLabel="LUC"></data-count>
-          <data-count
-            :dataCount="hei.countPrivate"
-            dataLabel="Private"
-          ></data-count>
-          <data-count :dataCount="hei.countOgs" dataLabel="OGS"></data-count>
-        </template>
-      </advanced-widget>
-      <advanced-widget bgColor="bg-error-light" textColor="text-error">
-        <template v-slot:icon><UsersIcon class="h-8" /></template>
-        <template v-slot:count>{{ enrollees.total }}</template>
-        <template v-slot:label>NSTP Enrollees</template>
-        <template v-slot:data
-          ><data-count
-            :dataCount="enrollees.first"
-            dataLabel="1st Semester"
-          ></data-count>
-          <data-count
-            :dataCount="enrollees.second"
-            dataLabel="2nd Semester"
-          ></data-count>
-        </template>
-      </advanced-widget>
-      <advanced-widget bgColor="bg-success-light" textColor="text-success">
-        <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
-        <template v-slot:count>{{ graduates.total }}</template>
-        <template v-slot:label>NSTP Graduates</template>
-        <template v-slot:data
-          ><data-count
-            :dataCount="graduates.cwts"
-            dataLabel="CWTS"
-          ></data-count>
-          <data-count :dataCount="graduates.lts" dataLabel="LTS"></data-count>
-        </template>
-      </advanced-widget>
-      <advanced-widget bgColor="bg-warning-light" textColor="text-warning">
-        <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
-        <template v-slot:count>{{ applications.total }}</template>
-        <template v-slot:label>Total Applications</template>
-        <template v-slot:data
-          ><data-count
-            :dataCount="applications.pending"
-            dataLabel="Pending"
-          ></data-count>
-          <data-count
-            :dataCount="applications.forApproval"
-            dataLabel="For Approval"
-          ></data-count>
-          <data-count
-            :dataCount="applications.forRevision"
-            dataLabel="For Revision"
-          ></data-count>
-          <data-count
-            :dataCount="applications.approved"
-            dataLabel="Approved"
-          ></data-count>
-        </template>
-      </advanced-widget>
-    </div>
-    <div
-      class="
-        col-span-2
-        w-full
-        bg-light-100
-        p-10
-        mt-10
-        shadow-sm
-        overflow-hidden
-      "
-    >
-      <div class="flex justify-between mb-3 items-center">
-        <div class="text-left">
-          <div class="font-bold text-lg">Serial Number Applications</div>
-          <div class="text-sm text-dark-100">
-            {{ filter.type }}: {{ filter.condition }}
-          </div>
-        </div>
-        <button class="bg-info p-2 rounded text-light-100 h-fit">
+      <div class="">
+        <button
+          @click="exportToPDF"
+          class="
+            bg-error
+            p-2
+            rounded-sm
+            text-light-100
+            h-fit
+            flex
+            items-center
+            text-sm
+            space-x-3
+          "
+        >
+          <span>Export to PDF</span>
           <DownloadIcon class="h-4" />
         </button>
       </div>
-      <BarChart :chartData="testData" :options="options" />
-      <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
-        <progress-bar
-          label="Pending"
-          :count="count.pending"
-          :total="count.total"
-          bgColor="bg-info-dark"
-        />
-        <progress-bar
-          label="For Approval"
-          :count="count.forApproval"
-          :total="count.total"
-          bgColor="bg-warning-dark"
-        />
+    </div>
+    <div ref="report">
+      <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+        <advanced-widget bgColor="bg-info-light" textColor="text-info">
+          <template v-slot:icon><LibraryIcon class="h-8" /></template>
+          <template v-slot:count>{{ hei.total }}</template>
+          <template v-slot:label>Higher Education Institutions</template>
+          <template v-slot:data>
+            <data-count :dataCount="hei.countSuc" dataLabel="SUC"></data-count>
+            <data-count :dataCount="hei.countLuc" dataLabel="LUC"></data-count>
+            <data-count
+              :dataCount="hei.countPrivate"
+              dataLabel="Private"
+            ></data-count>
+            <data-count :dataCount="hei.countOgs" dataLabel="OGS"></data-count>
+          </template>
+        </advanced-widget>
+        <advanced-widget bgColor="bg-error-light" textColor="text-error">
+          <template v-slot:icon><UsersIcon class="h-8" /></template>
+          <template v-slot:count>{{ enrollees.total }}</template>
+          <template v-slot:label>NSTP Enrollees</template>
+          <template v-slot:data
+            ><data-count
+              :dataCount="enrollees.first"
+              dataLabel="1st Semester"
+            ></data-count>
+            <data-count
+              :dataCount="enrollees.second"
+              dataLabel="2nd Semester"
+            ></data-count>
+          </template>
+        </advanced-widget>
+        <advanced-widget bgColor="bg-success-light" textColor="text-success">
+          <template v-slot:icon><AcademicCapIcon class="h-8" /></template>
+          <template v-slot:count>{{ graduates.total }}</template>
+          <template v-slot:label>NSTP Graduates</template>
+          <template v-slot:data
+            ><data-count
+              :dataCount="graduates.cwts"
+              dataLabel="CWTS"
+            ></data-count>
+            <data-count :dataCount="graduates.lts" dataLabel="LTS"></data-count>
+          </template>
+        </advanced-widget>
+        <advanced-widget bgColor="bg-warning-light" textColor="text-warning">
+          <template v-slot:icon><DocumentTextIcon class="h-8" /></template>
+          <template v-slot:count>{{ applications.total }}</template>
+          <template v-slot:label>Total Applications</template>
+          <template v-slot:data
+            ><data-count
+              :dataCount="applications.pending"
+              dataLabel="Pending"
+            ></data-count>
+            <data-count
+              :dataCount="applications.forApproval"
+              dataLabel="For Approval"
+            ></data-count>
+            <data-count
+              :dataCount="applications.forRevision"
+              dataLabel="For Revision"
+            ></data-count>
+            <data-count
+              :dataCount="applications.approved"
+              dataLabel="Approved"
+            ></data-count>
+          </template>
+        </advanced-widget>
+      </div>
+      <div
+        class="
+          col-span-2
+          w-full
+          bg-light-100
+          p-10
+          mt-10
+          shadow-sm
+          overflow-hidden
+        "
+      >
+        <div class="flex justify-between mb-3 items-center">
+          <div class="text-left">
+            <div class="font-bold text-lg">Serial Number Applications</div>
+            <div class="text-sm text-dark-100">
+              {{ filter.type }}: {{ filter.condition }}
+            </div>
+          </div>
+          <button class="bg-info p-2 rounded text-light-100 h-fit">
+            <DownloadIcon class="h-4" />
+          </button>
+        </div>
+        <BarChart :chartData="testData" :options="options" />
+        <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
+          <progress-bar
+            label="Pending"
+            :count="count.pending"
+            :total="count.total"
+            bgColor="bg-info-dark"
+          />
+          <progress-bar
+            label="For Approval"
+            :count="count.forApproval"
+            :total="count.total"
+            bgColor="bg-warning-dark"
+          />
 
-        <progress-bar
-          label="For Revision"
-          :count="count.forRevision"
-          :total="count.total"
-          bgColor="bg-error"
-        />
-        <progress-bar
-          label="Approved"
-          :count="count.approved"
-          :total="count.total"
-          bgColor="bg-success-dark"
-        />
+          <progress-bar
+            label="For Revision"
+            :count="count.forRevision"
+            :total="count.total"
+            bgColor="bg-error"
+          />
+          <progress-bar
+            label="Approved"
+            :count="count.approved"
+            :total="count.total"
+            bgColor="bg-success-dark"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -218,6 +238,7 @@ import { ref } from "vue";
 import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import Parse from "parse";
+import html2pdf from "html2pdf.js";
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -308,6 +329,30 @@ export default {
     this.getMonthlyData();
   },
   methods: {
+    exportToPDF() {
+      // console.log("hello");
+      const date = new Date().toLocaleString("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+      var opt = {
+        margin: 0.5,
+        filename: "Report-Summary-" + date + ".pdf",
+        image: { type: "jpeg", quality: 1 },
+        html2canvas: { scale: 5, letterRendering: true },
+        jsPDF: { unit: "in", format: "legal", orientation: "portrait" },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(this.$refs.report)
+        .toPdf()
+        .get("pdf")
+        .then(function (pdf) {
+          window.open(pdf.output("bloburl"), "_blank");
+        });
+    },
     setToMonth() {
       this.monthly = !this.monthly;
       this.getMonthlyData();
