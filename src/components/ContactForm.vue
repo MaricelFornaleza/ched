@@ -174,6 +174,7 @@
   </div>
 </template>
 <script>
+import Parse from "parse";
 export default {
   mounted() {
     let externalScript = document.createElement("script");
@@ -190,7 +191,13 @@ export default {
   },
   methods: {
     sendEmail() {
-      const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
+      const params = {
+        name: this.name,
+        email: this.email,
+        password: "password",
+        type: "Account",
+        approved: true,
+      };
       Parse.Cloud.run("contactForm", params);
 
       this.province = "";
