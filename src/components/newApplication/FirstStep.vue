@@ -281,6 +281,7 @@ export default {
             // self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 5");
+             this.$emit("sendEmail", "List of Enrollment for the 1st Semester", "Step 1 of 5");
             // this.completed = !this.completed;
           } else {
             //console.log("Something went wrong while parsing xlsx file!");

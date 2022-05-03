@@ -65,7 +65,9 @@
                 Academic Year {{ academicYear }}
               </div>
             </div>
-            <button class="bg-info p-2 rounded text-light-100 h-fit">
+            <button
+              class="bg-info p-2 rounded text-light-100 h-fit cursor-pointer"
+            >
               <DownloadIcon @click="exportToPDF" class="h-4" />
             </button>
           </div>
@@ -322,11 +324,7 @@ export default {
       this.applications.rejected = await query.count();
       query.equalTo("status", "Approved");
       this.applications.approved = await query.count();
-      query.notContainedIn("status", [
-        "For Approval",
-        "Rejected",
-        "Approved",
-      ]);
+      query.notContainedIn("status", ["For Approval", "Rejected", "Approved"]);
       this.applications.pending = await query.count();
     },
     async getGraduates() {

@@ -338,7 +338,7 @@ export default {
         margin: 0.5,
         image: { type: "jpeg", quality: 1 },
         html2canvas: { scale: 5, letterRendering: true },
-        jsPDF: { unit: "in", format: "legal", orientation: "portrait" },
+        jsPDF: { unit: "in", format: "legal", orientation: "landscape" },
       };
 
       html2pdf()
