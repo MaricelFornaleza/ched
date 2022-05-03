@@ -62,7 +62,7 @@
             <p class="body-s">
               Welcome back! Please provide the HEI's credentials.
             </p>
-            <div class="loader" v-if="loading"></div>
+            <div class="loader"></div>
             <form @submit.prevent="login">
               <div class="mt-10">
                 <div class="w-full">
@@ -79,7 +79,7 @@
                       Email Address
                     </span>
                     <input
-                      required
+                      
                       type="email"
                       name="email"
                       v-model="email"
@@ -103,7 +103,7 @@
                       "
                       placeholder="name@gmail.com"
                     />
-                    <span class="text-xs text-error" id="email-error">{{
+                    <span v-show="emailError !== ''" class="text-xs text-error" id="email-error">{{
                       emailError
                     }}</span>
                   </label>
@@ -120,7 +120,7 @@
                       Password
                     </span>
                     <input
-                      required
+                      
                       type="password"
                       name="password"
                       v-model="password"
@@ -145,24 +145,74 @@
                       placeholder="Enter password"
                       v-on:keyup.enter="login"
                     />
-                    <span class="text-xs text-error" id="password-error">{{
+                    <span v-show="passwordError !== ''" class="text-xs text-error" id="password-error">{{
                       passwordError
                     }}</span>
                   </label>
 
-                  <button
-                    type="submit"
-                    class="
-                      w-full
-                      btn-sm
-                      bg-brand-yellow
-                      mt-10
-                      text-light-100
-                      uppercase
-                    "
-                  >
-                    Submit
-                  </button>
+                  <div class="mt-10">
+                    <button
+                      v-if="!isLoading"
+                      type="submit"
+                      class="
+                        w-full
+                        btn-sm
+                        bg-brand-yellow
+                        text-light-100
+                        uppercase
+                      "
+                    >
+                      Submit
+                    </button>
+
+                    <button
+                      v-else
+                      class="
+                        w-full
+                        inline-flex
+                        justify-center
+                        items-center
+                        px-4
+                        py-4
+                        font-semibold
+                        leading-6
+                        text-sm
+                        shadow
+                        rounded-md
+                        text-light-100
+                        bg-brand-blue
+                        hover:bg-brand-blue
+                        transition
+                        ease-in-out
+                        duration-150
+                        cursor-progress
+                        opacity-100
+                      "
+                      disabled
+                    >
+                      <svg
+                        class="animate-spin -ml-1 mr-3 h-5 w-5 text-light-100"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Logging in...
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>
@@ -186,8 +236,10 @@ export default {
     return {
       open: false,
       email: "",
+      emailError: "",
       password: "",
-      isLoading: false
+      passwordError: "",
+      isLoading: false,
     };
   },
   methods: {
@@ -195,21 +247,29 @@ export default {
       this.open = !this.open;
     },
     async login() {
-      this.isLoading = true;
       if (this.email.length === 0) {
-        alert("Please enter an email");
+        // alert("Please enter an email");
+        this.emailError = "Please enter an email";
         return;
+      } else {
+        this.emailError = "";
       }
       if (this.password.length === 0) {
-        alert("Please enter a password");
+        // alert("Please enter a password");
+        this.passwordError = "Please enter a password";
         return;
-      }
+      } else {
+        this.passwordError = "";
+      } 
+      this.isLoading = true;
+      const self = this;
       Parse.User.logIn(this.email, this.password)
         .then(() => {
-          this.isLoading = false
+          self.isLoading = false;
           this.$router.push({ name: "home" });
         })
-        .catch(function (err) {
+        .catch((err) => {
+          self.isLoading = false;
           alert("error" + err.message);
         });
     },
@@ -241,5 +301,4 @@ export default {
   right: 0;
   padding: 0.5em;
 }
-
 </style>

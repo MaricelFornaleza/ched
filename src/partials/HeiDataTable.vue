@@ -29,7 +29,7 @@
               {{ table_header.title }}
             </th>
             <th class="px-6 py-2">Edit</th>
-            <th class="px-6 py-2">Delete</th>
+            <!-- <th class="px-6 py-2">Delete</th> -->
           </tr>
         </thead>
         <tbody class="">
@@ -64,12 +64,12 @@
                 class="h-6 mx-auto cursor-pointer"
               />
             </td>
-            <td class="px-6 py-4">
+            <!-- <td class="px-6 py-4">
               <TrashIcon
                 @click="deleteHei(hei.id)"
                 class="h-6 mx-auto text-error cursor-pointer"
               />
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -85,14 +85,13 @@ import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
 import * as XLSX from "xlsx";
 import router from "../router";
-import { DownloadIcon, EyeIcon, TrashIcon } from "@heroicons/vue/outline";
+import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
 
 export default {
   components: {
     DownloadIcon,
     EyeIcon,
-    TrashIcon,
   },
   props: {
     heis: Object,

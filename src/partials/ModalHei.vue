@@ -74,7 +74,7 @@
             <div class="mt-8">
               <Select2
                 v-model="value"
-                :options="lists"
+                :options="sortHEIs"
                 :settings="{ width: '100%', placeholder: 'Select' }"
               />
               <!-- @change="myChangeEvent($event)" @select="mySelectEvent($event)" -->
@@ -151,6 +151,20 @@ export default {
   components: {
     // SearchIcon,
     Select2,
+  },
+  computed: {
+    sortHEIs() {
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+      function compare(a, b) {
+        const heiA = a.text.toUpperCase(); // ignore upper and lowercase
+        const heiB = b.text.toUpperCase(); // ignore upper and lowercase
+        if(heiA < heiB) return -1;
+        if(heiA > heiB) return 1;
+        return 0;
+      }
+      var heiList = this.lists;
+      return heiList.sort(compare);
+    },
   },
   methods: {
     async nextPage(application_type) {

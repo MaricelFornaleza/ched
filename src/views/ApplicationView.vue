@@ -242,6 +242,25 @@ export default {
 
     applicationSubscription.on("create", (object) => {
       console.log("object created" + object);
+      this.getGraduates(object.id).then((nstp) => {
+        this.applications.push({
+          id: object.id,
+          hei_id: object.get("heiId").id,
+          hei_name: object.get("heiId").get("name"),
+          application_type: object.get("applicationType"),
+          program: nstp.prog,
+          no_of_graduates: nstp.gradCount,
+          date_applied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          date_approved: object.get("dateApproved"),
+          status: object.get("status"),
+        });
+      });
+      this.count();
     });
 
     applicationSubscription.on("update", (object) => {
@@ -252,7 +271,7 @@ export default {
       this.getGraduates(object.id).then((nstp) => {
         this.applications[index] = {
           ...this.applications[index],
-          hei_id: object.id,
+          hei_id: object.get("heiId").id,
           hei_name: object.get("heiId").get("name"),
           program: nstp.prog,
           no_of_graduates: nstp.gradCount,
@@ -261,10 +280,30 @@ export default {
         };
       });
       this.count();
+      console.log(this.applications);
     });
 
     applicationSubscription.on("enter", (object) => {
       console.log("object entered" + object);
+      this.getGraduates(object.id).then((nstp) => {
+        this.applications.push({
+          id: object.id,
+          hei_id: object.get("heiId").id,
+          hei_name: object.get("heiId").get("name"),
+          application_type: object.get("applicationType"),
+          program: nstp.prog,
+          no_of_graduates: nstp.gradCount,
+          date_applied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          date_approved: object.get("dateApproved"),
+          status: object.get("status"),
+        });
+      });
+      this.count();
     });
 
     applicationSubscription.on("leave", (object) => {
@@ -272,6 +311,7 @@ export default {
       // find
       var index = this.applications.findIndex((app) => app.id == object.id);
       this.applications.splice(index, 1); //remove the specific object in the array
+      this.count();
     });
 
     applicationSubscription.on("delete", (object) => {
@@ -279,6 +319,7 @@ export default {
       // find
       var index = this.applications.findIndex((app) => app.id == object.id);
       this.applications.splice(index, 1); //remove the specific object in the array
+      this.count();
     });
 
     applicationSubscription.on("close", () => {
@@ -314,7 +355,7 @@ export default {
       }
 
       nstpenrollment.equalTo(
-        "applicationId", 
+        "applicationId",
         new Parse.Object("Application", { id: appId })
       );
       nstpenrollment.exists("serialNumber");
