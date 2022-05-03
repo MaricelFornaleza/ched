@@ -363,12 +363,7 @@
           >
             Cancel
           </button>
-          <button
-            class="btn-sm btn-default"
-            type="submit"
-          >
-            Submit
-          </button>
+          <button class="btn-sm btn-default" type="submit">Submit</button>
         </div>
       </form>
     </div>
@@ -424,12 +419,13 @@ export default {
       user.set("userType", "hei");
       user.save().then((user) => {
         const params = {
+          name: this.name,
           email: this.email,
           password: password,
           type: "Account",
           approved: true,
         };
-        Parse.Cloud.run("accountCredential", params);
+        Parse.Cloud.run("sendEmailNotification", params);
 
         router.push({
           name: "hei",
