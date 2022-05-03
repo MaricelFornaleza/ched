@@ -47,6 +47,7 @@
         @goToApplication="goToApplication"
         @setStatus="setStatus"
         @checkActive="checkActive"
+        @sendEmail="sendEmail"
         :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
@@ -65,6 +66,7 @@ export default {
       hei: "",
       hei_username: "",
       hei_region_code: "",
+      hei_email: "",
       application_id: "",
       currentStep: 0,
       steps: [],
@@ -79,9 +81,10 @@ export default {
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.application_id);
     query.include("heiId");
-    var results = await query.first();
+    var results = await query.first({ useMasterKey: true });
     this.hei = results.get("heiId").get("name");
     this.hei_username = results.get("heiId").get("username");
+    this.hei_email = results.get("heiId").get("email");
     console.log(this.hei_username);
     this.hei_region_code = results.get("heiId").get("address").regionNo;
 
@@ -201,6 +204,17 @@ export default {
       } else {
         this.allow = true;
       }
+    },
+    sendEmail(document, title) {
+      const params = {
+        title: title,
+        name: this.hei,
+        email: this.hei_email,
+        document: document,
+        type: "Notification",
+        approved: true,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
     },
   },
   components: {},
