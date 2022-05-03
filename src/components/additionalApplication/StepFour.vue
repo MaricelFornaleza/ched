@@ -16,6 +16,9 @@
             <td class="border p-2">Application Status</td>
             <td class="border p-2">
               <span :class="variant(data.status)">{{ data.status }}</span>
+              <div v-if="data.status == 'Rejected'">
+                <span class="font-semibold">Reason: </span> {{ data.reason }}
+              </div>
             </td>
           </tr>
           <tr>
@@ -40,49 +43,118 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="!isCompleted" class="flex justify-center space-x-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-        >
-          Back
-        </button>
-        <button
-          @click="setStatus('For Revision')"
-          class="btn-sm text-light-100 bg-error"
-        >
-          For Revision
-        </button>
-        <button @click="approve()" class="btn-sm text-light-100 bg-success">
-          Approve
-        </button>
-      </div>
-      <div v-else class="flex justify-center space-x-5">
-        <button
-          @click="$emit('previousStep')"
-          class="btn-sm btn-default btn-outline"
-        >
-          Back
-        </button>
+      <div v-if="data.status != 'Rejected'">
+        <div v-if="!isCompleted" class="flex justify-center space-x-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+          >
+            Back
+          </button>
+          <button @click="toggleModal()" class="btn-sm text-light-100 bg-error">
+            Reject
+          </button>
+          <button @click="approve()" class="btn-sm text-light-100 bg-success">
+            Approve
+          </button>
+        </div>
+        <div v-else class="flex justify-center space-x-5">
+          <button
+            @click="$emit('previousStep')"
+            class="btn-sm btn-default btn-outline"
+          >
+            Back
+          </button>
 
-        <button
-          @click="$emit('nextStep')"
-          class="btn-sm text-light-100 bg-brand-blue"
-        >
-          Next
-        </button>
+          <button
+            @click="$emit('nextStep')"
+            class="btn-sm text-light-100 bg-brand-blue"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
+
+    <ModalWidget v-show="visible" class="p-4">
+      <template #header>
+        <h3 class="pb-4">Reason for Rejection</h3>
+      </template>
+      <template #body>
+        <textarea
+          class="
+            form-control
+            block
+            w-full
+            px-3
+            py-1.5
+            text-base
+            font-normal
+            text-dark-400
+            bg-light-100 bg-clip-padding
+            border border-solid border-light-400
+            rounded
+            transition
+            ease-in-out
+            m-0
+            resize-none
+            focus:text-dark-400
+            focus:bg-light-100
+            focus:border-brand-blue
+            focus:outline-none
+          "
+          rows="10"
+          cols="60"
+          placeholder="Reason...."
+          :value="value"
+          @input="value = $event.target.value"
+          required
+        ></textarea>
+      </template>
+      <template #footer>
+        <div class="px-4 mt-2 py-4 sm:px-6">
+          <button
+            type="button"
+            @click="send()"
+            class="
+              w-full
+              inline-flex
+              justify-center
+              btn-sm btn-default
+              sm:ml-3 sm:w-auto sm:text-sm
+            "
+          >
+            Send
+          </button>
+          <button
+            type="button"
+            @click="toggleModal()"
+            class="
+              mt-3
+              w-full
+              justify-center
+              inline-flex
+              btn-sm btn-outline
+              sm:mt-0 sm:ml-4 sm:w-auto sm:text-sm
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </template>
+    </ModalWidget>
   </div>
 </template>
 
 <script>
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
+import ModalWidget from "@/partials/ModalWidget.vue";
 
 export default {
   components: {
     AlertWidget,
+    ModalWidget,
   },
   data() {
     return {
@@ -95,7 +167,10 @@ export default {
         male: 0,
         program: "",
         acadYear: "",
+        reason: "",
       },
+      visible: false,
+      value: "",
     };
   },
   props: {
@@ -104,7 +179,6 @@ export default {
     hei_region_code: String,
     allow: Boolean,
   },
-
   mounted() {
     this.getData();
   },
@@ -114,7 +188,7 @@ export default {
         return "badge-success";
       } else if (stats == "For Approval") {
         return "badge-warning";
-      } else if (stats == "For Revision") {
+      } else if (stats == "Rejected") {
         return "badge-error";
       } else {
         //Ongoing
@@ -138,6 +212,7 @@ export default {
       await query.find().then(function (results) {
         _this.data.graduates = results.length;
         _this.data.status = results[0].get("applicationId").get("status");
+        _this.data.reason = results[0].get("applicationId").get("reason");
         _this.data.acadYear = results[0]
           .get("applicationId")
           .get("academicYear");
@@ -179,16 +254,28 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
-      query.descending("serialNumber");
-      const serialNumber = await query.first();
-      const endSerialNumber = serialNumber.get("serialNumber").end;
-      const newStart = endSerialNumber + 1;
-      const newEnd = endSerialNumber + this.data.graduates;
+      // query.equalTo("objectId", this.appId);
+      const results = await query.first();
+      //get serialNumber, if undefined; set startSerialNum to 1
+      //if not, set startSerialNum to the last saved endSerialNumber + 1
+      var newStart = 0;
+      var newEnd = 0;
 
-      //get application details
-      const application = new Parse.Query(Application);
-      application.equalTo("objectId", this.appId);
-      await application.first().then(function (result) {
+      if (results.get("serialNumber") == null) {
+        newStart = 1;
+        newEnd = this.data.graduates;
+      } else {
+        query.descending("serialNumber");
+        const serialNumber = await query.first();
+        const endSerialNumber = serialNumber.get("serialNumber").end;
+        newStart = endSerialNumber + 1;
+        newEnd = endSerialNumber + this.data.graduates;
+      }
+      console.log(newStart);
+      console.log(newEnd);
+
+      query.equalTo("objectId", this.appId);
+      await query.first().then(function (result) {
         result.set("dateApproved", date);
         result.set("awardYear", fullyear.toString());
         result.set("serialNumber", { start: newStart, end: newEnd });
@@ -214,6 +301,9 @@ export default {
             "-" +
             year;
           results[i].set("serialNumber", sn);
+          results[i].set("takenNstp1", true);
+          results[i].set("takenNstp2", true);
+          results[i].set("isGraduated", true);
           results[i].save();
           start++;
         }
@@ -221,6 +311,22 @@ export default {
       this.$emit("setStatus", "Approved");
       this.$emit("complete", 4);
       this.$emit("nextStep");
+    },
+    toggleModal() {
+      this.visible = !this.visible;
+      this.value = "";
+    },
+    async send() {
+      const Application = Parse.Object.extend("Application");
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      const results = await application.first();
+      results.set("reason", this.value);
+      results.save();
+      this.data.reason = this.value;
+      this.setStatus("Rejected");
+      console.log(this.value);
+      this.toggleModal();
     },
   },
 };

@@ -19,7 +19,11 @@
     "datatables.net-dt": "^1.11.5",
     "emailjs": "^3.8.0",
     "emailjs-com": "^3.2.0",
+<<<<<<< HEAD
     "firebase": "^9.7.0",
+=======
+    "html2pdf.js": "^0.10.1",
+>>>>>>> 6b97aae62b1704f51d3c37418825332ffaf33913
     "jquery": "^3.6.0",
     "lottie-vuejs": "^0.4.0",
     "parse": "^3.4.1",
@@ -29,6 +33,7 @@
     "tailwindcss": "^3",
     "vue": "^3.2.13",
     "vue-chart-3": "^3.1.4",
+    "vue-html2pdf": "^1.8.0",
     "vue-plugin-load-script": "^2.1.1",
     "vue-router": "^4.0.13",
     "vue-sidebar-menu": "^5.2.1",

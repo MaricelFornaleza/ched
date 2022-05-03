@@ -50,15 +50,23 @@
 
         <div
           v-else
-          class="my-20 w-fit flex justify-between p-5 border border-light-300"
+          class="my-20 w-full flex justify-between p-5 border border-light-300"
         >
-          <div class="flex space-x-5">
-            <img
-              src="@/assets/img/xls.png"
-              class="h-8"
-              alt="XLS Icon by Dimitry Miroliubov"
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-5">
+              <img
+                src="@/assets/img/xls.png"
+                class="h-8"
+                alt="PDF Icon by Dimitry Miroliubov"
+              />
+              <div class="text-base">{{ dropzoneFile.name }}</div>
+            </div>
+
+            <XCircleIcon
+              @click="removeFile()"
+              class="h-5 text-error cursor-pointer"
+              title="Remove File"
             />
-            <div class="text-base">{{ dropzoneFile.name }}</div>
           </div>
         </div>
 
@@ -112,56 +120,55 @@
             :students="students"
           ></StudentsDataTable>
         </div>
+      </div>
 
-        <div
-          v-if="errorStudents()"
-          class="container mx-auto flex flex-col items-center justify-center"
-        >
-          <AlertWidget className="alert-warning">
-            The following students' record for the 1st Semester were not found.
-            Please ensure the students have taken the same NSTP 1 program.
-          </AlertWidget>
+      <div
+        v-if="errorStudents()"
+        class="container mx-auto flex flex-col items-center justify-center"
+      >
+        <AlertWidget className="alert-warning">
+          The following students' record for the 1st Semester were not found.
+          Please ensure the students have taken the same NSTP 1 program.
+        </AlertWidget>
 
-          <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ femaleNumError }}</h2>
-              <p class="uppercase">female</p>
-            </div>
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ maleNumError }}</h2>
-              <p class="uppercase">male</p>
-            </div>
-            <div class="flex flex-col items-center">
-              <h2 class="">{{ maleNumError + femaleNumError }}</h2>
-              <p class="uppercase">total</p>
-            </div>
+        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ femaleNumError }}</h2>
+            <p class="uppercase">female</p>
           </div>
-
-          <StudentsDataTable
-            newId="datatable2"
-            :key="componentKey"
-            :students="studentsMissing"
-          ></StudentsDataTable>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNumError }}</h2>
+            <p class="uppercase">male</p>
+          </div>
+          <div class="flex flex-col items-center">
+            <h2 class="">{{ maleNumError + femaleNumError }}</h2>
+            <p class="uppercase">total</p>
+          </div>
         </div>
 
-        <div class="flex items-center justify-center space-x-5 mt-5">
-          <button
-            @click="goToApplication()"
-            class="btn-sm btn-default btn-outline"
-            type="button"
-          >
-            Cancel
-          </button>
+        <StudentsDataTable
+          :key="componentKey"
+          :students="studentsMissing"
+          newId="datatable2"
+          fileName="List-of-Students-Missing-2ndSem"
+        ></StudentsDataTable>
+      </div>
 
-          <button
-            v-if="finishedStudents()"
-            @click="nextStep()"
-            class="btn-sm btn-default"
-            type="submit"
-          >
-            Next
-          </button>
-        </div>
+      <div
+        v-if="finishedStudents()"
+        class="flex items-center justify-center space-x-5 mt-5"
+      >
+        <button
+          @click="goToApplication()"
+          class="btn-sm btn-default btn-outline"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+          Next
+        </button>
       </div>
     </div>
 
@@ -222,6 +229,8 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import { XCircleIcon } from "@heroicons/vue/outline";
+
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from "parse";
@@ -251,6 +260,7 @@ export default {
     DropZone,
     StudentsDataTable,
     ModalWidget,
+    XCircleIcon,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -308,6 +318,8 @@ export default {
             self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "3 of 5");
+             this.$emit("sendEmail", "List of Enrollment for the 2nd Semester", "Step 2 of 5");
+
             // this.completed = !this.completed;
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
@@ -336,14 +348,12 @@ export default {
         reader.readAsArrayBuffer(this.dropzoneFile);
       }
     },
-    async setAcadYear(acadYear) {
+    async getHeiId() {
       const Application = Parse.Object.extend("Application");
       const query = new Parse.Query(Application);
       query.equalTo("objectId", this.appId);
       var results = await query.first();
-      results.set("academicYear", acadYear);
-      results.set("awardYear", acadYear); //acadYear is just the same with awardYear
-      results.save();
+      return results.get("heiId");
     },
     async getNstpId(nstp) {
       const Nstp = Parse.Object.extend("Nstp");
@@ -361,10 +371,10 @@ export default {
       console.log(studentSet);
       const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(nstpEnrollment);
-      query.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
+      // query.equalTo(
+      //   "applicationId",
+      //   new Parse.Object("Application", { id: this.appId })
+      // );
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
@@ -392,24 +402,17 @@ export default {
               await results[i].save();
             } else {
               //found the student but there are mismatch in stored info
+              //delete from set since it'll still be shown because of nstpTaken2 == false
               studentSet.delete(studentData[x]);
-              // this.storeStudents(studentData[x], results[i]);
             }
             break;
           }
-          // else {
-          //   //uniquely store all students who has missing records
-          //   missingSet.add(studentData[x]);
-          //   if(!missingSet.has(studentData[x])) {
-          //     this.storeStudents(studentData[x]);
-          //   }
-          // }
         }
       }
       const self = this;
       const students = studentSet.values();
       for (const student of students) {
-        await self.storeStudents(student, null, nstpProgram);
+        await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
       // studentSet.forEach (function(student) {
@@ -417,12 +420,11 @@ export default {
       // });
       await this.getStudents();
     },
-    async storeStudents(studentData, results, nstpProgram) {
-      var nstpId = "";
-      if (results == null) {
-        results = new Parse.Object("NstpEnrollment");
-        nstpId = await this.getNstpId(nstpProgram);
-      }
+    async storeStudents(studentData, nstpProgram) {
+      const nstpEnrollment = new Parse.Object("NstpEnrollment");
+      const nstpId = await this.getNstpId(nstpProgram);
+      const heiId = await this.getHeiId();
+
       const student = new Parse.Object("Student");
       student.set("name", {
         lastName: studentData.F,
@@ -444,26 +446,28 @@ export default {
         programLevelCode: studentData.R,
         programName: studentData.S,
       });
+      student.set("heiId", heiId);
 
       await student.save().then((student) => {
         // this.forceRerender(); //solution to updating DOM of child component
-        results.set(
+        nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        results.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
-        results.set(
+        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+        nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
         // nstpEnrollment.set("takenNstp1", false);   //defaults to false when the seeder is used
         // nstpEnrollment.set("takenNstp2", false);
-        results.save();
+        nstpEnrollment.save();
       });
     },
     async getStudents() {
       var studentList = [],
         studentErrorList = [];
+      //reset the numbers to be sure
       this.femaleNum = 0;
       this.maleNum = 0;
       this.femaleNumError = 0;
@@ -534,8 +538,11 @@ export default {
       console.log(this.studentsMissing);
       this.forceRerender();
     },
+    removeFile() {
+      this.dropzoneFile = "";
+    },
     nextStep() {
-      this.worker.terminate();
+      // this.worker.terminate();
       this.worker = undefined;
 
       this.$emit("nextStep");

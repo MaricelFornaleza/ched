@@ -60,6 +60,7 @@ export default {
   methods: {
     async logout() {
       await Parse.User.logOut();
+      await Parse.LiveQuery.close();
       const currentUser = await Parse.User.current();
       if (currentUser === null) {
         this.$router.push({ name: "landing" });

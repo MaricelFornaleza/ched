@@ -357,17 +357,13 @@
 
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button
-            class="btn-sm border-none bg-light-300 font-bold"
+            @click="goToHei()"
+            class="btn-sm btn-default btn-outline"
             type="button"
           >
             Cancel
           </button>
-          <button
-            class="btn-sm bg-brand-blue text-light-100 font-bold"
-            type="submit"
-          >
-            Submit
-          </button>
+          <button class="btn-sm btn-default" type="submit">Submit</button>
         </div>
       </form>
     </div>
@@ -422,8 +418,14 @@ export default {
       user.set("password", password);
       user.set("userType", "hei");
       user.save().then((user) => {
-        const params = {email:this.email, password:password, type:"Account", approved:true};
-        Parse.Cloud.run("accountCredential", params);
+        const params = {
+          name: this.name,
+          email: this.email,
+          password: password,
+          type: "Account",
+          approved: true,
+        };
+        Parse.Cloud.run("sendEmailNotification", params);
 
         router.push({
           name: "hei",
@@ -434,6 +436,6 @@ export default {
         });
       });
     },
-  },  
+  },
 };
 </script>

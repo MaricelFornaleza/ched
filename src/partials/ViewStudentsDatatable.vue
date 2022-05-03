@@ -18,20 +18,35 @@
           </button>
         </div>
       </div>
-      <div class="inline-block bg-light-200">
-        <table :id="tableId" class="p-4 hover text-center w-full row-border">
+      <div class="bg-light-200">
+        <table
+          :id="tableId"
+          width="200%"
+          class="p-4 hover text-center w-full row-border"
+        >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
               <th class="p-6">No.</th>
-              <th class="text-left">Last name</th>
+              <th>Award Year</th>
+              <th>NSTP Program</th>
+              <th>Region</th>
+              <th>Serial Number</th>
+              <th>Last name</th>
               <th>First name</th>
               <th>Extension Name</th>
-              <th>Middle</th>
+              <th>Middle Name</th>
               <th>Birthdate</th>
               <th>Sex</th>
               <th>Street/Brgy.</th>
               <th>Town/City</th>
               <th>Province</th>
+              <th>HEI Name</th>
+              <th>Institutional Code</th>
+              <th>Type of HEI</th>
+              <th>Program Level Code</th>
+              <th>Main Program Name</th>
+              <th>Email Address</th>
+              <th>Contact Number</th>
             </tr>
           </thead>
           <tbody class="bg-white text-sm">
@@ -41,25 +56,27 @@
               class="whitespace-nowrap"
             >
               <td class="px-6 py-4">{{ index + 1 }}</td>
-              <td class="px-6 py-4 text-left">
-                {{ student.name.lastName }}
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-gray-900">
-                  {{ student.name.firstName }}
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="">{{ student.name.extensionName }}</div>
-              </td>
-              <td class="px-6 py-4">{{ student.name.middleName }}</td>
-              <td class="px-6 py-4">
-                {{ student.birthdate }}
-              </td>
-              <td class="px-6 py-4">{{ student.gender }}</td>
-              <td class="px-6 py-4">{{ student.address.street }}</td>
-              <td class="px-6 py-4">{{ student.address.city }}</td>
-              <td class="px-6 py-4">{{ student.address.province }}</td>
+              <td>{{ student.awardYear }}</td>
+              <td>{{ student.nstpProgram }}</td>
+              <td>{{ student.region }}</td>
+              <td>{{ student.serialNumber }}</td>
+
+              <td>{{ student.name.lastName }}</td>
+              <td>{{ student.name.firstName }}</td>
+              <td>{{ student.name.extensionName }}</td>
+              <td>{{ student.name.middleName }}</td>
+              <td>{{ student.birthdate }}</td>
+              <td>{{ student.gender }}</td>
+              <td>{{ student.address.street }}</td>
+              <td>{{ student.address.city }}</td>
+              <td>{{ student.address.province }}</td>
+              <td>{{ student.heiName }}</td>
+              <td>{{ student.institutionalCode }}</td>
+              <td>{{ student.heiType }}</td>
+              <td>{{ student.program.programLevelCode }}</td>
+              <td>{{ student.program.programName }}</td>
+              <td>{{ student.emailAddress }}</td>
+              <td>{{ student.contactNumber }}</td>
             </tr>
           </tbody>
         </table>
@@ -83,17 +100,15 @@ export default {
   data() {
     return {
       tableId: "dataTable",
-      newFileName: this.fileName,
     };
   },
   components: {
     DownloadIcon,
   },
-  props: { students: Array, newId: String, fileName: String },
+  props: { students: Array, newId: String },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
-    this.newFileName = this.fileName;
   },
   watch: {
     students() {
@@ -136,7 +151,7 @@ export default {
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       if (typeof this.newFileName == "undefined")
-        this.newFileName = `List-of-Applications_${currentDate}.xlsx`;
+        this.newFileName = `List-of-Students_${currentDate}.xlsx`;
       else this.newFilename = `${this.newFileName}_${currentDate}.xlsx`;
       XLSX.writeFileXLSX(workbook, this.newFilename);
     },

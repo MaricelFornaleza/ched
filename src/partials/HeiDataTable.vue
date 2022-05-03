@@ -17,8 +17,8 @@
         <DownloadIcon class="h-5" />
       </button>
     </div>
-    <div class="overflow-x-auto">
-      <table id="dataTable" class="p-4 w-full hover row-border">
+    <div class="bg-light-200">
+      <table id="dataTable" width="100%" class="p-4 w-full hover row-border">
         <thead class="text-xs">
           <tr>
             <th
@@ -65,9 +65,9 @@
               />
             </td>
             <td class="px-6 py-4">
-              <TrashIcon 
+              <TrashIcon
                 @click="deleteHei(hei.id)"
-                class="h-6 mx-auto text-error cursor-pointer" 
+                class="h-6 mx-auto text-error cursor-pointer"
               />
             </td>
           </tr>
@@ -117,6 +117,7 @@ export default {
             search: "",
             sLengthMenu: "_MENU_",
           },
+          scrollX: true,
         });
       });
     },
@@ -128,15 +129,15 @@ export default {
     },
     deleteHei(id) {
       const query = new Parse.Query(Parse.User);
-          query.get(id).then(
-            (object) => {
-              console.log("success");
-              object.destroy({ useMasterKey: true });
-            },
-            (error) => {
-              console.log(error);
-            }
-          );  
+      query.get(id).then(
+        (object) => {
+          console.log("success");
+          object.destroy({ useMasterKey: true });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     },
     exportToExcel() {
       var currentDate = new Date()
