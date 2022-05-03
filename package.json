@@ -19,6 +19,7 @@
     "datatables.net-dt": "^1.11.5",
     "emailjs": "^3.8.0",
     "emailjs-com": "^3.2.0",
+    "firebase": "^9.7.0",
     "jquery": "^3.6.0",
     "lottie-vuejs": "^0.4.0",
     "parse": "^3.4.1",
