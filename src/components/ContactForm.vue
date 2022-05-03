@@ -190,7 +190,7 @@ export default {
   methods: {
     sendEmail() {
       //just commented out to work, pass is not defined error
-      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true}; 
+      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
       // Parse.Cloud.run("contactForm", params);
 
       this.province = "";

@@ -149,10 +149,11 @@
 <script>
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
-
+import ModalWidget from "@/partials/ModalWidget.vue";
 export default {
   components: {
     AlertWidget,
+    ModalWidget,
   },
   data() {
     return {
@@ -279,7 +280,7 @@ export default {
         result.set("serialNumber", { start: newStart, end: newEnd });
         result.save();
       });
-      
+
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(

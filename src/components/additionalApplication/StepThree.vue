@@ -18,8 +18,8 @@
         "
       >
         <AlertWidget :className="className">
-          Please Upload the List of Enrollment for First Semester. Follow the
-          format provided in the Template.&nbsp;
+          Please Upload the List of Graduates. Follow the format provided in the
+          Template.&nbsp;
           <a
             :href="templateUrl"
             class="font-bold underline hover:text-brand-blue"
@@ -94,8 +94,8 @@
         class="container mx-auto flex flex-col items-center justify-center"
       >
         <SuccessAlert className="alert-success">
-          The list for the 1st semester was successfully uploaded. An
-          Acknowledgement letter was sent to the email address.
+          The list of graduates was successfully uploaded. An Acknowledgement
+          letter was sent to the email address.
         </SuccessAlert>
 
         <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
@@ -277,6 +277,7 @@ export default {
             // self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "For Approval");
+            self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
             // this.completed = !this.completed;
           } else {
             //console.log("Something went wrong while parsing xlsx file!");
@@ -339,7 +340,7 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
-      
+
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
@@ -359,7 +360,7 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram) {
+            if (program == nstpProgram) {
               studentSet.delete(studentData[x]);
               results[i].set(
                 "applicationId",
@@ -367,7 +368,7 @@ export default {
               );
               results[i].set("takenNstp1", true);
               await results[i].save();
-            } else if(program != nstpProgram && !takenNstp1){
+            } else if (program != nstpProgram && !takenNstp1) {
               //found the student but there are mismatch in stored info
               const newEnrollment = new Parse.Object.extend("NstpEnrollment");
               newEnrollment.set(
@@ -431,10 +432,7 @@ export default {
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        nstpEnrollment.set(
-          "nstpId",
-          new Parse.Object("Nstp", { id: nstpId })
-        );
+        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
         nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
@@ -442,7 +440,7 @@ export default {
         // nstpEnrollment.set("takenNstp1", true);
         nstpEnrollment.save();
       });
-      
+
       this.pending = false;
     },
     async getStudents() {

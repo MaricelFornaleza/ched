@@ -65,7 +65,9 @@
                 Academic Year {{ academicYear }}
               </div>
             </div>
-            <button class="bg-info p-2 rounded text-light-100 h-fit">
+            <button
+              class="bg-info p-2 rounded text-light-100 h-fit cursor-pointer"
+            >
               <DownloadIcon @click="exportToPDF" class="h-4" />
             </button>
           </div>
@@ -201,13 +203,21 @@ export default {
   },
   methods: {
     exportToPDF() {
-      html2pdf(this.$refs.document, {
-        margin: 1,
-        filename: "document.pdf",
-        image: { type: "png", quality: 1 },
+      var opt = {
+        margin: 0.5,
+        image: { type: "jpeg", quality: 1 },
         html2canvas: { scale: 5, letterRendering: true },
-        jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
-      });
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(this.$refs.document)
+        .toPdf()
+        .get("pdf")
+        .then(function (pdf) {
+          window.open(pdf.output("bloburl"), "_blank");
+        });
     },
     async getData() {
       const Applications = Parse.Object.extend("Application");
@@ -314,11 +324,7 @@ export default {
       this.applications.rejected = await query.count();
       query.equalTo("status", "Approved");
       this.applications.approved = await query.count();
-      query.notContainedIn("status", [
-        "For Approval",
-        "Rejected",
-        "Approved",
-      ]);
+      query.notContainedIn("status", ["For Approval", "Rejected", "Approved"]);
       this.applications.pending = await query.count();
     },
     async getGraduates() {

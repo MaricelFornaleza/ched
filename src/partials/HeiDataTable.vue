@@ -128,15 +128,15 @@ export default {
     },
     deleteHei(id) {
       const query = new Parse.Query(Parse.User);
-          query.get(id).then(
-            (object) => {
-              console.log("success");
-              object.destroy({ useMasterKey: true });
-            },
-            (error) => {
-              console.log(error);
-            }
-          );  
+      query.get(id).then(
+        (object) => {
+          console.log("success");
+          object.destroy({ useMasterKey: true });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     },
     exportToExcel() {
       var currentDate = new Date()

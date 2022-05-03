@@ -263,11 +263,12 @@ export default {
         user.save().then(() => {
           const params = {
             email: data[i].I,
+            name: data[i].B,
             password: password,
             type: "Account",
             approved: true,
           };
-          Parse.Cloud.run("accountCredential", params);
+          Parse.Cloud.run("sendEmailNotification", params);
 
           console.log("success");
         });
