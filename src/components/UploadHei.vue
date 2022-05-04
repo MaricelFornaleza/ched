@@ -159,7 +159,7 @@ import Parse from "parse";
 export default {
   data() {
     return {
-      templateUrl: "/files/NTSP-LIST-OF-HEI-TEMPLATE.xlsx", //may switch to file-loader package to load files
+      templateUrl: "/files/NSTP-LIST-OF-HEI-TEMPLATE.xlsx", //may switch to file-loader package to load files
       visible: false,
       completed: false,
       className: "alert-info",
@@ -228,6 +228,8 @@ export default {
                     msg: "The HEIs were successfully added.",
                   },
                 });
+              } else {
+                _this.visible = false;
               }
             };
           }
