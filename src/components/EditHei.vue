@@ -182,11 +182,13 @@
               name="hei_type"
               required
             >
-              <option selected>Select</option>
-              <option value="LUC">Local Universities and Colleges</option>
-              <option value="SUC">State Universities and Colleges</option>
-              <option value="Private">Private</option>
-              <option value="OGS">Other GOvernment Schools</option>
+              <option
+                v-for="type in hei_types"
+                :key="type.value"
+                :value="type.value"
+              >
+                {{ type.title }}
+              </option>
             </select>
           </div>
         </div>
@@ -400,9 +402,11 @@ export default {
       regionName: "",
       institutional_code: "",
       hei_type: "",
+      hei_types: [],
     };
   },
   async mounted() {
+    this.getHeiTypes();
     this.id = this.$route.params.id;
     console.log(this.id);
     const query = new Parse.Query(Parse.User);
@@ -421,8 +425,21 @@ export default {
     this.province = result.get("address").province;
     this.regionNo = result.get("address").regionNo;
     this.regionName = result.get("address").regionName;
+    console.log(this.hei_type.value);
   },
   methods: {
+    async getHeiTypes() {
+      const Hei_type = Parse.Object.extend("HeiType");
+      const query = new Parse.Query(Hei_type);
+      const results = await query.find();
+      for (let i = 0; i < results.length; i++) {
+        this.hei_types.push({
+          value: results[i].get("abbreviation"),
+          title: results[i].get("title"),
+        });
+      }
+      console.log(this.hei_type);
+    },
     async addHei() {
       const User = Parse.Object.extend(Parse.User);
       const q = new Parse.Query(User);
