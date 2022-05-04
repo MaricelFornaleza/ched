@@ -236,7 +236,6 @@ export default {
   },
   created() {
     this.getStudents();
-    console.log(this.allow);
   },
   methods: {
     forceRerender() {
@@ -265,7 +264,6 @@ export default {
           // _this.table_headers = event.data.headers;
           // self.students = event.data.rows;
           if (event.data.complete) {
-            console.log("Successfully parsed xlsx file!");
             self.maleNum = event.data.male;
             self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
@@ -280,7 +278,6 @@ export default {
             self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
             // this.completed = !this.completed;
           } else {
-            //console.log("Something went wrong while parsing xlsx file!");
             self.pending = false;
             alert(event.data.reason);
           }
@@ -330,7 +327,7 @@ export default {
       //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
       //if not, store in separate lists
       const studentSet = new Set(studentData);
-      console.log(studentSet);
+
       const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(nstpEnrollment);
       // query.equalTo(
@@ -386,7 +383,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);

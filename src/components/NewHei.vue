@@ -303,7 +303,6 @@ export default {
           title: results[i].get("title"),
         });
       }
-      console.log(this.hei_types);
     },
     addHei() {
       this.isLoading = true;

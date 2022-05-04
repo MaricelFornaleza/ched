@@ -213,8 +213,7 @@ export default {
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
               var heis = event.data.rows;
-              console.log(_this.table_headers);
-              console.log(heis);
+
               _this.storeHeis(heis);
 
               if (event.data.complete) {
@@ -269,8 +268,6 @@ export default {
             approved: true,
           };
           Parse.Cloud.run("sendEmailNotification", params);
-
-          console.log("success");
         });
       }
     },

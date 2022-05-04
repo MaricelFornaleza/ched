@@ -257,11 +257,11 @@ export default {
   async mounted() {
     this.getHeiTypes();
     this.id = this.$route.params.id;
-    console.log(this.id);
+
     const query = new Parse.Query(Parse.User);
     query.equalTo("objectId", this.id);
     const result = await query.first({ useMasterKey: true });
-    console.log(result);
+
     this.name = result.get("name");
     this.username = result.get("username");
     this.email = result.get("email");
@@ -274,7 +274,6 @@ export default {
     this.province = result.get("address").province;
     this.regionNo = result.get("address").regionNo;
     this.regionName = result.get("address").regionName;
-    console.log(this.hei_type.value);
   },
   methods: {
     async getHeiTypes() {
@@ -287,7 +286,6 @@ export default {
           title: results[i].get("title"),
         });
       }
-      console.log(this.hei_type);
     },
     async addHei() {
       const User = Parse.Object.extend(Parse.User);

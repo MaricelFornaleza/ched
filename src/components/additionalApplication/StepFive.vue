@@ -40,11 +40,11 @@
           <tr>
             <td class="border p-2">Students's Serial Number</td>
             <td class="border p-2">
-              <button 
+              <button
                 class="underline font-bold hover:text-brand-blue cursor-pointer"
                 @click="downloadSN()"
               >
-                 Download
+                Download
               </button>
             </td>
           </tr>
@@ -73,7 +73,7 @@
 <script>
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 export default {
   components: {
@@ -88,18 +88,19 @@ export default {
         graduates: 0,
         program: "",
         awardYear: "",
-        snRange: ""
+        snRange: "",
       },
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean, hei_username: String },
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    allow: Boolean,
+    hei_username: String,
+  },
 
   mounted() {
     this.getData();
-    console.log(this.isCompleted);
-    // var user = Parse.User.current();
-    // var name= user.get("username");
-    // console.log(name);
   },
   methods: {
     variant(stats) {
@@ -115,8 +116,6 @@ export default {
       }
     },
     async downloadSN() {
-      console.log("download starting...");
-      // console.log(this.hei_username);
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo(
@@ -141,28 +140,48 @@ export default {
           serialNumber: element.get("serialNumber"),
         });
       }
-       /* generate worksheet and workbook */
+      /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
       const worksheetName = "List of Students";
       const workbook = XLSX.utils.book_new();
-      const currentDate = new Date().toLocaleDateString().replace(/[^\w\s]/gi, "-");
-      const workbookName = `Issued-SN-${this.hei_username}_${currentDate}.xlsx`;    //update to include name of HEI
+      const currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      const workbookName = `Issued-SN-${this.hei_username}_${currentDate}.xlsx`; //update to include name of HEI
       XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName);
 
       /* fix headers */
       // currently, styling cell values is only supported in SheetJS pro version :(
-      // although, there are community forks alternatives to make this possible such as xlsx-js-style 
+      // although, there are community forks alternatives to make this possible such as xlsx-js-style
       // ... to be updated
-      const headers = ["AWARD YEAR", "PROGRAM NAME", "LAST NAME", "FIRST NAME", "MIDDLE NAME", "EXTENSION NAME", "SERIAL NUMBER"]
+      const headers = [
+        "AWARD YEAR",
+        "PROGRAM NAME",
+        "LAST NAME",
+        "FIRST NAME",
+        "MIDDLE NAME",
+        "EXTENSION NAME",
+        "SERIAL NUMBER",
+      ];
       XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
-       
+
       /* calculate max column width */
-      const max_width = students.reduce((w, r) => Math.max(w, r.serialNumber.length), 10);
-      worksheet["!cols"] = [ { wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width } ];
+      const max_width = students.reduce(
+        (w, r) => Math.max(w, r.serialNumber.length),
+        10
+      );
+      worksheet["!cols"] = [
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+      ];
 
       /* create an XLSX file and try to save to xlsx file*/
       XLSX.writeFileXLSX(workbook, workbookName);
-
     },
     async getData() {
       let _this = this;
@@ -197,7 +216,6 @@ export default {
             day: "numeric",
           });
         _this.data.awardYear = results[0].get("applicationId").get("awardYear");
-        console.log(_this.data.dateApproved + " " + _this.data.awardYear);
 
         _this.data.program = results[0].get("nstpId").get("programName");
         const sn = results[0].get("applicationId").get("serialNumber");
@@ -221,9 +239,9 @@ export default {
       this.getData();
     },
     goToApplication() {
-      this.$emit('complete', 5);
+      this.$emit("complete", 5);
       this.$emit("goToApplication");
-    }
+    },
   },
 };
 </script>
