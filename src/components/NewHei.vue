@@ -182,11 +182,14 @@
               name="hei_type"
               required
             >
-              <option selected>Select</option>
-              <option value="LUC">Local Universities and Colleges</option>
-              <option value="SUC">State Universities and Colleges</option>
-              <option value="Private">Private</option>
-              <option value="OGS">Other Government Schools</option>
+              <option value="" selected>Select</option>
+              <option
+                v-for="type in hei_types"
+                :key="type.value"
+                :value="type.value"
+              >
+                {{ type.title }}
+              </option>
             </select>
           </div>
         </div>
@@ -434,9 +437,25 @@ export default {
       institutional_code: "",
       hei_type: "",
       isLoading: false,
+      hei_types: [],
     };
   },
+  mounted() {
+    this.getHeiTypes();
+  },
   methods: {
+    async getHeiTypes() {
+      const Hei_type = Parse.Object.extend("HeiType");
+      const query = new Parse.Query(Hei_type);
+      const results = await query.find();
+      for (let i = 0; i < results.length; i++) {
+        this.hei_types.push({
+          value: results[i].get("abbreviation"),
+          title: results[i].get("title"),
+        });
+      }
+      console.log(this.hei_types);
+    },
     addHei() {
       this.isLoading = true;
       var password = Math.random().toString(36).slice(-12);
