@@ -214,6 +214,19 @@
     bg-error-light 
     rounded-full;
   }
+  .text-input {
+    @apply appearance-none
+      border-2
+      rounded
+      w-full
+      py-2
+      px-4
+      text-dark-100 text-sm
+      focus:outline-none focus:ring;
+  }
+  .text-input-label{
+    @apply block text-dark-200 text-sm font-bold mb-2
+  }
 
   .widget-simple {
     background-color: theme("colors.light.100");
