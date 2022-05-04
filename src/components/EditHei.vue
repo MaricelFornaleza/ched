@@ -424,13 +424,16 @@ export default {
   },
   methods: {
     async addHei() {
-      const user = await Parse.User.current();
-      user.set("objectId", this.id);
-      user.set("name", this.name);
-      user.set("email", this.email);
-      user.set("username", this.username);
-      user.set("contactNumber", this.contact_number);
-      user.set("address", {
+      const User = Parse.Object.extend(Parse.User);
+      const q = new Parse.Query(User);
+      q.matches("objectId", this.id);
+      const result = await q.first();
+      // user.set();
+      result.set("name", this.name);
+      result.set("email", this.email);
+      result.set("username", this.username);
+      result.set("contactNumber", this.contact_number);
+      result.set("address", {
         street: this.street,
         barangay: this.barangay,
         city: this.city,
@@ -438,18 +441,23 @@ export default {
         regionNo: this.regionNo,
         regionName: this.regionName,
       });
-      user.set("institutionalCode", this.institutional_code);
-      user.set("type", this.hei_type);
+      result.set("institutionalCode", this.institutional_code);
+      result.set("type", this.hei_type);
 
-      user.save({ useMasterKey: true }).then((user) => {
-        router.push({
-          name: "hei",
-          query: {
-            status: "success",
-            msg: user.get("name") + " was successfully updated.",
-          },
+      result
+        .save(
+          { useMasterKey: true },
+          { sessionToken: result.get("sessionToken") }
+        )
+        .then((user) => {
+          router.push({
+            name: "hei",
+            query: {
+              status: "success",
+              msg: user.get("name") + " was successfully updated.",
+            },
+          });
         });
-      });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
       //   alert('New object created with objectId: ' + hei.id);

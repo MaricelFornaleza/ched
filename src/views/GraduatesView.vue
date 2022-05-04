@@ -120,7 +120,7 @@ export default {
     return {
       academicYears: [],
       year: "",
-      sem: "",
+      sem: 0,
       objects: [],
       loading: true,
       CWTS: { femaleNum: 0, maleNum: 0 },

@@ -215,7 +215,7 @@ export default {
               var heis = event.data.rows;
               console.log(_this.table_headers);
               console.log(heis);
-              // _this.storeHeis(heis);
+              _this.storeHeis(heis);
 
               if (event.data.complete) {
                 _this.visible = false;
@@ -250,7 +250,7 @@ export default {
           barangay: data[i].D,
           city: data[i].E,
           province: data[i].F,
-          regionNo: data[i].G,
+          regionNo: data[i].G.toString(),
           regionName: data[i].H,
         });
         user.set("email", data[i].I);

@@ -48,11 +48,7 @@ const routes = [
   {
     path: "/nstp",
     component: ViewLayout,
-      beforeEnter: () => {
-        if (Parse.User.current().get("userType") !== "admin") {
-          return { name: '403' }
-        } 
-      }, 
+     
     children: [
       {
         path: "/sample",
@@ -72,7 +68,12 @@ const routes = [
           breadcrumb: [
             {name: 'Home'},
           ]
-        }
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
       {
         path: "/hei",
@@ -82,7 +83,14 @@ const routes = [
           breadcrumb: [
             {name: 'HEI'},
           ]
-        }
+        },
+        
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
+        
         
       },
       {
@@ -92,6 +100,11 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "New" }],
         },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
         
       },
       {
@@ -100,6 +113,11 @@ const routes = [
         component: EditHei,
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "Edit" }],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
       },
       {
@@ -111,6 +129,11 @@ const routes = [
             { name: "HEI", link: "/hei" },
             { name: "Upload Excel File" },
           ],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
       },
       {
@@ -270,6 +293,11 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "Summary of Enrollment" }],
         },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
     
       {
@@ -296,6 +324,11 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "Serial Numbers" }],
         },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
       {
         path: "/report-summary",
@@ -303,6 +336,11 @@ const routes = [
         component: ReportSummaryView,
         meta: {
           breadcrumb: [{ name: "Report Summary" }],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
       },
     ],
