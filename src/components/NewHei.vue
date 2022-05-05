@@ -128,82 +128,116 @@
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
-            <label class="text-input-label" for="street"> Street </label>
-
-            <input
-              class="text-input"
-              name="street"
-              id="street"
-              v-model="street"
-              type="text"
-              placeholder="Enter Street"
-            />
+            <label class="text-input-label" for="region"> Region </label>
+            <select
+              class="
+                form-select
+                text-input
+                block
+                bg-clip-padding
+                transition
+                ease-in-out
+                m-0
+                focus:outline-none
+              "
+              name="region"
+              @change="handleProvince"
+              required
+            >
+              <option value="" disabled selected>Select Region</option>
+              <option
+                v-for="region in regions"
+                :value="region.region_code"
+                :key="region.region_code"
+              >
+                {{ region.region_name }}
+              </option>
+            </select>
           </div>
 
           <div class="mb-4">
-            <label class="text-input-label" for="barangay"> Barangay </label>
-            <input
-              class="text-input"
-              name="barangay"
-              id="barangay"
-              v-model="barangay"
-              type="text"
-              placeholder="Enter Barangay"
-            />
+            <label class="text-input-label" for="province"> Province </label>
+            <select
+              class="
+                form-select
+                text-input
+                block
+                bg-clip-padding
+                transition
+                ease-in-out
+                m-0
+                focus:outline-none
+              "
+              name="province"
+              @change="handleCity"
+              required
+            >
+              <option value="" disabled selected>Select Province</option>
+              <option
+                v-for="province in provinces"
+                :value="province.province_code"
+                :key="province.province_code"
+              >
+                {{ province.province_name }}
+              </option>
+            </select>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
             <label class="text-input-label" for="city"> City </label>
-            <input
-              class="text-input"
+            <select
+              class="
+                form-select
+                text-input
+                block
+                bg-clip-padding
+                transition
+                ease-in-out
+                m-0
+                focus:outline-none
+              "
               name="city"
-              id="city"
-              v-model="city"
-              type="text"
-              placeholder="Enter City"
-            />
+              @change="handleBarangay"
+              required
+            >
+              <option value="" disabled selected>Select City</option>
+              <option
+                v-for="city in cities"
+                :value="city.city_code"
+                :key="city.city_code"
+              >
+                {{ city.city_name }}
+              </option>
+            </select>
           </div>
 
           <div class="mb-4">
-            <label class="text-input-label" for="province"> Province </label>
-            <input
-              class="text-input"
-              name="province"
-              id="province"
-              v-model="province"
-              type="text"
-              placeholder="Enter Province"
-            />
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-5">
-          <div class="mb-4">
-            <label class="text-input-label" for="regionNo">
-              Region Number
-            </label>
-            <input
-              class="text-input"
-              name="regionNo"
-              id="regionNo"
-              v-model="regionNo"
-              type="text"
-              placeholder="Enter Region No."
-            />
-          </div>
-
-          <div class="mb-4">
-            <label class="text-input-label" for="regionName">
-              Region Name
-            </label>
-            <input
-              class="text-input"
-              name="regionName"
-              id="regionName"
-              v-model="regionName"
-              type="text"
-              placeholder="Enter Region Name"
-            />
+            <label class="text-input-label" for="barangay"> Barangay </label>
+            <select
+              class="
+                form-select
+                text-input
+                block
+                bg-clip-padding
+                transition
+                ease-in-out
+                m-0
+                focus:outline-none
+              "
+              name="barangay"
+              @change="barangaysChange"
+              required
+            >
+              <option value="" disabled selected>Select Barangay</option>
+              <option
+                v-for="barangay in barangays"
+                :value="barangay.brgy_code"
+                :key="barangay.brgy_code"
+              >
+                {{ barangay.brgy_name }}
+              </option>
+            </select>
           </div>
         </div>
 
@@ -264,7 +298,12 @@ import { LibraryIcon } from "@heroicons/vue/solid";
 import Parse from "parse";
 import router from "../router";
 //import emailjs from '@emailjs/browser';
-
+import {
+  regions,
+  provinces,
+  cities,
+  barangays,
+} from "select-philippines-address";
 export default {
   auth: true,
   components: {
@@ -277,12 +316,16 @@ export default {
       username: "",
       email: "",
       contact_number: "",
-      street: "",
-      barangay: "",
-      city: "",
-      province: "",
-      regionNo: "",
-      regionName: "",
+      regions: [],
+      provinces: [],
+      cities: [],
+      barangays: [],
+      region: null,
+      regionNo: null,
+      regionName: null,
+      province: null,
+      city: null,
+      barangay: null,
       institutional_code: "",
       hei_type: "",
       isLoading: false,
@@ -291,8 +334,33 @@ export default {
   },
   mounted() {
     this.getHeiTypes();
+    regions().then((response) => {
+      this.regions = response;
+    });
   },
   methods: {
+    handleProvince(e) {
+      this.regionName = e.target.selectedOptions[0].text;
+      this.regionNo = e.target.value;
+      provinces(e.target.value).then((response) => {
+        this.provinces = response;
+      });
+    },
+    handleCity(e) {
+      this.province = e.target.selectedOptions[0].text;
+      cities(e.target.value).then((response) => {
+        this.cities = response;
+      });
+    },
+    handleBarangay(e) {
+      this.city = e.target.selectedOptions[0].text;
+      barangays(e.target.value).then((response) => {
+        this.barangays = response;
+      });
+    },
+    barangaysChange(e) {
+      this.barangay = e.target.selectedOptions[0].text;
+    },
     async getHeiTypes() {
       const Hei_type = Parse.Object.extend("HeiType");
       const query = new Parse.Query(Hei_type);
@@ -313,7 +381,6 @@ export default {
       user.set("username", this.username);
       user.set("contactNumber", this.contact_number);
       user.set("address", {
-        street: this.street,
         barangay: this.barangay,
         city: this.city,
         province: this.province,

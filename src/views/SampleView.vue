@@ -1,19 +1,98 @@
 <template >
-  <div @click="notify()">Click me!</div>
+  <select @change="handleProvince">
+    <option disabled selected>Select Region</option>
+    <option
+      v-for="region in regions"
+      :value="region.region_code"
+      :key="region.region_code"
+    >
+      {{ region.region_name }}
+    </option>
+  </select>
+  <br /><br />
+  <select @change="handleCity">
+    <option disabled selected>Select Province</option>
+    <option
+      v-for="province in provinces"
+      :value="province.province_code"
+      :key="province.province_code"
+    >
+      {{ province.province_name }}
+    </option>
+  </select>
+  <br /><br />
+  <select @change="handleBarangay">
+    <option disabled selected>Select City</option>
+    <option
+      v-for="city in cities"
+      :value="city.city_code"
+      :key="city.city_code"
+    >
+      {{ city.city_name }}
+    </option>
+  </select>
+  <br /><br />
+  <select @change="barangaysChange">
+    <option disabled selected>Select Barangay</option>
+    <option
+      v-for="barangay in barangays"
+      :value="barangay.brgy_code"
+      :key="barangay.brgy_code"
+    >
+      {{ barangay.brgy_name }}
+    </option>
+  </select>
+  <br /><br />
+  <p>{{ barangay }}, {{ city }}, {{ province }}, {{ region }}</p>
+  <br />
 </template>
 <script>
-import Parse from "parse";
-
+import {
+  regions,
+  provinces,
+  cities,
+  barangays,
+} from "select-philippines-address";
 export default {
   data() {
     return {
       name: null,
+      regions: [],
+      provinces: [],
+      cities: [],
+      barangays: [],
+      region: null,
+      province: null,
+      city: null,
+      barangay: null,
     };
   },
+  mounted() {
+    regions().then((response) => {
+      this.regions = response;
+    });
+  },
   methods: {
-    notify() {
-      const params = {};
-      Parse.Cloud.run("approveRequest", params);
+    handleProvince(e) {
+      this.region = e.target.selectedOptions[0].text;
+      provinces(e.target.value).then((response) => {
+        this.provinces = response;
+      });
+    },
+    handleCity(e) {
+      this.province = e.target.selectedOptions[0].text;
+      cities(e.target.value).then((response) => {
+        this.cities = response;
+      });
+    },
+    handleBarangay(e) {
+      this.city = e.target.selectedOptions[0].text;
+      barangays(e.target.value).then((response) => {
+        this.barangays = response;
+      });
+    },
+    barangaysChange(e) {
+      this.barangay = e.target.selectedOptions[0].text;
     },
   },
 };
