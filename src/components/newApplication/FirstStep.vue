@@ -427,14 +427,14 @@ export default {
       });
       student.set("heiId", this.heiId);
 
-      student.save().then((student) => {
-        this.students.push({
-          name: student.get("name"),
-          birthdate: student.get("birthdate"),
-          gender: student.get("gender"),
-          address: student.get("address"),
-        });
-        this.forceRerender(); //solution to updating DOM of child component
+      await student.save().then((student) => {
+        // this.students.push({
+        //   name: student.get("name"),
+        //   birthdate: student.get("birthdate"),
+        //   gender: student.get("gender"),
+        //   address: student.get("address"),
+        // });
+        // this.forceRerender(); //solution to updating DOM of child component
         nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })

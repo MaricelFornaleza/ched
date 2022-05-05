@@ -357,13 +357,13 @@
 
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button
-            class="btn-sm border-none bg-light-300 font-bold"
+            class="btn-sm btn-default btn-outline"
             type="button"
           >
             Cancel
           </button>
           <button
-            class="btn-sm bg-brand-blue text-light-100 font-bold"
+            class="btn-sm btn-default"
             type="submit"
           >
             Submit
@@ -424,13 +424,16 @@ export default {
   },
   methods: {
     async addHei() {
-      const user = await Parse.User.current();
-      user.set("objectId", this.id);
-      user.set("name", this.name);
-      user.set("email", this.email);
-      user.set("username", this.username);
-      user.set("contactNumber", this.contact_number);
-      user.set("address", {
+      const User = Parse.Object.extend(Parse.User);
+      const q = new Parse.Query(User);
+      q.matches("objectId", this.id);
+      const result = await q.first();
+      // user.set();
+      result.set("name", this.name);
+      result.set("email", this.email);
+      result.set("username", this.username);
+      result.set("contactNumber", this.contact_number);
+      result.set("address", {
         street: this.street,
         barangay: this.barangay,
         city: this.city,
@@ -438,10 +441,10 @@ export default {
         regionNo: this.regionNo,
         regionName: this.regionName,
       });
-      user.set("institutionalCode", this.institutional_code);
-      user.set("type", this.hei_type);
-
-      user.save({ useMasterKey: true }).then((user) => {
+      result.set("institutionalCode", this.institutional_code);
+      result.set("type", this.hei_type);
+      
+      result.save({ useMasterKey: true }).then((user) => {
         router.push({
           name: "hei",
           query: {
