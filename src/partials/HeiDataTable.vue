@@ -51,7 +51,7 @@
             </td>
             <td class="px-6 py-4 text-sm text-left text-gray-500">
               <div class="text-sm text-gray-900">
-                {{ hei.address.street }} {{ hei.address.barangay }},
+                {{ hei.address.barangay }},
                 {{ hei.address.city }}
               </div>
               <div class="text-xs text-gray-900">
