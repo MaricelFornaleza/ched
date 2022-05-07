@@ -38,10 +38,12 @@
               {{ hei.institutional_code }}
             </td>
             <td class="px-6 py-4 text-left">
-              <div class="text-xs font-bold text-gray-900">
+              <div class="text-xs font-bold text-gray-900 uppercase">
                 {{ hei.hei_username }}
               </div>
-              <div class="text-sm text-gray-900">{{ hei.hei_name }}</div>
+              <div class="text-sm text-gray-900 uppercase">
+                {{ hei.hei_name }}
+              </div>
             </td>
             <td class="px-6 py-4 text-center">
               <div class="text-sm text-gray-500">{{ hei.hei_type }}</div>
