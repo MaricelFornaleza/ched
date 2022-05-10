@@ -200,6 +200,23 @@ export default {
         this.allow = true;
       }
     },
+    sendEmail(document, title) {
+      var date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      const params = {
+        title: title,
+        name: this.hei,
+        email: this.hei_email,
+        document: document,
+        type: "Notification",
+        approved: true,
+        date: date,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
+    },
   },
   components: {},
 };
