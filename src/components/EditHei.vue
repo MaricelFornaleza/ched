@@ -1,5 +1,12 @@
 <template>
   <div>
+    <!-- alert message -->
+    <div class="w-fit mx-auto">
+      <AlertWidget :className="alert.className">
+        {{ alert.msg }}
+      </AlertWidget>
+    </div>
+
     <div
       class="
         m-auto
@@ -33,7 +40,7 @@
         <p class="uppercase font-bold label-sm">Higher Education Institution</p>
       </div>
 
-      <form ref="form" id="addHei" @submit.prevent="addHei">
+      <form ref="form" id="editHei" @submit.prevent="editHei">
         <div class="mb-4">
           <label class="text-input-label" for="name"> Name </label>
           <input
@@ -266,6 +273,8 @@
 import { LibraryIcon } from "@heroicons/vue/solid";
 import Parse from "parse";
 import router from "../router";
+import AlertWidget from "@/partials/AlertWidget.vue";
+
 //import emailjs from '@emailjs/browser';
 import {
   regions,
@@ -277,6 +286,7 @@ export default {
   auth: true,
   components: {
     LibraryIcon,
+    AlertWidget,
   },
   data() {
     return {
@@ -302,6 +312,8 @@ export default {
       province_code: null,
       city_code: null,
       brgy_code: null,
+      usertype: null,
+      alert: { className: "", msg: "" },
     };
   },
   async mounted() {
@@ -311,6 +323,11 @@ export default {
     });
 
     this.id = this.$route.params.id;
+
+    // get current user
+    // we will use this for redirecting after submit
+    const user = new Parse.User.current();
+    this.usertype = user.get("userType");
 
     const query = new Parse.Query(Parse.User);
     query.equalTo("objectId", this.id);
@@ -395,7 +412,7 @@ export default {
         });
       }
     },
-    async addHei() {
+    async editHei() {
       const User = Parse.Object.extend(Parse.User);
       const q = new Parse.Query(User);
       q.matches("objectId", this.id);
@@ -422,13 +439,22 @@ export default {
           { sessionToken: result.get("sessionToken") }
         )
         .then((user) => {
-          router.push({
-            name: "hei",
-            query: {
-              status: "success",
-              msg: user.get("name") + " was successfully updated.",
-            },
-          });
+          if (this.usertype == "admin") {
+            router.push({
+              name: "hei",
+              query: {
+                status: "success",
+                msg: user.get("name") + " was successfully updated.",
+              },
+            });
+          } else {
+            this.alert.className = "alert-success";
+            window.scrollTo(0, 0);
+            this.alert.msg = user.get("name") + " was successfully updated.";
+            router.push({
+              name: "myAccount",
+            });
+          }
         });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.

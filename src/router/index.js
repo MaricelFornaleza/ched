@@ -114,11 +114,17 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "Edit" }],
         },
-        beforeEnter: () => {
-          if (Parse.User.current().get("userType") !== "admin" ) {
-            return { name: '403' }
-          } 
+        
+      },
+      
+      {
+        path: "/my-account/edit/:id",
+        name: "myAccount",
+        component: EditHei,
+        meta: {
+          breadcrumb: [{ name: "My Account" }, { name: "Edit" }],
         },
+        
       },
       {
         path: "/hei/upload",
