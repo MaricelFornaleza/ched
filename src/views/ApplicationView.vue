@@ -352,8 +352,14 @@ export default {
 
   methods: {
     async count() {
+      const user = new Parse.User.current();
+      const usertype = user.get("userType");
+
       const Applications = Parse.Object.extend("Application");
       const query = new Parse.Query(Applications);
+      if (usertype == "hei") {
+        query.equalTo("heiId", new Parse.Object("_User", { id: user.id }));
+      }
       this.total_applications = await query.count();
       query.equalTo("status", "For Approval");
       this.for_approval = await query.count();
