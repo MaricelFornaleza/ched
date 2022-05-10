@@ -234,7 +234,7 @@ export default {
             hiddenOnCollapse: true,
           },
           {
-            href: "/graduates",
+            href: "/hei/graduates",
             title: "Summary of Graduates",
             icon: {
               element: "img",

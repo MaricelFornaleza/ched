@@ -6,6 +6,7 @@ import HEIView from "../views/HEIView.vue";
 import ApplicationView from "../views/ApplicationView.vue";
 import EnrollmentView from "../views/EnrollmentView.vue";
 import GraduatesView from "../views/GraduatesView.vue";
+import HeiGraduatesView from "../views/HeiGraduatesView.vue";
 import SerialNumbersView from "../views/SerialNumbersView.vue";
 import ReportSummaryView from "../views/ReportSummaryView.vue";
 import StudentsView from "../views/StudentsView.vue";
@@ -310,6 +311,14 @@ const routes = [
         path: "/graduates",
         name: "graduates",
         component: GraduatesView,
+        meta: {
+          breadcrumb: [{ name: "Summary of Graduates" }],
+        },
+      },
+      {
+        path: "/hei/graduates",
+        name: "heiGraduates",
+        component: HeiGraduatesView,
         meta: {
           breadcrumb: [{ name: "Summary of Graduates" }],
         },
