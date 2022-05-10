@@ -84,7 +84,7 @@
         <div class="bg-light-100 px-4 mb-4 py-4 sm:px-6">
           <button
             type="button"
-            @click="nextPage(application_type)"
+            @click="nextPage()"
             class="
               w-full
               inline-flex
@@ -117,9 +117,8 @@
 
 <script>
 // import { SearchIcon } from "@heroicons/vue/outline";
-import router from "../router";
+
 import Select2 from "vue3-select2-component";
-import Parse from "parse";
 
 export default {
   name: "ModalHei",
@@ -128,20 +127,6 @@ export default {
       results: false,
       value: "",
       placeholder: "Select",
-      newSteps: [
-				{ no: 1, title: "Enrollment for 1st Semester", completed: false },
-				{ no: 2, title: "Enrollment for 2nd Semester", completed: false },
-				{ no: 3, title: "List of Graduates", completed: false },
-				{ no: 4, title: "Application for Approval", completed: false },
-				{ no: 5, title: "Application Complete", completed: false },
-			],
-      additionalSteps: [
-        { no: 1, title: "Notarized Transmittal Letter", completed: false },
-        { no: 2, title: "Proof", completed: false },
-        { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
-      ],
     };
   },
   props: {
@@ -158,8 +143,8 @@ export default {
       function compare(a, b) {
         const heiA = a.text.toUpperCase(); // ignore upper and lowercase
         const heiB = b.text.toUpperCase(); // ignore upper and lowercase
-        if(heiA < heiB) return -1;
-        if(heiA > heiB) return 1;
+        if (heiA < heiB) return -1;
+        if (heiA > heiB) return 1;
         return 0;
       }
       var heiList = this.lists;
@@ -167,66 +152,8 @@ export default {
     },
   },
   methods: {
-    async nextPage(application_type) {
-      if (application_type == "new") {
-        //new application
-        let currentDate = new Date();
-        // var currentDate = dateformat(now, "dddd, mmmm d, yyyy, h:MM TT");
-
-        const Application = Parse.Object.extend("Application");
-        const application = new Application();
-
-        application.set("dateApplied", currentDate);
-        application.set("status", "1 of 5");
-        application.set("steps", this.newSteps);
-        application.set("applicationType", "New Application");
-        application.set("heiId", new Parse.User({ id: this.value }));
-
-        application.save().then(
-          (application) => {
-            router.push({
-              name: "1stStep",
-              params: { step: 1, application: application.id },
-            });
-          },
-          (error) => {
-            alert(
-              "Failed to create new object, with error code: " + error.message
-            );
-          }
-        );
-      
-      } else if (application_type == "additional") {
-        //for additional graduates
-        // const dateformat = require("dateformat");
-        let currentDate = new Date();
-        // var currentDate = dateformat(now, "dddd, mmmm d, yyyy, h:MM TT");
-
-        const Application = Parse.Object.extend("Application");
-        const application = new Application();
-
-        application.set("dateApplied", currentDate);
-        application.set("status", "1 of 5");
-        application.set("steps", this.additionalSteps);
-        application.set("applicationType", "For Additional Graduates");
-        application.set("heiId", new Parse.User({ id: this.value }));
-
-        application.save().then(
-          (application) => {
-            router.push({
-              name: "Step1",
-              params: {
-                application: application.id,
-              },
-            });
-          },
-          (error) => {
-            alert(
-              "Failed to create new object, with error code: " + error.message
-            );
-          }
-        );
-      }
+    nextPage() {
+      this.$emit("createApplication", this.value);
     },
     myChangeEvent(val) {
       console.log(val);

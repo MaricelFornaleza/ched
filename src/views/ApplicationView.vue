@@ -123,7 +123,7 @@
       <ModalHei
         v-show="visible"
         :lists="lists"
-        :application_type="application_type"
+        @createApplication="createApplication"
         @close="toggleModal('')"
       />
     </div>
@@ -139,6 +139,7 @@ import ApplicationDataTable from "@/partials/ApplicationDataTable.vue";
 import ModalHei from "@/partials/ModalHei.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
 import Parse from "parse";
+import router from "../router";
 
 export default {
   name: "ApplicationView",
@@ -166,18 +167,40 @@ export default {
       total_applications: 0,
       status: "",
       message: "",
+      newSteps: [
+        { no: 1, title: "Enrollment for 1st Semester", completed: false },
+        { no: 2, title: "Enrollment for 2nd Semester", completed: false },
+        { no: 3, title: "List of Graduates", completed: false },
+        { no: 4, title: "Application for Approval", completed: false },
+        { no: 5, title: "Application Complete", completed: false },
+      ],
+      additionalSteps: [
+        { no: 1, title: "Notarized Transmittal Letter", completed: false },
+        { no: 2, title: "Proof", completed: false },
+        { no: 3, title: "List of Graduates", completed: false },
+        { no: 4, title: "Application for Approval", completed: false },
+        { no: 5, title: "Application Complete", completed: false },
+      ],
     };
   },
 
   async mounted() {
     this.getHeis();
+    // get current user
+    const user = new Parse.User.current();
+    const usertype = user.get("userType");
+
     var data = [];
     const Applications = Parse.Object.extend("Application");
     const query = new Parse.Query(Applications);
     query.include("heiId");
     query.descending("dateApplied");
+    if (usertype == "hei") {
+      query.equalTo("heiId", new Parse.Object("_User", { id: user.id }));
+    }
 
     const results = await query.find();
+
     // get nstp enrollment
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     var query2 = new Parse.Query(NstpEnrollment);
@@ -367,8 +390,15 @@ export default {
       return { gradCount: grads, prog: program };
     },
     toggleModal(type) {
-      this.visible = !this.visible;
+      // get current user
+      const user = new Parse.User.current();
+      const usertype = user.get("userType");
       this.application_type = type;
+      if (usertype == "admin") {
+        this.visible = !this.visible;
+      } else {
+        this.createApplication(user.id);
+      }
     },
     async getHeis() {
       var heiList = [];
@@ -451,6 +481,66 @@ export default {
       subscription.on("close", () => {
         console.log("subscription closed");
       });
+    },
+    async createApplication(hei) {
+      if (this.application_type == "new") {
+        //new application
+
+        let currentDate = new Date();
+
+        const Application = Parse.Object.extend("Application");
+        const application = new Application();
+
+        application.set("dateApplied", currentDate);
+        application.set("status", "1 of 5");
+        application.set("steps", this.newSteps);
+        application.set("applicationType", "New Application");
+        application.set("heiId", new Parse.User({ id: hei }));
+
+        application.save().then(
+          (application) => {
+            router.push({
+              name: "1stStep",
+              params: { step: 1, application: application.id },
+            });
+          },
+          (error) => {
+            alert(
+              "Failed to create new object, with error code: " + error.message
+            );
+          }
+        );
+      } else if (this.application_type == "additional") {
+        //for additional graduates
+        // const dateformat = require("dateformat");
+        let currentDate = new Date();
+        // var currentDate = dateformat(now, "dddd, mmmm d, yyyy, h:MM TT");
+
+        const Application = Parse.Object.extend("Application");
+        const application = new Application();
+
+        application.set("dateApplied", currentDate);
+        application.set("status", "1 of 5");
+        application.set("steps", this.additionalSteps);
+        application.set("applicationType", "For Additional Graduates");
+        application.set("heiId", new Parse.User({ id: hei }));
+
+        application.save().then(
+          (application) => {
+            router.push({
+              name: "Step1",
+              params: {
+                application: application.id,
+              },
+            });
+          },
+          (error) => {
+            alert(
+              "Failed to create new object, with error code: " + error.message
+            );
+          }
+        );
+      }
     },
     displayAlert(status, msg) {
       this.alert.className = "alert-" + status;
