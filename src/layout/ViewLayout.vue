@@ -4,7 +4,7 @@
       <TopNavigation class="z-[900]" />
       <sidebar-menu
         :menu="menu"
-        class="z-[800]"
+        class="z-[900]"
         @update:collapsed="toggle"
         v-model="collapsed"
       >

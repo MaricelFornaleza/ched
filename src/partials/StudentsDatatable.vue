@@ -2,7 +2,7 @@
   <div class="py-5 w-full">
     <div class="overflow-x-auto">
       <div class="bg-light-100 relative">
-        <div class="flex flex-col w-fit absolute z-40 right-5 top-5">
+        <div class="w-fit absolute z-40 right-5 top-5">
           <button
             @click="exportToExcel()"
             class="
