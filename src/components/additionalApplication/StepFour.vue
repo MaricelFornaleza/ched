@@ -271,8 +271,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -325,7 +323,7 @@ export default {
       results.save();
       this.data.reason = this.value;
       this.setStatus("Rejected");
-      console.log(this.value);
+
       this.toggleModal();
     },
   },

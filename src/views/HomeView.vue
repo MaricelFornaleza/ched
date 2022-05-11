@@ -331,6 +331,7 @@ export default {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.exists("serialNumber");
+      query.equalTo("isGraduated", true);
       this.graduates.total = await query.count();
       query.startsWith("serialNumber", "C");
       this.graduates.cwts = await query.count();

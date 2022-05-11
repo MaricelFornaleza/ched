@@ -321,10 +321,8 @@ export default {
   },
   created() {
     this.filter.condition = new Date().toLocaleString("en", { month: "long" });
-    this.year = new Date().toLocaleString("en", {
-      year: "numeric",
-    });
-    this.setYears();
+
+    this.year = this.years[0];
 
     this.month = new Date().toLocaleString("en", { month: "long" });
     this.getHeis();
@@ -370,13 +368,6 @@ export default {
     setToMonth() {
       this.monthly = !this.monthly;
       this.getMonthlyData();
-    },
-    setYears() {
-      var year = this.year;
-      for (let i = 0; i < 10; i++) {
-        this.years.push(year);
-        year--;
-      }
     },
 
     setCondition(e) {
@@ -528,6 +519,10 @@ export default {
         });
       }
       this.recentApplications = list;
+
+      query.distinct("awardYear").then((res) => {
+        this.years = res;
+      });
 
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");

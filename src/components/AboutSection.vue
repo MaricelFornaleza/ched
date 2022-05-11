@@ -30,9 +30,13 @@
           aenean. Aliquet lectus eget pretium ut.
         </p>
         <div>
-          <button class="btn-sm text-light-100 bg-brand-yellow">
+          <a
+            class="btn-sm text-light-100 bg-brand-yellow"
+            href="https://ched.gov.ph/wp-content/uploads/2017/10/CMO-no.-27-s.-2015.pdf"
+            target="_blank" rel="noopener noreferrer"
+          >
             Learn More
-          </button>
+          </a>
         </div>
       </div>
     </div>

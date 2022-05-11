@@ -6,6 +6,7 @@ import HEIView from "../views/HEIView.vue";
 import ApplicationView from "../views/ApplicationView.vue";
 import EnrollmentView from "../views/EnrollmentView.vue";
 import GraduatesView from "../views/GraduatesView.vue";
+import HeiGraduatesView from "../views/HeiGraduatesView.vue";
 import SerialNumbersView from "../views/SerialNumbersView.vue";
 import ReportSummaryView from "../views/ReportSummaryView.vue";
 import StudentsView from "../views/StudentsView.vue";
@@ -48,11 +49,7 @@ const routes = [
   {
     path: "/nstp",
     component: ViewLayout,
-      beforeEnter: () => {
-        if (Parse.User.current().get("userType") !== "admin") {
-          return { name: '403' }
-        } 
-      }, 
+     
     children: [
       {
         path: "/sample",
@@ -72,7 +69,12 @@ const routes = [
           breadcrumb: [
             {name: 'Home'},
           ]
-        }
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
       {
         path: "/hei",
@@ -82,7 +84,14 @@ const routes = [
           breadcrumb: [
             {name: 'HEI'},
           ]
-        }
+        },
+        
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
+        
         
       },
       {
@@ -91,6 +100,11 @@ const routes = [
         component: NewHei,
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "New" }],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
         
       },
@@ -101,6 +115,17 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "HEI", link: "/hei" }, { name: "Edit" }],
         },
+        
+      },
+      
+      {
+        path: "/my-account/edit/:id",
+        name: "myAccount",
+        component: EditHei,
+        meta: {
+          breadcrumb: [{ name: "My Account" }, { name: "Edit" }],
+        },
+        
       },
       {
         path: "/hei/upload",
@@ -111,6 +136,11 @@ const routes = [
             { name: "HEI", link: "/hei" },
             { name: "Upload Excel File" },
           ],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
       },
       {
@@ -270,12 +300,25 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "Summary of Enrollment" }],
         },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
     
       {
         path: "/graduates",
         name: "graduates",
         component: GraduatesView,
+        meta: {
+          breadcrumb: [{ name: "Summary of Graduates" }],
+        },
+      },
+      {
+        path: "/hei/graduates",
+        name: "heiGraduates",
+        component: HeiGraduatesView,
         meta: {
           breadcrumb: [{ name: "Summary of Graduates" }],
         },
@@ -296,6 +339,11 @@ const routes = [
         meta: {
           breadcrumb: [{ name: "Serial Numbers" }],
         },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
+        },
       },
       {
         path: "/report-summary",
@@ -303,6 +351,11 @@ const routes = [
         component: ReportSummaryView,
         meta: {
           breadcrumb: [{ name: "Report Summary" }],
+        },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") !== "admin" ) {
+            return { name: '403' }
+          } 
         },
       },
     ],

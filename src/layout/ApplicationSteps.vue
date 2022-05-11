@@ -206,6 +206,11 @@ export default {
       }
     },
     sendEmail(document, title) {
+      var date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
       const params = {
         title: title,
         name: this.hei,
@@ -213,6 +218,7 @@ export default {
         document: document,
         type: "Notification",
         approved: true,
+        date: date,
       };
       Parse.Cloud.run("sendEmailNotification", params);
     },

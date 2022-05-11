@@ -22,10 +22,10 @@ onmessage = function(event) {
             rows.push(rowObj[i]);
     }*/
     for(var i=0; i<rowObj.length; i++){
-        if(i ==  5 && Object.keys(rowObj[5]).length == 12) {
-            headers = rowObj[5];
+        if(i ==  6 && Object.keys(rowObj[6]).length == 11) {
+            headers = rowObj[6];
         } 
-        else if (Object.keys(rowObj[i]).length == 12) {
+        else if (Object.keys(rowObj[i]).length == 11) {
             rows.push(rowObj[i]);
         }
     }

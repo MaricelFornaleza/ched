@@ -120,8 +120,9 @@ import file from "@/assets/sidebar_icons/file.svg";
 import cap from "@/assets/sidebar_icons/cap.svg";
 import code from "@/assets/sidebar_icons/code.svg";
 import report from "@/assets/sidebar_icons/report.svg";
+import userIcon from "@/assets/sidebar_icons/user.svg";
 import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
-
+import Parse from "parse";
 export default {
   name: "ViewLayout",
   components: {
@@ -135,70 +136,8 @@ export default {
     return {
       collapsed: true,
       breadcrumbs: [],
-
-      menu: [
-        {
-          href: "/home",
-          title: "Home",
-          icon: {
-            element: "img",
-            attributes: { src: home },
-          },
-        },
-
-        {
-          href: "/hei",
-          title: "HEI",
-          icon: {
-            element: "img",
-            attributes: { src: hei },
-          },
-        },
-        {
-          href: "/application",
-          title: "Application",
-          icon: {
-            element: "img",
-            attributes: { src: file },
-          },
-        },
-        {
-          header: "Reports",
-          hiddenOnCollapse: true,
-        },
-        {
-          href: "/enrollment",
-          title: "Summary of Enrollment",
-          icon: {
-            element: "img",
-            attributes: { src: cap },
-          },
-        },
-        {
-          href: "/graduates",
-          title: "Summary of Graduates",
-          icon: {
-            element: "img",
-            attributes: { src: cap },
-          },
-        },
-        {
-          href: "/serial-numbers",
-          title: "Serial Numbers",
-          icon: {
-            element: "img",
-            attributes: { src: code },
-          },
-        },
-        {
-          href: "/report-summary",
-          title: "Report Summary",
-          icon: {
-            element: "img",
-            attributes: { src: report },
-          },
-        },
-      ],
+      menu: [],
+      usertype: null,
     };
   },
   watch: {
@@ -208,9 +147,116 @@ export default {
   },
   mounted() {
     this.updateList();
+    this.getMenu();
   },
 
   methods: {
+    getMenu() {
+      const user = new Parse.User.current();
+      this.usertype = user.get("userType");
+      const id = user.id;
+      if (this.usertype == "admin") {
+        this.menu = [
+          {
+            href: "/home",
+            title: "Home",
+            icon: {
+              element: "img",
+              attributes: { src: home },
+            },
+          },
+
+          {
+            href: "/hei",
+            title: "HEI",
+            icon: {
+              element: "img",
+              attributes: { src: hei },
+            },
+          },
+          {
+            href: "/application",
+            title: "Application",
+            icon: {
+              element: "img",
+              attributes: { src: file },
+            },
+          },
+          {
+            header: "Reports",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/enrollment",
+            title: "Summary of Enrollment",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+          {
+            href: "/graduates",
+            title: "Summary of Graduates",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+          {
+            href: "/serial-numbers",
+            title: "Serial Numbers",
+            icon: {
+              element: "img",
+              attributes: { src: code },
+            },
+          },
+          {
+            href: "/report-summary",
+            title: "Report Summary",
+            icon: {
+              element: "img",
+              attributes: { src: report },
+            },
+          },
+        ];
+      } else if (this.usertype == "hei") {
+        this.menu = [
+          {
+            href: "/application",
+            title: "Application",
+            icon: {
+              element: "img",
+              attributes: { src: file },
+            },
+          },
+          {
+            header: "Reports",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/hei/graduates",
+            title: "Summary of Graduates",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+          {
+            header: "Account Settings",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/my-account/edit/" + id,
+            title: "My Account",
+            icon: {
+              element: "img",
+              attributes: { src: userIcon },
+            },
+          },
+        ];
+      }
+      console.log(this.usertype);
+    },
     updateList() {
       this.breadcrumbs = this.$route.meta.breadcrumb;
     },
