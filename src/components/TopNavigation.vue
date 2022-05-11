@@ -34,11 +34,12 @@
         class="
           flex
           items-center
-          gap-2
+          gap-4
           lg:order-last lg:right-0 lg:absolute lg:pr-10
         "
       >
-        <button><BellIcon class="h-6" /></button>
+        <NotificationContainer />
+
         <button class="gap-2 flex" @click="logout()">
           <LogoutIcon class="h-6" />
           <div class="hidden lg:block">Logout</div>
@@ -48,14 +49,15 @@
   </div>
 </template>
 <script>
-import { BellIcon, LogoutIcon } from "@heroicons/vue/outline";
+import { LogoutIcon } from "@heroicons/vue/outline";
+import NotificationContainer from "@/partials/NotificationContainer.vue";
 import Parse from "parse";
 
 export default {
   name: "TopNavigation",
   components: {
-    BellIcon,
     LogoutIcon,
+    NotificationContainer,
   },
   methods: {
     async logout() {
