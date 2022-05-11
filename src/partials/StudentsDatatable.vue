@@ -1,8 +1,8 @@
 <template>
   <div class="py-5 w-full">
     <div class="overflow-x-auto">
-      <div class="flex space-x-5 absolute right-20 mt-5 z-10">
-        <div class="flex flex-col">
+      <div class="bg-light-100 relative">
+        <div class="flex flex-col w-fit absolute z-40 right-5 top-5">
           <button
             @click="exportToExcel()"
             class="
@@ -17,9 +17,11 @@
             <DownloadIcon class="h-5" />
           </button>
         </div>
-      </div>
-      <div class="inline-block bg-light-200">
-        <table :id="tableId" class="p-4 hover text-center w-full row-border">
+        <table
+          :id="tableId"
+          width="100%"
+          class="p-4 hover text-center w-full row-border z-10"
+        >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
               <th class="p-6">No.</th>
