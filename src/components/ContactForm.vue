@@ -173,7 +173,7 @@
   </div>
 </template>
 <script>
-import Parse from "parse";
+
 export default {
   mounted() {
     let externalScript = document.createElement("script");
@@ -190,14 +190,9 @@ export default {
   },
   methods: {
     sendEmail() {
-<<<<<<< HEAD
-      const params = {name:this.name, email:this.email, type:"Contact", message:this.message, approved:true};
-      Parse.Cloud.run("contactForm", params);
-=======
       //just commented out to work, pass is not defined error
       // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
       // Parse.Cloud.run("contactForm", params);
->>>>>>> 6b97aae62b1704f51d3c37418825332ffaf33913
 
       this.province = "";
       this.name = "";

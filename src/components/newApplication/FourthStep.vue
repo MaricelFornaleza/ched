@@ -307,6 +307,14 @@ export default {
           start++;
         }
       });
+
+      const notification = new Parse.Object("Notification");
+      notification.set("applicationId", this.appId);
+      notification.set("message", "Application with id number ${this.appId} is Approved");
+      notification.set("routeName", "Step4");
+      notification.set("isRead", false);
+      notification.save();
+
       this.$emit("setStatus", "Approved");
       this.$emit("complete", 4);
       this.$emit("nextStep");

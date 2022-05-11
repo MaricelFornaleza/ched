@@ -19,11 +19,8 @@
     "datatables.net-dt": "^1.11.5",
     "emailjs": "^3.8.0",
     "emailjs-com": "^3.2.0",
-<<<<<<< HEAD
-    "firebase": "^9.7.0",
-=======
+    "firebase": "^8.2.7",
     "html2pdf.js": "^0.10.1",
->>>>>>> 6b97aae62b1704f51d3c37418825332ffaf33913
     "jquery": "^3.6.0",
     "lottie-vuejs": "^0.4.0",
     "parse": "^3.4.1",
