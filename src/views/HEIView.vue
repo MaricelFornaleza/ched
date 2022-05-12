@@ -224,7 +224,7 @@ export default {
     this.countLUC = await query.count();
     query.equalTo("type", "SUC");
     this.countSUC = await query.count();
-    query.equalTo("type", "Private");
+    query.equalTo("type", "PRIVATE");
     this.countPrivate = await query.count();
     query.equalTo("type", "OGS");
     this.countOGS = await query.count();
