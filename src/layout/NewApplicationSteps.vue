@@ -28,7 +28,10 @@
                 currentStep === step.no
                   ? 'bg-info-dark border-light-100 text-light-100'
                   : 'border-light-400',
-                step.completed ? 'border-info' : '',
+                step.completed && currentStep != step.no ? 'border-info' : '',
+                step.completed && currentStep === step.no
+                  ? 'border-light-100'
+                  : '',
               ]"
             >
               <div v-if="step.completed"><CheckIcon class="h-5" /></div>
