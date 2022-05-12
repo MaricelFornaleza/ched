@@ -51,10 +51,18 @@
           >
             Back
           </button>
-          <button @click="toggleModal()" class="btn-sm text-light-100 bg-error">
+          <button
+            v-if="isAdmin"
+            @click="toggleModal()"
+            class="btn-sm text-light-100 bg-error"
+          >
             Reject
           </button>
-          <button @click="approve()" class="btn-sm text-light-100 bg-success">
+          <button
+            v-if="isAdmin"
+            @click="approve()"
+            class="btn-sm text-light-100 bg-success"
+          >
             Approve
           </button>
         </div>
@@ -171,6 +179,7 @@ export default {
       },
       visible: false,
       value: "",
+      isAdmin: false,
     };
   },
   props: {
@@ -181,6 +190,10 @@ export default {
   },
   mounted() {
     this.getData();
+    const user = Parse.User.current();
+    if (user.get("userType" == "admin")) {
+      this.isAdmin = true;
+    }
   },
   methods: {
     variant(stats) {
@@ -271,8 +284,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -325,7 +336,7 @@ export default {
       results.save();
       this.data.reason = this.value;
       this.setStatus("Rejected");
-      console.log(this.value);
+
       this.toggleModal();
     },
   },

@@ -6,51 +6,56 @@
       </AlertWidget>
     </div>
     <div v-else>
-      <table :data="data" class="w-full mx-auto lg:w-1/2 my-20 text-left">
-        <tbody>
-          <tr>
-            <td class="border p-2">Application Date</td>
-            <td class="border p-2">{{ data.dateApplied }}</td>
-          </tr>
-          <tr>
-            <td class="border p-2">Date Approved</td>
-            <td class="border p-2">
-              {{ data.dateApproved }}
-            </td>
-          </tr>
-          <tr>
-            <td class="border p-2">Number of Graduates</td>
-            <td class="border p-2">{{ data.graduates }}</td>
-          </tr>
-          <tr>
-            <td class="border p-2">NSTP Program</td>
-            <td class="border p-2">{{ data.program }}</td>
-          </tr>
-          <tr>
-            <td class="border p-2">Award Year</td>
-            <td class="border p-2">{{ data.awardYear }}</td>
-          </tr>
-          <tr>
-            <td class="border p-2">Serial Number Range</td>
-            <td class="border p-2">
-              {{ data.snRange }}
-            </td>
-          </tr>
-
-          <tr>
-            <td class="border p-2">Students's Serial Number</td>
-            <td class="border p-2">
-              <button 
-                class="underline font-bold hover:text-brand-blue cursor-pointer"
-                @click="downloadSN()"
-              >
-                 Download
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
+      <div
+        class="
+          shadow-md
+          p-5
+          border
+          text-left
+          border-light-200
+          my-10
+          grid
+          xl:grid-cols-2
+          w-full
+          xl:w-1/2 xl:divide-x
+          divide-light-300
+          space-y-2
+          mx-auto
+        "
+      >
+        <div class="flex flex-col space-y-2">
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">Application Date:</div>
+            <div class="">{{ data.dateApplied }}</div>
+          </div>
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">Date Approved:</div>
+            <div class="">{{ data.dateApproved }}</div>
+          </div>
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">No. of Graduates:</div>
+            <div class="">{{ data.graduates }}</div>
+          </div>
+        </div>
+        <div class="flex flex-col space-y-2 xl:pl-5">
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">NSTP Program:</div>
+            <div class="">{{ data.program }}</div>
+          </div>
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">Award Year:</div>
+            <div class="">{{ data.awardYear }}</div>
+          </div>
+          <div class="grid grid-cols-2 text-sm">
+            <div class="font-bold">Serial Number Range:</div>
+            <div class="">{{ data.snRange }}</div>
+          </div>
+        </div>
+      </div>
+      <view-students-datatable
+        :students="students"
+        :key="componentKey"
+      ></view-students-datatable>
       <div class="flex justify-center space-x-5">
         <button
           @click="$emit('previousStep')"
@@ -73,11 +78,13 @@
 <script>
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
+import ViewStudentsDatatable from "@/partials/ViewStudentsDatatable.vue";
 
 export default {
   components: {
     AlertWidget,
+    ViewStudentsDatatable,
   },
   data() {
     return {
@@ -88,20 +95,28 @@ export default {
         graduates: 0,
         program: "",
         awardYear: "",
-        snRange: ""
+        snRange: "",
       },
+      students: [],
+      componentKey: 0,
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean, hei_username: String },
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    allow: Boolean,
+    hei_username: String,
+  },
 
   mounted() {
     this.getData();
     console.log(this.isCompleted);
-    // var user = Parse.User.current();
-    // var name= user.get("username");
-    // console.log(name);
+    this.getStudents();
   },
   methods: {
+    forceRerender() {
+      this.componentKey += 1;
+    },
     variant(stats) {
       if (stats == "Approved") {
         return "badge-success";
@@ -114,9 +129,50 @@ export default {
         return "badge";
       }
     },
+    async getStudents() {
+      var data = [];
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.include("applicationId");
+      query.include("studentId");
+      query.include("nstpId");
+      const results = await query.find();
+
+      for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+        data.push({
+          no: i,
+          awardYear: object.get("applicationId").get("academicYear"),
+          nstpProgram: object.get("nstpId").get("programName"),
+          region:
+            object.get("applicationId").get("heiId").get("address").regionNo +
+            " - " +
+            object.get("applicationId").get("heiId").get("address").regionName,
+          serialNumber: object.get("serialNumber"),
+          name: object.get("studentId").get("name"),
+          birthdate: object.get("studentId").get("birthdate"),
+          gender: object.get("studentId").get("gender"),
+          address: object.get("studentId").get("address"),
+          heiName: object.get("applicationId").get("heiId").get("name"),
+          institutionalCode: object
+            .get("applicationId")
+            .get("heiId")
+            .get("institutionalCode"),
+          heiType: object.get("applicationId").get("heiId").get("type"),
+          program: object.get("studentId").get("program"),
+          emailAddress: object.get("studentId").get("emailAddress"),
+          contactNumber: object.get("studentId").get("contactNumber"),
+        });
+      }
+      this.students = data;
+      this.forceRerender();
+    },
     async downloadSN() {
-      console.log("download starting...");
-      // console.log(this.hei_username);
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo(
@@ -141,28 +197,48 @@ export default {
           serialNumber: element.get("serialNumber"),
         });
       }
-       /* generate worksheet and workbook */
+      /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
       const worksheetName = "List of Students";
       const workbook = XLSX.utils.book_new();
-      const currentDate = new Date().toLocaleDateString().replace(/[^\w\s]/gi, "-");
-      const workbookName = `Issued-SN-${this.hei_username}_${currentDate}.xlsx`;    //update to include name of HEI
+      const currentDate = new Date()
+        .toLocaleDateString()
+        .replace(/[^\w\s]/gi, "-");
+      const workbookName = `Issued-SN-${this.hei_username}_${currentDate}.xlsx`; //update to include name of HEI
       XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName);
 
       /* fix headers */
       // currently, styling cell values is only supported in SheetJS pro version :(
-      // although, there are community forks alternatives to make this possible such as xlsx-js-style 
+      // although, there are community forks alternatives to make this possible such as xlsx-js-style
       // ... to be updated
-      const headers = ["AWARD YEAR", "PROGRAM NAME", "LAST NAME", "FIRST NAME", "MIDDLE NAME", "EXTENSION NAME", "SERIAL NUMBER"]
+      const headers = [
+        "AWARD YEAR",
+        "PROGRAM NAME",
+        "LAST NAME",
+        "FIRST NAME",
+        "MIDDLE NAME",
+        "EXTENSION NAME",
+        "SERIAL NUMBER",
+      ];
       XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
-       
+
       /* calculate max column width */
-      const max_width = students.reduce((w, r) => Math.max(w, r.serialNumber.length), 10);
-      worksheet["!cols"] = [ { wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width },{ wch: max_width } ];
+      const max_width = students.reduce(
+        (w, r) => Math.max(w, r.serialNumber.length),
+        10
+      );
+      worksheet["!cols"] = [
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+        { wch: max_width },
+      ];
 
       /* create an XLSX file and try to save to xlsx file*/
       XLSX.writeFileXLSX(workbook, workbookName);
-
     },
     async getData() {
       let _this = this;
@@ -221,9 +297,9 @@ export default {
       this.getData();
     },
     goToApplication() {
-      this.$emit('complete', 5);
+      this.$emit("complete", 5);
       this.$emit("goToApplication");
-    }
+    },
   },
 };
 </script>

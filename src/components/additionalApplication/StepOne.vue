@@ -170,7 +170,6 @@ export default {
   },
   created() {
     this.getUrl(this.appId);
-    console.log(this.allow);
   },
   methods: {
     validate(filename) {
@@ -221,8 +220,6 @@ export default {
                 .getElementById("fileurl")
                 .setAttribute("href", docs.url());
             });
-
-            console.log("File has been uploaded! ");
           },
           function (error) {
             // The file either could not be read, or could not be saved to Parse.

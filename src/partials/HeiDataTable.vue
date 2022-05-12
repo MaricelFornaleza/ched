@@ -28,7 +28,7 @@
             >
               {{ table_header.title }}
             </th>
-            <th class="px-6 py-2">Edit</th>
+            <th class="px-6 py-2"></th>
             <!-- <th class="px-6 py-2">Delete</th> -->
           </tr>
         </thead>
@@ -38,10 +38,12 @@
               {{ hei.institutional_code }}
             </td>
             <td class="px-6 py-4 text-left">
-              <div class="text-xs font-bold text-gray-900">
+              <div class="text-xs font-bold text-gray-900 uppercase">
                 {{ hei.hei_username }}
               </div>
-              <div class="text-sm text-gray-900">{{ hei.hei_name }}</div>
+              <div class="text-sm text-gray-900 uppercase">
+                {{ hei.hei_name }}
+              </div>
             </td>
             <td class="px-6 py-4 text-center">
               <div class="text-sm text-gray-500">{{ hei.hei_type }}</div>
@@ -51,7 +53,7 @@
             </td>
             <td class="px-6 py-4 text-sm text-left text-gray-500">
               <div class="text-sm text-gray-900">
-                {{ hei.address.street }} {{ hei.address.barangay }},
+                {{ hei.address.barangay }},
                 {{ hei.address.city }}
               </div>
               <div class="text-xs text-gray-900">

@@ -97,8 +97,8 @@
               <th v-for="table_header in table_headers" :key="table_header">
                 {{ table_header.title }}
               </th>
-              <th class="px-6 py-2 text-xs text-gray-500">View</th>
-              <th class="px-6 py-2 text-xs text-gray-500">Delete</th>
+              <th></th>
+              <!-- <th></th> -->
             </tr>
           </thead>
           <tbody class="bg-white text-sm">
@@ -149,7 +149,7 @@
                   application.status
                 }}</span>
               </td>
-              <td class="px-6 py-0">
+              <td class="px-6 py-0 flex space-x-3 justify-start">
                 <EyeIcon
                   @click="
                     viewApplication(
@@ -157,10 +157,8 @@
                       application.application_type
                     )
                   "
-                  class="h-6 mx-auto cursor-pointer"
+                  class="h-6 cursor-pointer"
                 />
-              </td>
-              <td class="px-6 py-4">
                 <TrashIcon
                   @click="
                     deleteApplication(
@@ -169,15 +167,17 @@
                       application.status
                     )
                   "
-                  class="h-6 mx-auto text-error"
+                  class="h-6 text-error"
                   :class="[
                     application.application_type == 'New Application'
                       ? application.status == '1 of 5'
                         ? 'cursor-pointer'
-                        : 'opacity-50 cursor-pointer'
-                      : application.status == '1 of 5' || application.status == '2 of 5' || application.status == '3 of 5'
+                        : 'hidden'
+                      : application.status == '1 of 5' ||
+                        application.status == '2 of 5' ||
+                        application.status == '3 of 5'
                       ? 'cursor-pointer'
-                      : 'opacity-50 cursor-pointer',
+                      : 'hidden',
                   ]"
                 />
               </td>
@@ -315,7 +315,11 @@ export default {
           this.displayMsg("error", "Cannot delete application after step 1!");
         }
       } else if (app_type == "For Additional Graduates") {
-        if (app_status == "1 of 5" || app_status == "2 of 5" || app_status == "3 of 5") {
+        if (
+          app_status == "1 of 5" ||
+          app_status == "2 of 5" ||
+          app_status == "3 of 5"
+        ) {
           if (confirm("Are you sure to delete?")) {
             // to be updated
             // Application

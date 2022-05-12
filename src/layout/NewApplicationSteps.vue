@@ -2,7 +2,7 @@
   <div class="p-10">
     <div class="font-bold uppercase mb-3">{{ hei }}</div>
     <div class="bg-light-100 h-full w-full p-5 text-center">
-      <div class="flex border-light-300 border-2">
+      <div class="flex">
         <div
           v-for="step in steps"
           :key="step.no"
@@ -26,12 +26,16 @@
               "
               :class="[
                 currentStep === step.no
-                  ? 'bg-brand-blue border-brand-blue text-light-100'
+                  ? 'bg-info-dark border-light-100 text-light-100'
                   : 'border-light-400',
-                step.completed ? 'border-light-100' : '',
+                step.completed && currentStep != step.no ? 'border-info' : '',
+                step.completed && currentStep === step.no
+                  ? 'border-light-100'
+                  : '',
               ]"
             >
-              {{ step.no }}
+              <div v-if="step.completed"><CheckIcon class="h-5" /></div>
+              <div v-else>{{ step.no }}</div>
             </div>
             <div class="text-xs text-left">
               <div class="uppercase font-bold">Step {{ step.no }}</div>
@@ -59,7 +63,12 @@
 <script>
 import router from "../router";
 import Parse from "parse";
+import { CheckIcon } from "@heroicons/vue/outline";
+
 export default {
+  components: {
+    CheckIcon,
+  },
   data() {
     return {
       hei: "",
@@ -200,68 +209,24 @@ export default {
         this.allow = true;
       }
     },
+    sendEmail(document, title) {
+      var date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      const params = {
+        title: title,
+        name: this.hei,
+        email: this.hei_email,
+        document: document,
+        type: "Notification",
+        approved: true,
+        date: date,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
+    },
   },
-  components: {},
 };
 </script>
 
-
-<style>
-.step {
-  position: relative;
-  width: 20%;
-  height: 100px;
-  margin-left: 0;
-  color: theme("colors.dark.300");
-  background-color: theme("colors.light.300");
-  text-align: center;
-}
-.step:after {
-  content: "";
-  position: absolute;
-  left: 100%;
-  top: 0px;
-  width: 0px;
-  height: 0px;
-  border-top: 50px solid transparent;
-  border-left: 20px solid theme("colors.light.300");
-  border-bottom: 50px solid transparent;
-}
-.step:nth-of-type(1) {
-  z-index: 5;
-}
-.step:nth-of-type(2) {
-  z-index: 4;
-  padding-left: 25px;
-}
-.step:nth-of-type(3) {
-  z-index: 3;
-  padding-left: 25px;
-}
-.step:nth-of-type(4) {
-  z-index: 2;
-  padding-left: 25px;
-}
-.step:nth-of-type(5) {
-  z-index: 1;
-  padding-left: 25px;
-}
-.active {
-  background-color: theme("colors.light.100") !important;
-  color: theme("colors.brand.blue") !important;
-}
-.active:after {
-  border-left: 20px solid theme("colors.light.100") !important;
-}
-.completed {
-  background-color: theme("colors.brand.blue");
-  color: theme("colors.light.100");
-}
-.completed:after {
-  border-left: 20px solid theme("colors.brand.blue");
-}
-.step:nth-of-type(5):after,
-.completed:nth-of-type(5):after {
-  border-left: 0px !important;
-}
-</style>  

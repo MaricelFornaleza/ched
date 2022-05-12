@@ -318,7 +318,11 @@ export default {
             self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "3 of 5");
-             self.$emit("sendEmail", "List of Enrollment for the 2nd Semester", "Step 2 of 5");
+            self.$emit(
+              "sendEmail",
+              "List of Enrollment for the 2nd Semester",
+              "Step 2 of 5"
+            );
 
             // this.completed = !this.completed;
           } else {
@@ -496,6 +500,9 @@ export default {
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
             address: object.get("studentId").get("address"),
+            program: object.get("studentId").get("program"),
+            emailAddress: object.get("studentId").get("emailAddress"),
+            contactNumber: object.get("studentId").get("contactNumber"),
           });
           if (
             object.get("studentId").get("gender").toUpperCase() == "F" ||

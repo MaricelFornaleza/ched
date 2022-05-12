@@ -213,8 +213,7 @@ export default {
             _this.worker.onmessage = function (event) {
               _this.table_headers = event.data.headers;
               var heis = event.data.rows;
-              console.log(_this.table_headers);
-              console.log(heis);
+
               _this.storeHeis(heis);
 
               if (event.data.complete) {
@@ -246,19 +245,18 @@ export default {
         user.set("institutionalCode", data[i].A);
         user.set("name", data[i].B);
         user.set("address", {
-          street: data[i].C,
-          barangay: data[i].D,
-          city: data[i].E,
-          province: data[i].F,
-          regionNo: data[i].G.toString(),
-          regionName: data[i].H,
+          barangay: data[i].C,
+          city: data[i].D,
+          province: data[i].E,
+          regionNo: data[i].F.toString(),
+          regionName: data[i].G,
         });
-        user.set("email", data[i].I);
-        user.set("contactNumber", data[i].J);
-        user.set("type", data[i].K);
+        user.set("email", data[i].H);
+        user.set("contactNumber", data[i].I);
+        user.set("type", data[i].J);
         user.set("userType", "hei");
         user.set("password", password);
-        user.set("username", data[i].L);
+        user.set("username", data[i].K);
 
         user.save().then(() => {
           const params = {
@@ -269,8 +267,6 @@ export default {
             approved: true,
           };
           Parse.Cloud.run("sendEmailNotification", params);
-
-          console.log("success");
         });
       }
     },

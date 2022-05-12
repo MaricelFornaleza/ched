@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="flex">
-      <TopNavigation class="z-40" />
+      <TopNavigation class="z-[900]" />
       <sidebar-menu
         :menu="menu"
-        class="z-10"
+        class="z-[900]"
         @update:collapsed="toggle"
         v-model="collapsed"
       >
@@ -36,7 +36,18 @@
             : 'pl-[65px] transition-width duration-300'
         "
       >
-        <div class="breadcrumbs mt-14 w-full bg-light-100 p-3 fixed shadow-sm">
+        <div
+          class="
+            breadcrumbs
+            mt-14
+            w-full
+            z-[700]
+            bg-light-100
+            p-3
+            fixed
+            shadow-sm
+          "
+        >
           <ul class="flex space-x-3 text-sm">
             <li
               class="list space-x-3 cursor-pointer"
@@ -120,6 +131,7 @@ import file from "@/assets/sidebar_icons/file.svg";
 import cap from "@/assets/sidebar_icons/cap.svg";
 import code from "@/assets/sidebar_icons/code.svg";
 import report from "@/assets/sidebar_icons/report.svg";
+import userIcon from "@/assets/sidebar_icons/user.svg";
 import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
 import Parse from "parse";
 export default {
@@ -136,6 +148,7 @@ export default {
       collapsed: true,
       breadcrumbs: [],
       menu: [],
+      usertype: null,
     };
   },
   watch: {
@@ -151,8 +164,9 @@ export default {
   methods: {
     getMenu() {
       const user = new Parse.User.current();
-      const usertype = user.get("userType");
-      if (usertype == "admin") {
+      this.usertype = user.get("userType");
+      const id = user.id;
+      if (this.usertype == "admin") {
         this.menu = [
           {
             href: "/home",
@@ -216,7 +230,7 @@ export default {
             },
           },
         ];
-      } else if (usertype == "hei") {
+      } else if (this.usertype == "hei") {
         this.menu = [
           {
             href: "/application",
@@ -231,16 +245,28 @@ export default {
             hiddenOnCollapse: true,
           },
           {
-            href: "/graduates",
+            href: "/hei/graduates",
             title: "Summary of Graduates",
             icon: {
               element: "img",
               attributes: { src: cap },
             },
           },
+          {
+            header: "Account Settings",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/my-account/edit/" + id,
+            title: "My Account",
+            icon: {
+              element: "img",
+              attributes: { src: userIcon },
+            },
+          },
         ];
       }
-      console.log(usertype);
+      console.log(this.usertype);
     },
     updateList() {
       this.breadcrumbs = this.$route.meta.breadcrumb;

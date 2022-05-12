@@ -479,6 +479,9 @@ export default {
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
             address: object.get("studentId").get("address"),
+            program: object.get("studentId").get("program"),
+            emailAddress: object.get("studentId").get("emailAddress"),
+            contactNumber: object.get("studentId").get("contactNumber"),
           });
           if (
             object.get("studentId").get("gender").toUpperCase() == "F" ||
