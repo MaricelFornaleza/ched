@@ -97,6 +97,7 @@
             The list for the 2nd semester was successfully uploaded. An
             Acknowledgement letter was sent to the email address.
           </SuccessAlert>
+          <ApplicationDetails :appId="appId" />
 
           <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
             <div class="flex flex-col items-center">
@@ -231,6 +232,8 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import ApplicationDetails from "@/partials/ApplicationDetails.vue";
+
 import { XCircleIcon } from "@heroicons/vue/outline";
 
 import { ref } from "vue";
@@ -263,6 +266,7 @@ export default {
     StudentsDataTable,
     ModalWidget,
     XCircleIcon,
+    ApplicationDetails,
   },
   setup() {
     let dropzoneFile = ref("");
