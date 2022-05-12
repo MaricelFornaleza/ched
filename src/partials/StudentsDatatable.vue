@@ -19,21 +19,25 @@
         </div>
         <table
           :id="tableId"
-          width="100%"
+          width="150%"
           class="p-4 hover text-center w-full row-border z-10"
         >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
               <th class="p-6">No.</th>
-              <th class="text-left">Last name</th>
-              <th>First name</th>
+              <th class="text-left">Last Name</th>
+              <th>First Name</th>
               <th>Extension Name</th>
-              <th>Middle</th>
+              <th>Middle Name</th>
               <th>Birthdate</th>
               <th>Sex</th>
               <th>Street/Brgy.</th>
               <th>Town/City</th>
               <th>Province</th>
+              <th>Program Level Code</th>
+              <th>Main program name</th>
+              <th>Email address</th>
+              <th>Contact number</th>
             </tr>
           </thead>
           <tbody class="bg-white text-sm">
@@ -62,6 +66,10 @@
               <td class="px-6 py-4">{{ student.address.street }}</td>
               <td class="px-6 py-4">{{ student.address.city }}</td>
               <td class="px-6 py-4">{{ student.address.province }}</td>
+              <td class="px-6 py-4">{{ student.program.programLevelCode }}</td>
+              <td class="px-6 py-4">{{ student.program.programName }}</td>
+              <td class="px-6 py-4">{{ student.emailAddress }}</td>
+              <td class="px-6 py-4">{{ student.contactNumber }}</td>
             </tr>
           </tbody>
         </table>
