@@ -195,7 +195,7 @@ export default {
       options: null,
     };
   },
-  mounted() {
+  created() {
     this.getHeis();
     this.getApplications();
     this.getGraduates();

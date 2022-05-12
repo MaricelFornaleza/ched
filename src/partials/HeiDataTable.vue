@@ -28,7 +28,7 @@
             >
               {{ table_header.title }}
             </th>
-            <th class="px-6 py-2">Edit</th>
+            <th class="px-6 py-2"></th>
             <!-- <th class="px-6 py-2">Delete</th> -->
           </tr>
         </thead>

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="flex">
-      <TopNavigation class="z-40" />
+      <TopNavigation class="z-[900]" />
       <sidebar-menu
         :menu="menu"
-        class="z-10"
+        class="z-[900]"
         @update:collapsed="toggle"
         v-model="collapsed"
       >
@@ -36,7 +36,18 @@
             : 'pl-[65px] transition-width duration-300'
         "
       >
-        <div class="breadcrumbs mt-14 w-full bg-light-100 p-3 fixed shadow-sm">
+        <div
+          class="
+            breadcrumbs
+            mt-14
+            w-full
+            z-[700]
+            bg-light-100
+            p-3
+            fixed
+            shadow-sm
+          "
+        >
           <ul class="flex space-x-3 text-sm">
             <li
               class="list space-x-3 cursor-pointer"

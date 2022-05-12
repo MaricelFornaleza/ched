@@ -25,7 +25,7 @@
             <th colspan="3" class="p-8 border-l border-light-400">CWTS</th>
             <th colspan="3" class="p-8 border-l border-light-400">LTS</th>
             <th colspan="3" class="p-8 border-x border-light-400">ROTC</th>
-            <th rowspan="2" class="px-6 py-2">Action</th>
+            <th rowspan="2" class="px-6 py-2"></th>
           </tr>
           <tr>
             <th class="p-8 border-l border-light-400">Male</th>
