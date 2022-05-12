@@ -195,11 +195,16 @@ export default {
       options: null,
     };
   },
-  mounted() {
+  async created() {
     this.getHeis();
     this.getApplications();
     this.getGraduates();
     this.getData();
+  },
+  computed: {
+    reverseApplications() {
+      return this.recentApplications.slice().reverse();
+    },
   },
   methods: {
     exportToPDF() {
@@ -280,30 +285,176 @@ export default {
       this.options = options;
     },
     async getHeis() {
-      const query = new Parse.Query(Parse.User);
-      query.equalTo("userType", "hei");
-      this.hei.total = await query.count();
-      query.equalTo("type", "LUC");
-      this.hei.countLuc = await query.count();
-      query.equalTo("type", "SUC");
-      this.hei.countSuc = await query.count();
-      query.equalTo("type", "Private");
-      this.hei.countPrivate = await query.count();
-      query.equalTo("type", "OGS");
-      this.hei.countOgs = await query.count();
+      const heiQuery = new Parse.Query(Parse.User);
+      heiQuery.equalTo("userType", "hei");
+      const userSubscription = await heiQuery.subscribe();
+
+      userSubscription.on("open", async () => {
+        console.log("heiHome subscription opened");
+        // can get the list here
+        var heis = await heiQuery.find();
+        this.hei.total = heis.length;
+        this.hei.countLuc = heis.filter((data) =>
+          data.get("type").match("LUC")
+        ).length;
+        this.hei.countSuc = heis.filter((data) =>
+          data.get("type").match("SUC")
+        ).length;
+        this.hei.countPrivate = heis.filter((data) =>
+          data.get("type").match("Private")
+        ).length;
+        this.hei.countOgs = heis.filter((data) =>
+          data.get("type").match("OGS")
+        ).length;
+        // this.hei.total = await query.count();
+        // query.equalTo("type", "LUC");
+        // this.hei.countLuc = await query.count();
+        // query.equalTo("type", "SUC");
+        // this.hei.countSuc = await query.count();
+        // query.equalTo("type", "Private");
+        // this.hei.countPrivate = await query.count();
+        // query.equalTo("type", "OGS");
+        // this.hei.countOgs = await query.count();
+      });
+
+      userSubscription.on("create", (object) => {
+        console.log("object created" + object);
+        this.hei.total++;
+        switch (object.get("type")) {
+          case "LUC":
+            this.hei.countLuc++;
+            break;
+          case "SUC":
+            this.hei.countSuc++;
+            break;
+          case "Private":
+            this.hei.countPrivate++;
+            break;
+          case "OGS":
+            this.hei.countOgs++;
+            break;
+        }
+      });
+
+      userSubscription.on("update", async (object) => {
+        console.log("object updated" + object);
+        //just update them all
+        var heis = await heiQuery.find();
+        this.hei.total = heis.length;
+        this.hei.countLuc = heis.filter((data) =>
+          data.get("type").match("LUC")
+        ).length;
+        this.hei.countSuc = heis.filter((data) =>
+          data.get("type").match("SUC")
+        ).length;
+        this.hei.countPrivate = heis.filter((data) =>
+          data.get("type").match("Private")
+        ).length;
+        this.hei.countOgs = heis.filter((data) =>
+          data.get("type").match("OGS")
+        ).length;
+      });
+
+      userSubscription.on("enter", (object) => {
+        console.log("object entered" + object);
+        this.hei.total++;
+        switch (object.get("type")) {
+          case "LUC":
+            this.hei.countLuc++;
+            break;
+          case "SUC":
+            this.hei.countSuc++;
+            break;
+          case "Private":
+            this.hei.countPrivate++;
+            break;
+          case "OGS":
+            this.hei.countOgs++;
+            break;
+        }
+      });
+
+      userSubscription.on("leave", (object) => {
+        console.log("object left" + object);
+        this.hei.total--;
+        switch (object.get("type")) {
+          case "LUC":
+            this.hei.countLuc--;
+            break;
+          case "SUC":
+            this.hei.countSuc--;
+            break;
+          case "Private":
+            this.hei.countPrivate--;
+            break;
+          case "OGS":
+            this.hei.countOgs--;
+            break;
+        }
+      });
+
+      userSubscription.on("delete", (object) => {
+        console.log("object deleted" + object);
+        this.hei.total--;
+        switch (object.get("type")) {
+          case "LUC":
+            this.hei.countLuc--;
+            break;
+          case "SUC":
+            this.hei.countSuc--;
+            break;
+          case "Private":
+            this.hei.countPrivate--;
+            break;
+          case "OGS":
+            this.hei.countOgs--;
+            break;
+        }
+      });
+
+      userSubscription.on("close", () => {
+        console.log("heiHome subscription closed");
+      });
     },
-    async getApplications() {
-      var list = [];
+    async getApplications() {   //better if queue is used instead of the usual array
       const Applications = Parse.Object.extend("Application");
       const query = new Parse.Query(Applications);
-      query.limit(9);
       query.include("heiId");
-      query.descending("dateApplied");
 
-      var results = await query.find();
-      for (let i = 0; i < results.length; i++) {
-        const object = results[i];
-        list.push({
+      const appSubscription = await query.subscribe();
+      appSubscription.on("open", async () => {
+        console.log("appHome subscription opened");
+        // can get the list here
+        var list = [];
+        query.limit(9);
+        query.descending("dateApplied");
+
+        var results = await query.find();
+        for (let i = 0; i < results.length; i++) {
+          const object = results[i];
+          list.push({
+            id: object.id,
+            dateApplied: object.get("dateApplied").toLocaleDateString("en", {
+              weekday: "short",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            hei: object.get("heiId").get("name"),
+            type: object.get("applicationType"),
+          });
+        }
+        this.recentApplications = list;
+        this.countApplications();
+      });
+
+      appSubscription.on("create", (object) => {
+        console.log("object created" + object);
+        // console.log("length: " + this.recentApplications.length);
+        if(this.recentApplications.length >= 9) {
+          this.recentApplications.splice(8, 1);   //remove oldest application if apps > 9
+        }
+        this.recentApplications.unshift({   //place latest app in the first index
           id: object.id,
           dateApplied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "short",
@@ -314,9 +465,59 @@ export default {
           hei: object.get("heiId").get("name"),
           type: object.get("applicationType"),
         });
-      }
-      this.recentApplications = list;
+        this.countApplications();
+      });
 
+      appSubscription.on("update", (object) => {
+        console.log("object updated" + object);
+        this.countApplications();
+      });
+
+      appSubscription.on("enter", (object) => {
+        console.log("object entered" + object);
+        if(this.recentApplications.length >= 9) {
+          this.recentApplications.splice(8, 1);   //remove oldest application if apps > 9
+        }
+        this.recentApplications.unshift({
+          id: object.id,
+          dateApplied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "short",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          hei: object.get("heiId").get("name"),
+          type: object.get("applicationType"),
+        });
+        this.countApplications();
+      });
+
+      appSubscription.on("leave", (object) => {
+        console.log("object left" + object);
+
+        var index = this.recentApplications.findIndex((app) => app.id == object.id);
+        if(index > -1)  //only delete if it exists
+          this.recentApplications.splice(index, 1); //remove the specific object in the array
+        this.countApplications();
+      });
+
+      appSubscription.on("delete", (object) => {
+        console.log("object deleted" + object);
+
+        var index = this.recentApplications.findIndex((app) => app.id == object.id);
+        console.log(index);
+        if(index > -1)  //only delete if it exists
+          this.recentApplications.splice(index, 1); //remove the specific object in the array
+        this.countApplications();
+      });
+
+      appSubscription.on("close", () => {
+        console.log("heiApp subscription closed");
+      });
+    },
+    async countApplications() {
+      const Application = Parse.Object.extend("Application");
+      const query = new Parse.Query(Application);
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");
       this.applications.forApproval = await query.count();
@@ -328,6 +529,48 @@ export default {
       this.applications.pending = await query.count();
     },
     async getGraduates() {
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.exists("serialNumber");
+      query.equalTo("isGraduated", true);
+
+      const gradsSubscription = await query.subscribe();
+      gradsSubscription.on("open", async () => {
+        console.log("gradsHome subscription opened");
+        this.countGraduates();  //lazy counting
+      });
+
+      gradsSubscription.on("create", (object) => {
+        console.log("object created" + object);
+        this.countGraduates();
+      });
+
+      gradsSubscription.on("update", (object) => {
+        console.log("object updated" + object);
+        this.countGraduates();
+      });
+
+      gradsSubscription.on("enter", (object) => {
+        console.log("object entered" + object);
+        this.countGraduates();
+      });
+
+      gradsSubscription.on("leave", (object) => {
+        console.log("object left" + object);
+        this.countGraduates();
+      });
+
+      gradsSubscription.on("delete", (object) => {
+        console.log("object deleted" + object);
+        this.countGraduates();
+      });
+
+      gradsSubscription.on("close", () => {
+        console.log("gradsApp subscription closed");
+      });
+
+    },
+    async countGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.exists("serialNumber");

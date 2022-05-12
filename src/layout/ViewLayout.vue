@@ -121,7 +121,7 @@ import cap from "@/assets/sidebar_icons/cap.svg";
 import code from "@/assets/sidebar_icons/code.svg";
 import report from "@/assets/sidebar_icons/report.svg";
 import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
-
+import Parse from "parse";
 export default {
   name: "ViewLayout",
   components: {
@@ -135,70 +135,7 @@ export default {
     return {
       collapsed: true,
       breadcrumbs: [],
-
-      menu: [
-        {
-          href: "/home",
-          title: "Home",
-          icon: {
-            element: "img",
-            attributes: { src: home },
-          },
-        },
-
-        {
-          href: "/hei",
-          title: "HEI",
-          icon: {
-            element: "img",
-            attributes: { src: hei },
-          },
-        },
-        {
-          href: "/application",
-          title: "Application",
-          icon: {
-            element: "img",
-            attributes: { src: file },
-          },
-        },
-        {
-          header: "Reports",
-          hiddenOnCollapse: true,
-        },
-        {
-          href: "/enrollment",
-          title: "Summary of Enrollment",
-          icon: {
-            element: "img",
-            attributes: { src: cap },
-          },
-        },
-        {
-          href: "/graduates",
-          title: "Summary of Graduates",
-          icon: {
-            element: "img",
-            attributes: { src: cap },
-          },
-        },
-        {
-          href: "/serial-numbers",
-          title: "Serial Numbers",
-          icon: {
-            element: "img",
-            attributes: { src: code },
-          },
-        },
-        {
-          href: "/report-summary",
-          title: "Report Summary",
-          icon: {
-            element: "img",
-            attributes: { src: report },
-          },
-        },
-      ],
+      menu: [],
     };
   },
   watch: {
@@ -208,9 +145,103 @@ export default {
   },
   mounted() {
     this.updateList();
+    this.getMenu();
   },
 
   methods: {
+    getMenu() {
+      const user = new Parse.User.current();
+      const usertype = user.get("userType");
+      if (usertype == "admin") {
+        this.menu = [
+          {
+            href: "/home",
+            title: "Home",
+            icon: {
+              element: "img",
+              attributes: { src: home },
+            },
+          },
+
+          {
+            href: "/hei",
+            title: "HEI",
+            icon: {
+              element: "img",
+              attributes: { src: hei },
+            },
+          },
+          {
+            href: "/application",
+            title: "Application",
+            icon: {
+              element: "img",
+              attributes: { src: file },
+            },
+          },
+          {
+            header: "Reports",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/enrollment",
+            title: "Summary of Enrollment",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+          {
+            href: "/graduates",
+            title: "Summary of Graduates",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+          {
+            href: "/serial-numbers",
+            title: "Serial Numbers",
+            icon: {
+              element: "img",
+              attributes: { src: code },
+            },
+          },
+          {
+            href: "/report-summary",
+            title: "Report Summary",
+            icon: {
+              element: "img",
+              attributes: { src: report },
+            },
+          },
+        ];
+      } else if (usertype == "hei") {
+        this.menu = [
+          {
+            href: "/application",
+            title: "Application",
+            icon: {
+              element: "img",
+              attributes: { src: file },
+            },
+          },
+          {
+            header: "Reports",
+            hiddenOnCollapse: true,
+          },
+          {
+            href: "/graduates",
+            title: "Summary of Graduates",
+            icon: {
+              element: "img",
+              attributes: { src: cap },
+            },
+          },
+        ];
+      }
+      console.log(usertype);
+    },
     updateList() {
       this.breadcrumbs = this.$route.meta.breadcrumb;
     },

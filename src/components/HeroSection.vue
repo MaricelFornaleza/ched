@@ -59,6 +59,11 @@
             "
           >
             <h2 class="text-brand-blue font-bold">Sign In</h2>
+            <div class="w-fit">
+              <AlertWidget :className="alert.className">
+                {{ alert.msg }}
+              </AlertWidget>
+            </div>
             <p class="body-s">
               Welcome back! Please provide the HEI's credentials.
             </p>
@@ -79,7 +84,6 @@
                       Email Address
                     </span>
                     <input
-                      
                       type="email"
                       name="email"
                       v-model="email"
@@ -103,9 +107,12 @@
                       "
                       placeholder="name@gmail.com"
                     />
-                    <span v-show="emailError !== ''" class="text-xs text-error" id="email-error">{{
-                      emailError
-                    }}</span>
+                    <span
+                      v-show="emailError !== ''"
+                      class="text-xs text-error"
+                      id="email-error"
+                      >{{ emailError }}</span
+                    >
                   </label>
                   <label class="block">
                     <span
@@ -120,7 +127,6 @@
                       Password
                     </span>
                     <input
-                      
                       type="password"
                       name="password"
                       v-model="password"
@@ -145,9 +151,12 @@
                       placeholder="Enter password"
                       v-on:keyup.enter="login"
                     />
-                    <span v-show="passwordError !== ''" class="text-xs text-error" id="password-error">{{
-                      passwordError
-                    }}</span>
+                    <span
+                      v-show="passwordError !== ''"
+                      class="text-xs text-error"
+                      id="password-error"
+                      >{{ passwordError }}</span
+                    >
                   </label>
 
                   <div class="mt-10">
@@ -225,12 +234,14 @@
 
 <script>
 import { XIcon } from "@heroicons/vue/outline";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import Parse from "parse";
 
 export default {
   name: "HeroSection",
   components: {
     XIcon,
+    AlertWidget
   },
   data() {
     return {
@@ -240,6 +251,7 @@ export default {
       password: "",
       passwordError: "",
       isLoading: false,
+      alert: {},
     };
   },
   methods: {
@@ -260,18 +272,33 @@ export default {
         return;
       } else {
         this.passwordError = "";
-      } 
+      }
       this.isLoading = true;
       const self = this;
       Parse.User.logIn(this.email, this.password)
         .then(() => {
           self.isLoading = false;
-          this.$router.push({ name: "home" });
+          const user = Parse.User.current();
+          const usertype = user.get("userType");
+
+          if (usertype == "hei") {
+            if (user.get("emailVerified"))
+              this.$router.push({ name: "application" });
+            else 
+              this.displayAlert("error", "Please verify first your email!");
+          } else if (usertype == "admin") {
+            this.$router.push({ name: "home" });
+          }
         })
         .catch((err) => {
           self.isLoading = false;
-          alert("error" + err.message);
+          // alert("error" + err.message);
+          this.displayAlert("error", err.message);
         });
+    },
+    displayAlert(status, msg) {
+      this.alert.className = "alert-" + status;
+      this.alert.msg = msg;
     },
   },
 };

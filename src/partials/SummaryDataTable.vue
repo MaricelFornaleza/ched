@@ -79,19 +79,13 @@
               </div>
             </td>
             <td class="px-6 py-4 border-l border-light-400">
-              <div class="">
-                {{ object.rotc.male }}
-              </div>
+              <div class="">0</div>
             </td>
             <td class="px-6 py-4">
-              <div class="">
-                {{ object.rotc.female }}
-              </div>
+              <div class="">0</div>
             </td>
             <td class="px-6 py-4 border-r border-light-400">
-              <div class="">
-                {{ object.rotc.total }}
-              </div>
+              <div class="">0</div>
             </td>
             <td class="px-6 py-4">
               <div class="">

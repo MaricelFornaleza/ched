@@ -33,22 +33,11 @@
         <p class="uppercase font-bold label-sm">Higher Education Institution</p>
       </div>
 
-      <form ref="form" id="addHei" @submit.prevent="addHei">
+      <form ref="form" id="editHei" @submit.prevent="editHei">
         <div class="mb-4">
-          <label class="block text-dark-200 text-sm font-bold mb-2" for="name">
-            Name
-          </label>
+          <label class="text-input-label" for="name"> Name </label>
           <input
-            class="
-              appearance-none
-              border-2
-              rounded
-              w-full
-              py-2
-              px-4
-              text-dark-100 text-sm
-              focus:outline-none focus:ring
-            "
+            class="text-input"
             name="name"
             id="name"
             type="text"
@@ -57,23 +46,9 @@
           />
         </div>
         <div class="mb-4">
-          <label
-            class="block text-dark-200 text-sm font-bold mb-2"
-            for="username"
-          >
-            Username
-          </label>
+          <label class="text-input-label" for="username"> Username </label>
           <input
-            class="
-              appearance-none
-              border-2
-              rounded
-              w-full
-              py-2
-              px-4
-              text-dark-100 text-sm
-              focus:outline-none focus:ring
-            "
+            class="text-input"
             name="username"
             id="username"
             type="text"
@@ -82,20 +57,9 @@
           />
         </div>
         <div class="mb-4">
-          <label class="block text-dark-200 text-sm font-bold mb-2" for="email">
-            Email
-          </label>
+          <label class="text-input-label" for="email"> Email </label>
           <input
-            class="
-              appearance-none
-              border-2
-              rounded
-              w-full
-              py-2
-              px-4
-              text-dark-100 text-sm
-              focus:outline-none focus:ring
-            "
+            class="text-input"
             name="email"
             id="email"
             type="email"
@@ -104,23 +68,11 @@
           />
         </div>
         <div class="mb-4">
-          <label
-            class="block text-dark-200 text-sm font-bold mb-2"
-            for="contact_number"
-          >
+          <label class="text-input-label" for="contact_number">
             Contact Number
           </label>
           <input
-            class="
-              appearance-none
-              border-2
-              rounded
-              w-full
-              py-2
-              px-4
-              text-dark-100 text-sm
-              focus:outline-none focus:ring
-            "
+            class="text-input"
             name="contact_number"
             id="contact_number"
             v-model="contact_number"
@@ -130,23 +82,11 @@
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="institutional_code"
-            >
+            <label class="text-input-label" for="institutional_code">
               Institutional Code
             </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="institutional_code"
               id="institutional_code"
               v-model="institutional_code"
@@ -155,24 +95,13 @@
             />
           </div>
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="hei_type"
-            >
-              HEI Type
-            </label>
+            <label class="text-input-label" for="hei_type"> HEI Type </label>
             <select
               class="
                 form-select
-                appearance-none
+                text-input
                 block
-                w-full
-                px-3
-                py-2
-                text-sm text-dark-100
                 bg-clip-padding
-                border-2
-                rounded
                 transition
                 ease-in-out
                 m-0
@@ -182,11 +111,13 @@
               name="hei_type"
               required
             >
-              <option selected>Select</option>
-              <option value="LUC">Local Universities and Colleges</option>
-              <option value="SUC">State Universities and Colleges</option>
-              <option value="Private">Private</option>
-              <option value="OGS">Other GOvernment Schools</option>
+              <option
+                v-for="type in hei_types"
+                :key="type.value"
+                :value="type.value"
+              >
+                {{ type.title }}
+              </option>
             </select>
           </div>
         </div>
@@ -196,24 +127,10 @@
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="street"
-            >
-              Street
-            </label>
+            <label class="text-input-label" for="street"> Street </label>
 
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="street"
               id="street"
               v-model="street"
@@ -223,23 +140,9 @@
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="barangay"
-            >
-              Barangay
-            </label>
+            <label class="text-input-label" for="barangay"> Barangay </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="barangay"
               id="barangay"
               v-model="barangay"
@@ -250,23 +153,9 @@
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="city"
-            >
-              City
-            </label>
+            <label class="text-input-label" for="city"> City </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="city"
               id="city"
               v-model="city"
@@ -276,23 +165,9 @@
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="province"
-            >
-              Province
-            </label>
+            <label class="text-input-label" for="province"> Province </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="province"
               id="province"
               v-model="province"
@@ -303,23 +178,11 @@
         </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="regionNo"
-            >
+            <label class="text-input-label" for="regionNo">
               Region Number
             </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="regionNo"
               id="regionNo"
               v-model="regionNo"
@@ -329,23 +192,11 @@
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-dark-200 text-sm font-bold mb-2"
-              for="regionName"
-            >
+            <label class="text-input-label" for="regionName">
               Region Name
             </label>
             <input
-              class="
-                appearance-none
-                border-2
-                rounded
-                w-full
-                py-2
-                px-4
-                text-dark-100 text-sm
-                focus:outline-none focus:ring
-              "
+              class="text-input"
               name="regionName"
               id="regionName"
               v-model="regionName"
@@ -357,6 +208,7 @@
 
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button
+            @click="goToHei()"
             class="btn-sm btn-default btn-outline"
             type="button"
           >
@@ -400,9 +252,11 @@ export default {
       regionName: "",
       institutional_code: "",
       hei_type: "",
+      hei_types: [],
     };
   },
   async mounted() {
+    this.getHeiTypes();
     this.id = this.$route.params.id;
     console.log(this.id);
     const query = new Parse.Query(Parse.User);
@@ -421,9 +275,25 @@ export default {
     this.province = result.get("address").province;
     this.regionNo = result.get("address").regionNo;
     this.regionName = result.get("address").regionName;
+    console.log(this.hei_type.value);
   },
   methods: {
-    async addHei() {
+    goToHei() {
+      this.$router.push({ name: "hei" });
+    },
+    async getHeiTypes() {
+      const Hei_type = Parse.Object.extend("HeiType");
+      const query = new Parse.Query(Hei_type);
+      const results = await query.find();
+      for (let i = 0; i < results.length; i++) {
+        this.hei_types.push({
+          value: results[i].get("abbreviation"),
+          title: results[i].get("title"),
+        });
+      }
+      console.log(this.hei_type);
+    },
+    async editHei() { // better if this is done in cloud code
       const User = Parse.Object.extend(Parse.User);
       const q = new Parse.Query(User);
       q.matches("objectId", this.id);
@@ -443,16 +313,20 @@ export default {
       });
       result.set("institutionalCode", this.institutional_code);
       result.set("type", this.hei_type);
-      
-      result.save({ useMasterKey: true }).then((user) => {
-        router.push({
-          name: "hei",
-          query: {
-            status: "success",
-            msg: user.get("name") + " was successfully updated.",
-          },
+
+      result
+        .save(
+          // { useMasterKey: true }
+        )
+        .then((user) => {
+          router.push({
+            name: "hei",
+            query: {
+              status: "success",
+              msg: user.get("name") + " was successfully updated.",
+            },
+          });
         });
-      });
       // .then(function(hei) {
       //   // any logic to be executed after the object is saved.
       //   alert('New object created with objectId: ' + hei.id);
@@ -464,3 +338,6 @@ export default {
   },
 };
 </script>
+
+<style>
+</style>

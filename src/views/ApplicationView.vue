@@ -169,7 +169,7 @@ export default {
     };
   },
 
-  async mounted() {
+  async created() {
     this.getHeis();
     var data = [];
     const Applications = Parse.Object.extend("Application");

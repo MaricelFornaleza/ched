@@ -281,7 +281,11 @@ export default {
             // self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 5");
-             this.$emit("sendEmail", "List of Enrollment for the 1st Semester", "Step 1 of 5");
+            self.$emit(
+              "sendEmail",
+              "List of Enrollment for the 1st Semester",
+              "Step 1 of 5"
+            );
             // this.completed = !this.completed;
           } else {
             //console.log("Something went wrong while parsing xlsx file!");
@@ -364,7 +368,7 @@ export default {
             bday == studentData[x].J
           ) {
             //check program
-            if(program == nstpProgram) {
+            if (program == nstpProgram) {
               studentSet.delete(studentData[x]);
               results[i].set(
                 "applicationId",
@@ -372,7 +376,7 @@ export default {
               );
               results[i].set("takenNstp1", true);
               await results[i].save();
-            } else if(program != nstpProgram && !takenNstp1){
+            } else if (program != nstpProgram && !takenNstp1) {
               //found the student but there are mismatch in stored info
               const newEnrollment = new Parse.Object.extend("NstpEnrollment");
               newEnrollment.set(
@@ -439,10 +443,7 @@ export default {
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        nstpEnrollment.set(
-          "nstpId",
-          new Parse.Object("Nstp", { id: nstpId })
-        );
+        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
         nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
@@ -450,7 +451,7 @@ export default {
         nstpEnrollment.set("takenNstp1", true);
         nstpEnrollment.save();
       });
-      
+
       this.pending = false;
     },
     async getStudents() {
