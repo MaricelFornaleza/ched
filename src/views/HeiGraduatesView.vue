@@ -117,7 +117,6 @@ import ViewStudentsDatatable from "@/partials/ViewStudentsDatatable.vue";
 import Parse from "parse";
 
 export default {
-  name: "EnrollmentView",
   components: {
     AdvancedWidget,
     AcademicCapIcon,

@@ -5,7 +5,7 @@
         <div class="uppercase">{{ hei }}</div>
         <div class="flex space-x-2 text-sm">
           <span>{{ year }}</span>
-          <span v-if="sem != 0"> | {{ sem }}</span>
+          <span v-if="sem != '0'"> | {{ sem }}</span>
         </div>
       </div>
       <view-students-datatable

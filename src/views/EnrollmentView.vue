@@ -56,9 +56,21 @@
       </div>
     </div>
 
+    <!-- alert message -->
+    <div class="w-fit mx-10">
+      <AlertWidget :className="alert.className">
+        {{ alert.msg }}
+      </AlertWidget>
+    </div>
+
     <!-- dataTables  -->
     <div>
-      <summary-data-table :objects="objects" :sem="sem" :year="year">
+      <summary-data-table
+        :objects="objects"
+        :sem="sem"
+        :year="year"
+        @displayAlert="displayAlert"
+      >
         <template v-slot:button>
           <select
             @change="setYear($event)"
@@ -141,6 +153,7 @@ import DataCount from "@/partials/DataCount.vue";
 // import EmptyState from "@/components/EmptyState.vue";
 import { AcademicCapIcon } from "@heroicons/vue/solid";
 import SummaryDataTable from "@/partials/SummaryDataTable.vue";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import Parse from "parse";
 
 export default {
@@ -150,9 +163,11 @@ export default {
     AcademicCapIcon,
     SummaryDataTable,
     DataCount,
+    AlertWidget,
   },
   data() {
     return {
+      alert: { className: "", msg: "" },
       academicYears: [],
       year: "",
       sem: "1st Sem",
@@ -290,6 +305,11 @@ export default {
     setSem(e) {
       this.sem = e.target.value;
       this.getHeis();
+    },
+    displayAlert(status) {
+      this.alert.className = "alert-" + status;
+      this.alert.msg = "The Summary of Enrollment was successfully exported";
+      console.log("success");
     },
   },
 };

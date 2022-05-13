@@ -160,6 +160,8 @@ export default {
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
       XLSX.writeFileXLSX(workbook, filename);
+
+      this.displayMsg("success");
     },
     viewStudents(sem, year, id) {
       router.push({
@@ -170,6 +172,9 @@ export default {
           id: id,
         },
       });
+    },
+    displayMsg(status) {
+      this.$emit("displayAlert", status);
     },
   },
 
