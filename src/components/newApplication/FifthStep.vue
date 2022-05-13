@@ -297,7 +297,7 @@ export default {
       this.getData();
     },
     goToApplication() {
-      this.$emit("complete", 5);
+      this.$emit("complete", 4);
       this.$emit("goToApplication");
     },
   },
