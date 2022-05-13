@@ -490,7 +490,7 @@ export default {
       this.hei.countLuc = await query.count();
       query.equalTo("type", "SUC");
       this.hei.countSuc = await query.count();
-      query.equalTo("type", "Private");
+      query.equalTo("type", "PRIVATE");
       this.hei.countPrivate = await query.count();
       query.equalTo("type", "OGS");
       this.hei.countOgs = await query.count();
