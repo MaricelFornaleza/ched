@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="students == ''"
+        v-if="status != 'For Approval'"
         class="
           container
           w-fit
@@ -49,7 +49,7 @@
         </div>
         <div
           v-else
-          class="my-20 w-full flex justify-between p-5 border border-light-300"
+          class="my-20 w-fit flex justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -63,7 +63,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -154,7 +154,7 @@
           ></StudentsDataTable>
         </div>
 
-        <div v-if="isAdmin && !isCompleted" class="space-x-5">
+        <div v-if="isAdmin && !isCompleted && status == 'For Approval'" class="space-x-5">
           <button class="btn-sm btn-default btn-outline">Back</button>
           <button class="btn-sm btn-default bg-error text-light-100 border-0">
             Reject
@@ -275,6 +275,7 @@ export default {
       femaleNumError: 0,
       worker: undefined,
       confirm: false,
+      status: "",
 
       isAdmin: false,
       data: {
@@ -311,7 +312,19 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    this.getStudents();
+    // if(this.isCompleted)
+    const Application = Parse.Object.extend("Application");
+    const query = new Parse.Query(Application);
+    query.matches("objectId", this.appId);
+    query.select("status");
+    const self = this;
+    query.first().then(function(results) {
+      // each of results will only have the selected fields available.
+      self.status = results.get("status");
+      if(results.get("status") == 'For Approval')
+        self.getStudents();
+    });
+    
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;

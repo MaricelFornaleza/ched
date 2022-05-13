@@ -322,15 +322,15 @@ export default {
       loading: true,
     };
   },
-  created() {
+  async created() {
     this.filter.condition = new Date().toLocaleString("en", { month: "long" });
 
     this.month = new Date().toLocaleString("en", { month: "long" });
-    this.getHeis();
-    this.getApplications();
+    await this.getHeis();
+    await this.getApplications();
     // this.year = this.years[0];
-    this.getGraduates();
-    this.getMonthlyData();
+    await this.getGraduates();
+    await this.getMonthlyData();
 
     this.loading = false;
   },

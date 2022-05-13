@@ -199,14 +199,12 @@ export default {
 
     const results = await query.find();
 
-    // get nstp enrollment
-    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-    var query2 = new Parse.Query(NstpEnrollment);
-
     for (let i = 0; i < results.length; i++) {
       const object = results[i];
       var countGrads = 0;
-      var prog = "";
+      // get nstp enrollment
+      var NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      var query2 = new Parse.Query(NstpEnrollment);
       query2.matches("applicationId", object.id);
       query2.include("nstpId");
       await query2.find().then(function (res) {
@@ -218,11 +216,19 @@ export default {
             countGrads++;
         }
       });
-      if (
-        object.get("status") == "For Approval" ||
-        object.get("status") == "Rejected" ||
-        object.get("status") == "Approved"
-      ) {
+      // if (
+      //   object.get("status") == "For Approval" ||
+      //   object.get("status") == "Rejected" ||
+      //   object.get("status") == "Approved"
+      // ) {
+      //   await query2.first().then(function (res) {
+      //     prog = res.get("nstpId").get("programName");
+      //   });
+      // }
+      query2.exists("nstpId");
+      var result = await query2.first();
+      var prog = "";
+      if (typeof result !== "undefined") {
         await query2.first().then(function (res) {
           prog = res.get("nstpId").get("programName");
         });
@@ -246,9 +252,8 @@ export default {
       });
     }
 
-    this.count();
     this.applications = data;
-    this.loading = false;
+    this.count().then(() => (this.loading = false));
 
     // add subscription here
     // for applications, use the id to find the data
@@ -285,9 +290,10 @@ export default {
     });
 
     applicationSubscription.on("update", (object) => {
-      console.log("object updated" + object);
+      console.log("object updated" + object.id);
       // find
       var index = this.applications.findIndex((app) => app.id == object.id);
+      if (index == -1) return;
       // get graduates
       this.getGraduates(object.id).then((nstp) => {
         this.applications[index] = {
@@ -331,6 +337,7 @@ export default {
       console.log("object left" + object);
       // find
       var index = this.applications.findIndex((app) => app.id == object.id);
+      if (index == -1) return;
       this.applications.splice(index, 1); //remove the specific object in the array
       this.count();
     });
@@ -339,6 +346,7 @@ export default {
       console.log("object deleted" + object);
       // find
       var index = this.applications.findIndex((app) => app.id == object.id);
+      if (index == -1) return;
       this.applications.splice(index, 1); //remove the specific object in the array
       this.count();
     });
@@ -371,20 +379,25 @@ export default {
       const nstpenrollment = new Parse.Query(NstpEnrollment);
       nstpenrollment.include("applicationId");
       nstpenrollment.include("nstpId");
-      const result = await nstpenrollment.first();
-      var program = "";
-      if (
-        result.get("applicationId").get("status") == "For Approval" ||
-        result.get("applicationId").get("status") == "Rejected" ||
-        result.get("applicationId").get("status") == "Approved"
-      ) {
-        program = result.get("nstpId").get("programName");
-      }
-
       nstpenrollment.equalTo(
         "applicationId",
         new Parse.Object("Application", { id: appId })
       );
+      nstpenrollment.exists("nstpId");
+      const result = await nstpenrollment.first();
+      // console.log(result);
+      var program = "";
+      if (typeof result !== "undefined") {
+        program = result.get("nstpId").get("programName");
+      }
+      // if (
+      //   result.get("applicationId").get("status") == "For Approval" ||
+      //   result.get("applicationId").get("status") == "Rejected" ||
+      //   result.get("applicationId").get("status") == "Approved"
+      // ) {
+      //   program = result.get("nstpId").get("programName");
+      // }
+
       nstpenrollment.exists("serialNumber");
       nstpenrollment.equalTo("isGraduated", true);
       var grads = await nstpenrollment.count();
@@ -405,27 +418,37 @@ export default {
       }
     },
     async getHeis() {
-      var heiList = [];
+      // var heiList = [];
 
       const hei = new Parse.Query(Parse.User);
       hei.equalTo("userType", "hei");
-      const heidata = await hei.find();
+      // const heidata = await hei.find();
 
-      for (var i = 0; i < heidata.length; i++) {
-        const object = heidata[i];
+      // for (var i = 0; i < heidata.length; i++) {
+      //   const object = heidata[i];
 
-        heiList.push({
-          id: object.id,
-          text: object.get("name"),
-        });
-      }
-      this.lists = heiList;
+      //   heiList.push({
+      //     id: object.id,
+      //     text: object.get("name"),
+      //   });
+      // }
+      // this.lists = heiList;
 
       //add subscription PROBLEM: opens new subscriptions when not closed(when to close?)....
       const subscription = await hei.subscribe();
-      subscription.on("open", () => {
+      subscription.on("open", async () => {
         console.log("subscription opened");
         // can get the list here
+        const heidata = await hei.find();
+
+        for (var i = 0; i < heidata.length; i++) {
+          const object = heidata[i];
+
+          this.lists.push({
+            id: object.id,
+            text: object.get("name"),
+          });
+        }
       });
 
       subscription.on("create", (object) => {

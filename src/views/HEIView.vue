@@ -231,9 +231,8 @@ export default {
       });
     }
     this.heis = hei;
-    this.count();
-    this.loading = false;
-
+    this.count().then(() => this.loading = false );
+    
     const subscription = await query.subscribe();
     subscription.on("open", () => {
       console.log("hei subscription opened");

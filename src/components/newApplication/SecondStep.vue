@@ -50,7 +50,7 @@
 
         <div
           v-else
-          class="my-20 w-full flex justify-between p-5 border border-light-300"
+          class="my-20 w-fit flex justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -64,7 +64,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -273,7 +273,8 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    this.getStudents();
+    if(this.isCompleted)
+      this.getStudents();
   },
   methods: {
     forceRerender() {
@@ -314,8 +315,7 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.verifyStudents(event.data.rows, event.data.nstp);
-            self.pending = false;
+            self.verifyStudents(event.data.rows, event.data.nstp).then(() => self.pending = false );
             self.$emit("complete", step);
             self.$emit("setStatus", "3 of 4");
             self.$emit(
