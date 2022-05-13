@@ -1,7 +1,7 @@
 <template>
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div
-    class="fixed z-20 py-2 inset-0 overflow-y-auto overflow-visible"
+    class="fixed z-[800] py-2 inset-0 overflow-y-auto overflow-visible"
     aria-labelledby="modal-title"
     role="dialog"
     aria-modal="true"
@@ -66,12 +66,17 @@
           sm:my-8 sm:align-middle sm:max-w-lg sm:w-full
         "
       >
-        <div class="bg-light-100 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div class="mt-3 text-center sm:mt-0 sm:text-center">
-            <h3 class="h1 leading-6 font-bold text-dark-400" id="modal-title">
-              Select HEI
-            </h3>
-            <div class="mt-8">
+        <div class="bg-light-100 border-b-2 border-light-300">
+          <div class="mt-3 sm:mt-0">
+            <div class="w-full bg-info p-5 flex justify-between items-center">
+              <div class="text-left text-light-100">
+                <h5 class="font-body font-bold" id="modal-title">Select HEI</h5>
+              </div>
+              <div class="text-light-100">
+                <SearchCircleIcon class="h-10" />
+              </div>
+            </div>
+            <div class="p-5">
               <Select2
                 v-model="value"
                 :options="sortHEIs"
@@ -81,25 +86,11 @@
             </div>
           </div>
         </div>
-        <div class="bg-light-100 px-4 mb-4 py-4 sm:px-6">
-          <button
-            type="button"
-            @click="nextPage()"
-            class="
-              w-full
-              inline-flex
-              justify-center
-              btn-sm btn-default
-              sm:ml-3 sm:w-auto sm:text-sm
-            "
-          >
-            Select
-          </button>
+        <div class="bg-light-100 p-5 text-right sm:px-6">
           <button
             type="button"
             @click="$emit('close')"
             class="
-              mt-3
               w-full
               justify-center
               inline-flex
@@ -108,6 +99,21 @@
             "
           >
             Cancel
+          </button>
+          <button
+            type="button"
+            @click="nextPage()"
+            class="
+              w-full
+              inline-flex
+              justify-center
+              btn-sm btn-default
+              bg-info
+              border-0
+              sm:ml-3 sm:w-auto sm:text-sm
+            "
+          >
+            Next
           </button>
         </div>
       </div>
@@ -119,6 +125,7 @@
 // import { SearchIcon } from "@heroicons/vue/outline";
 
 import Select2 from "vue3-select2-component";
+import { SearchCircleIcon } from "@heroicons/vue/outline";
 
 export default {
   name: "ModalHei",
@@ -136,6 +143,7 @@ export default {
   components: {
     // SearchIcon,
     Select2,
+    SearchCircleIcon,
   },
   computed: {
     sortHEIs() {

@@ -10,7 +10,8 @@
         v-if="students == ''"
         class="
           container
-          w-fit
+          w-full
+          xl:w-6/12
           mx-auto
           flex flex-col
           items-center
