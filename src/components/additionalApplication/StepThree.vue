@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="!isCompleted"
+        v-if="students == ''"
         class="
           container
           w-fit
@@ -127,7 +127,7 @@
             Reject
           </button>
           <button
-            @click="approve()"
+            @click="toggleConfirmModal()"
             class="btn-sm btn-default bg-success text-light-100 border-0"
           >
             Approve
@@ -149,6 +149,11 @@
       </div>
     </div>
 
+    <ApplicationModal
+      v-if="confirm"
+      @toggleConfirmModal="toggleConfirmModal"
+      @confirmed="confirmed"
+    />
     <ModalWidget v-show="pending">
       <template #body>
         <div
@@ -206,6 +211,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import ApplicationModal from "@/partials/ApplicationModal.vue";
 import ApplicationDetails from "@/partials/ApplicationDetails.vue";
 import { XCircleIcon } from "@heroicons/vue/outline";
 
@@ -227,6 +233,7 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      confirm: false,
 
       isAdmin: false,
       data: {
@@ -250,6 +257,7 @@ export default {
     ModalWidget,
     XCircleIcon,
     ApplicationDetails,
+    ApplicationModal,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -583,6 +591,13 @@ export default {
 
       this.$emit("setStatus", "Approved");
       this.$emit("nextStep");
+    },
+    toggleConfirmModal() {
+      this.confirm = !this.confirm;
+      console.log(this.confirm);
+    },
+    confirmed() {
+      this.approve();
     },
     removeFile() {
       this.dropzoneFile = "";
