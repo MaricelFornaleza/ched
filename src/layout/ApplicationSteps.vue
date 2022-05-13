@@ -125,7 +125,7 @@ export default {
           count++;
         }
       }
-      if (count < 5) {
+      if (count < 4) {
         count++;
       }
       this.currentStep = count;
@@ -204,7 +204,7 @@ export default {
           count++;
         }
       }
-      if (count < 5) {
+      if (count < 4) {
         count++;
       }
       if (step > count) {

@@ -171,15 +171,13 @@ export default {
         { no: 1, title: "Enrollment for 1st Semester", completed: false },
         { no: 2, title: "Enrollment for 2nd Semester", completed: false },
         { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
+        { no: 4, title: "Application Complete", completed: false },
       ],
       additionalSteps: [
         { no: 1, title: "Notarized Transmittal Letter", completed: false },
         { no: 2, title: "Proof", completed: false },
         { no: 3, title: "List of Graduates", completed: false },
-        { no: 4, title: "Application for Approval", completed: false },
-        { no: 5, title: "Application Complete", completed: false },
+        { no: 4, title: "Application Complete", completed: false },
       ],
     };
   },

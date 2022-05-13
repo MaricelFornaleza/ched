@@ -21,14 +21,14 @@ import NewApplicationSteps from "../layout/NewApplicationSteps.vue";
 import FirstStep from "../components/newApplication/FirstStep.vue";
 import SecondStep from "../components/newApplication/SecondStep.vue";
 import ThirdStep from "../components/newApplication/ThirdStep.vue";
-import FourthStep from "../components/newApplication/FourthStep.vue";
+// import FourthStep from "../components/newApplication/FourthStep.vue";
 import FifthStep from "../components/newApplication/FifthStep.vue";
 
 
 import StepOne from '../components/additionalApplication/StepOne.vue'
 import StepTwo from '../components/additionalApplication/StepTwo.vue'
 import StepThree from '../components/additionalApplication/StepThree.vue'
-import StepFour from '../components/additionalApplication/StepFour.vue'
+// import StepFour from '../components/additionalApplication/StepFour.vue'
 import StepFive from '../components/additionalApplication/StepFive.vue'
 import EditHei from '../components/EditHei.vue'
 
@@ -194,29 +194,29 @@ const routes = [
               ]
             }
           },
+          // {
+          //   path: "/application/new/4/:application",
+          //   name: "4thStep",
+          //   component: FourthStep,
+          //   props: true,
+          //   meta:{
+          //     breadcrumb: [
+          //       { name: 'Application', link: '/application' },
+          //       {name: 'New Application'},
+          //       {name: 'Step 4'},
+          //     ]
+          //   }
+          // },
           {
             path: "/application/new/4/:application",
             name: "4thStep",
-            component: FourthStep,
-            props: true,
-            meta:{
-              breadcrumb: [
-                { name: 'Application', link: '/application' },
-                {name: 'New Application'},
-                {name: 'Step 4'},
-              ]
-            }
-          },
-          {
-            path: "/application/new/5/:application",
-            name: "5thStep",
             component: FifthStep,
             props: true,
             meta:{
               breadcrumb: [
                 { name: 'Application', link: '/application' },
                 {name: 'New Application'},
-                {name: 'Step 5'},
+                {name: 'Step 4'},
               ]
             }
           },
@@ -265,29 +265,29 @@ const routes = [
               ],
             },
           },
+          // {
+          //   path: "/application/additional/4/:application",
+          //   name: "Step4",
+          //   component: StepFour,
+          //   props: true,
+          //   meta: {
+          //     breadcrumb: [
+          //       { name: "Application", link: "/application" },
+          //       { name: "Additional Graduates" },
+          //       { name: "Step 4" },
+          //     ],
+          //   },
+          // },
           {
             path: "/application/additional/4/:application",
             name: "Step4",
-            component: StepFour,
-            props: true,
-            meta: {
-              breadcrumb: [
-                { name: "Application", link: "/application" },
-                { name: "Additional Graduates" },
-                { name: "Step 4" },
-              ],
-            },
-          },
-          {
-            path: "/application/additional/5/:application",
-            name: "Step5",
             component: StepFive,
             props: true,
             meta: {
               breadcrumb: [
                 { name: "Application", link: "/application" },
                 { name: "Additional Graduates" },
-                { name: "Step 5" },
+                { name: "Step 4" },
               ],
             },
           },

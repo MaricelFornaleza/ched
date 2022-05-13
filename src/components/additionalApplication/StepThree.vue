@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="!isCompleted"
+        v-if="forApproval"
         class="
           container
           w-fit
@@ -215,6 +215,7 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      forApproval: false,
     };
   },
   props: { isCompleted: Boolean, appId: String, allow: Boolean },
@@ -276,7 +277,7 @@ export default {
               event.data.nstp
             );
             // self.pending = false;
-            self.$emit("complete", step);
+            // self.$emit("complete", step);
             self.$emit("setStatus", "For Approval");
             self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
             // this.completed = !this.completed;
