@@ -354,7 +354,7 @@ export default {
             self.pending = false;
 
             self.$emit("setStatus", "For Approval");
-            self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
+            self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
 
             // this.completed = !this.completed;
           } else {
