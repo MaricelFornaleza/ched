@@ -242,11 +242,11 @@ export default {
           }
         );
         this.$emit("complete", step);
-        this.$emit("setStatus", "3 of 5");
+        this.$emit("setStatus", "3 of 4");
         this.$emit(
           "sendEmail",
           "Proof that the student/s Completed NSTP 1 and 2",
-          "Step 2 of 5"
+          "Step 2 of 4"
         );
       }
     },

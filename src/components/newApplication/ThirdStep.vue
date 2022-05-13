@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="!isCompleted"
+        v-if="students == ''"
         class="
           container
           w-fit
@@ -79,7 +79,7 @@
           </button>
           <button
             v-if="!isCompleted"
-            @click="upload(3)"
+            @click="upload()"
             class="btn-sm btn-default"
             type="submit"
           >
@@ -97,6 +97,7 @@
             The list for the 2nd semester was successfully uploaded. An
             Acknowledgement letter was sent to the email address.
           </SuccessAlert>
+          <ApplicationDetails :appId="appId" />
 
           <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
             <div class="flex flex-col items-center">
@@ -153,7 +154,19 @@
           ></StudentsDataTable>
         </div>
 
-        <div class="flex items-center justify-center space-x-5 mt-5">
+        <div v-if="isAdmin && !isCompleted" class="space-x-5">
+          <button class="btn-sm btn-default btn-outline">Back</button>
+          <button class="btn-sm btn-default bg-error text-light-100 border-0">
+            Reject
+          </button>
+          <button
+            @click="toggleConfirmModal()"
+            class="btn-sm btn-default bg-success text-light-100 border-0"
+          >
+            Approve
+          </button>
+        </div>
+        <div v-else class="flex items-center justify-center space-x-5 mt-5">
           <button
             @click="goToApplication()"
             class="btn-sm btn-default btn-outline"
@@ -173,7 +186,11 @@
         </div>
       </div>
     </div>
-
+    <ApplicationModal
+      v-if="confirm"
+      @toggleConfirmModal="toggleConfirmModal"
+      @confirmed="confirmed"
+    />
     <ModalWidget v-show="pending">
       <template #body>
         <div
@@ -231,6 +248,10 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import ApplicationModal from "@/partials/ApplicationModal.vue";
+
+import ApplicationDetails from "@/partials/ApplicationDetails.vue";
+
 import { XCircleIcon } from "@heroicons/vue/outline";
 
 import { ref } from "vue";
@@ -253,9 +274,22 @@ export default {
       maleNumError: 0,
       femaleNumError: 0,
       worker: undefined,
+      confirm: false,
+
+      isAdmin: false,
+      data: {
+        program: null,
+        graduates: null,
+      },
     };
   },
-  props: { isCompleted: Boolean, appId: String, allow: Boolean },
+
+  props: {
+    isCompleted: Boolean,
+    appId: String,
+    allow: Boolean,
+    hei_region_code: String,
+  },
   components: {
     AlertWidget,
     SuccessAlert,
@@ -263,6 +297,8 @@ export default {
     StudentsDataTable,
     ModalWidget,
     XCircleIcon,
+    ApplicationDetails,
+    ApplicationModal,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -276,6 +312,10 @@ export default {
   },
   created() {
     this.getStudents();
+    const user = Parse.User.current();
+    if (user.get("userType") == "admin") {
+      this.isAdmin = true;
+    }
     console.log(this.allow);
   },
   methods: {
@@ -302,7 +342,8 @@ export default {
         return false;
       }
     },
-    createWorker(data, step, self) {
+
+    createWorker(data, self) {
       if (typeof Worker !== "undefined") {
         if (typeof self.worker == "undefined") {
           self.worker = new Worker();
@@ -319,9 +360,9 @@ export default {
             // self.total = self.maleNum + self.femaleNum;
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
-            self.$emit("complete", step);
+
             self.$emit("setStatus", "For Approval");
-            self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
+            self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
 
             // this.completed = !this.completed;
           } else {
@@ -332,7 +373,7 @@ export default {
         };
       }
     },
-    upload(step) {
+    upload() {
       var validation = this.validate(this.dropzoneFile);
       if (validation) {
         // alert(`Submitted Files:\n${this.dropzoneFile.name}`);
@@ -342,7 +383,7 @@ export default {
         reader.onload = function (e) {
           var data = e.target.result;
           try {
-            self.createWorker(data, step, self);
+            self.createWorker(data, self);
           } catch (e) {
             console.log(e);
             this.pending = false;
@@ -491,11 +532,13 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
+      query.include("nstpId");
       const results = await query.find();
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
+        this.data.program = object.get("nstpId").get("programName");
 
         if (
           object.get("takenNstp1") == true &&
@@ -548,9 +591,84 @@ export default {
       }
       this.students = studentList;
       this.studentsMissing = studentErrorList;
-      console.log(this.students);
-      console.log(this.studentsMissing);
+      this.data.graduates = results.length;
+      console.log(this.data.graduates);
       this.forceRerender();
+    },
+    async approve() {
+      let _this = this;
+      const date = new Date();
+      const fullyear = new Date().getFullYear();
+      const year = new Date().toLocaleDateString("en", { year: "2-digit" });
+      const program = this.data.program.charAt(0);
+
+      const Application = Parse.Object.extend("Application");
+      //get the end of serial number
+      const query = new Parse.Query(Application);
+      const results = await query.first();
+      //get serialNumber, if undefined; set startSerialNum to 1
+      //if not, set startSerialNum to the last saved endSerialNumber + 1
+      var newStart = 0;
+      var newEnd = 0;
+
+      if (results.get("serialNumber") == null) {
+        newStart = 1;
+        newEnd = this.data.graduates;
+      } else {
+        query.descending("serialNumber");
+        const serialNumber = await query.first();
+        const endSerialNumber = serialNumber.get("serialNumber").end;
+        newStart = endSerialNumber + 1;
+        newEnd = endSerialNumber + this.data.graduates;
+      }
+      console.log(newStart);
+      console.log(newEnd);
+
+      query.equalTo("objectId", this.appId);
+      await query.first().then(function (result) {
+        result.set("dateApproved", date);
+        result.set("awardYear", fullyear.toString());
+        result.set("serialNumber", { start: newStart, end: newEnd });
+        result.save();
+      });
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const enrollment = new Parse.Query(NstpEnrollment);
+      enrollment.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      await enrollment.find().then(function (results) {
+        var start = newStart;
+        // save serial number for each student
+        for (let i = 0; i < results.length; i++) {
+          var sn =
+            program +
+            "-" +
+            _this.hei_region_code.padStart(2, "0") +
+            "-" +
+            (start + "").padStart(6, "0") +
+            "-" +
+            year;
+          results[i].set("serialNumber", sn);
+          results[i].set("takenNstp1", true);
+          results[i].set("takenNstp2", true);
+          results[i].set("isGraduated", true);
+          results[i].save();
+          start++;
+        }
+      });
+      this.$emit("complete", 3);
+
+      this.$emit("setStatus", "Approved");
+      this.$emit("nextStep");
+    },
+    toggleConfirmModal() {
+      this.confirm = !this.confirm;
+      console.log(this.confirm);
+    },
+    confirmed() {
+      this.approve();
     },
     removeFile() {
       this.dropzoneFile = "";

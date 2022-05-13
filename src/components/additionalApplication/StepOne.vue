@@ -228,8 +228,8 @@ export default {
         );
 
         this.$emit("complete", step);
-        this.$emit("setStatus", "2 of 5");
-        this.$emit("sendEmail", "Notarized Transmittal Letter", "Step 1 of 5");
+        this.$emit("setStatus", "2 of 4");
+        this.$emit("sendEmail", "Notarized Transmittal Letter", "Step 1 of 4");
       }
     },
     async getUrl(appId) {

@@ -93,7 +93,7 @@ export default {
     this.hei = results.get("heiId").get("name");
     this.hei_username = results.get("heiId").get("username");
     this.hei_email = results.get("heiId").get("email");
-    console.log(this.hei_username);
+
     this.hei_region_code = results.get("heiId").get("address").regionNo;
 
     this.steps = results.get("steps");
@@ -125,7 +125,7 @@ export default {
           count++;
         }
       }
-      if (count < 5) {
+      if (count < 4) {
         count++;
       }
       this.currentStep = count;
@@ -204,7 +204,7 @@ export default {
           count++;
         }
       }
-      if (count < 5) {
+      if (count < 4) {
         count++;
       }
       if (step > count) {

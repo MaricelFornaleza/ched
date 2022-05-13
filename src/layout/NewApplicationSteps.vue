@@ -51,6 +51,7 @@
         @goToApplication="goToApplication"
         @setStatus="setStatus"
         @checkActive="checkActive"
+        @sendEmail="sendEmail"
         :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
@@ -74,6 +75,8 @@ export default {
       hei: "",
       hei_username: "",
       hei_region_code: "",
+      hei_email: "",
+
       application_id: "",
       currentStep: 0,
       steps: [],
@@ -88,10 +91,11 @@ export default {
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.application_id);
     query.include("heiId");
-    var results = await query.first();
+    var results = await query.first({ useMasterKey: true });
     this.hei = results.get("heiId").get("name");
     this.hei_username = results.get("heiId").get("username");
-    console.log(this.hei_username);
+    this.hei_email = results.get("heiId").get("email");
+
     this.hei_region_code = results.get("heiId").get("address").regionNo;
 
     this.steps = results.get("steps");
@@ -123,7 +127,7 @@ export default {
           count++;
         }
       }
-      if (count < 5) {
+      if (count < 4) {
         count++;
       }
       this.currentStep = count;
@@ -173,7 +177,7 @@ export default {
       );
     },
     nextStep() {
-      if (this.currentStep < 5) {
+      if (this.currentStep < 4) {
         this.currentStep++;
         this.isCompleted = this.findStep(this.currentStep);
         router.push({

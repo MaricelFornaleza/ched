@@ -170,12 +170,12 @@
                   class="h-6 text-error"
                   :class="[
                     application.application_type == 'New Application'
-                      ? application.status == '1 of 5'
+                      ? application.status == '1 of 4'
                         ? 'cursor-pointer'
                         : 'hidden'
-                      : application.status == '1 of 5' ||
-                        application.status == '2 of 5' ||
-                        application.status == '3 of 5'
+                      : application.status == '1 of 4' ||
+                        application.status == '2 of 4' ||
+                        application.status == '3 of 4'
                       ? 'cursor-pointer'
                       : 'hidden',
                   ]"

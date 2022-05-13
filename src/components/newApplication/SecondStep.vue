@@ -317,11 +317,11 @@ export default {
             self.verifyStudents(event.data.rows, event.data.nstp);
             self.pending = false;
             self.$emit("complete", step);
-            self.$emit("setStatus", "3 of 5");
+            self.$emit("setStatus", "3 of 4");
             self.$emit(
               "sendEmail",
               "List of Enrollment for the 2nd Semester",
-              "Step 2 of 5"
+              "Step 2 of 4"
             );
 
             // this.completed = !this.completed;

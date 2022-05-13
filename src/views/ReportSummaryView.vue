@@ -442,7 +442,7 @@ export default {
         this.pending.push(
           data.filter(
             (data) =>
-              data.updatedAt.match(this.labels[i]) && data.status.match(/of 5/)
+              data.updatedAt.match(this.labels[i]) && data.status.match(/of 4/)
           ).length
         );
 
