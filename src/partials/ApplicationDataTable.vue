@@ -259,7 +259,7 @@ export default {
     deleteApplication(app_id, app_type, app_status) {
       //to be updated
       if (app_type == "New Application") {
-        if (app_status == "1 of 5") {
+        if (app_status == "1 of 4") {
           if (confirm("Are you sure to delete?")) {
             // Application
             const Application = Parse.Object.extend("Application");
@@ -316,9 +316,9 @@ export default {
         }
       } else if (app_type == "For Additional Graduates") {
         if (
-          app_status == "1 of 5" ||
-          app_status == "2 of 5" ||
-          app_status == "3 of 5"
+          app_status == "1 of 4" ||
+          app_status == "2 of 4" ||
+          app_status == "3 of 4"
         ) {
           if (confirm("Are you sure to delete?")) {
             // to be updated

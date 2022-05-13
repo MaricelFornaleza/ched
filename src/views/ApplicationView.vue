@@ -496,7 +496,7 @@ export default {
         const application = new Application();
 
         application.set("dateApplied", currentDate);
-        application.set("status", "1 of 5");
+        application.set("status", "1 of 4");
         application.set("steps", this.newSteps);
         application.set("applicationType", "New Application");
         application.set("heiId", new Parse.User({ id: hei }));
