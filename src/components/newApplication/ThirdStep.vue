@@ -88,6 +88,19 @@
           </button>
         </div>
       </div>
+      <div v-else-if="status == 'Rejected'">
+        <ApplicationDetails :appId="appId" />
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
 
       <div v-else>
         <div
