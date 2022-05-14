@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="status != 'For Approval'"
+        v-if="status != 'For Approval' && status != 'Rejected'"
         class="
           container
           w-full
@@ -155,9 +155,15 @@
           ></StudentsDataTable>
         </div>
 
-        <div v-if="isAdmin && !isCompleted && status == 'For Approval'" class="space-x-5">
+        <div
+          v-if="isAdmin && !isCompleted && status == 'For Approval'"
+          class="space-x-5"
+        >
           <button class="btn-sm btn-default btn-outline">Back</button>
-          <button class="btn-sm btn-default bg-error text-light-100 border-0">
+          <button
+            @click="toggleRejectModal()"
+            class="btn-sm btn-default bg-error text-light-100 border-0"
+          >
             Reject
           </button>
           <button
@@ -192,6 +198,7 @@
       @toggleConfirmModal="toggleConfirmModal"
       @confirmed="confirmed"
     />
+    <RejectModal v-if="reject" @rejectApplication="rejectApplication" />
     <ModalWidget v-show="pending">
       <template #body>
         <div
@@ -250,7 +257,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
 import ApplicationModal from "@/partials/ApplicationModal.vue";
-
+import RejectModal from "@/partials/RejectModal.vue";
 import ApplicationDetails from "@/partials/ApplicationDetails.vue";
 
 import { XCircleIcon } from "@heroicons/vue/outline";
@@ -276,6 +283,7 @@ export default {
       femaleNumError: 0,
       worker: undefined,
       confirm: false,
+      reject: false,
       status: "",
 
       isAdmin: false,
@@ -301,6 +309,7 @@ export default {
     XCircleIcon,
     ApplicationDetails,
     ApplicationModal,
+    RejectModal,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -319,13 +328,12 @@ export default {
     query.matches("objectId", this.appId);
     query.select("status");
     const self = this;
-    query.first().then(function(results) {
+    query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      if(results.get("status") == 'For Approval')
-        self.getStudents();
+      if (results.get("status") == "For Approval") self.getStudents();
     });
-    
+
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
@@ -680,6 +688,25 @@ export default {
     toggleConfirmModal() {
       this.confirm = !this.confirm;
       console.log(this.confirm);
+    },
+    toggleRejectModal() {
+      this.reject = !this.reject;
+    },
+    async rejectApplication(reason) {
+      const Application = Parse.Object.extend("Application");
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      const results = await application.first();
+      results.set("reason", reason);
+      results.save();
+      this.data.reason = reason;
+      this.setStatus("Rejected");
+      this.toggleRejectModal();
+    },
+    setStatus(status) {
+      this.$emit("setStatus", status);
+
+      this.getData();
     },
     confirmed() {
       this.approve();

@@ -122,7 +122,10 @@
           fileName="List-of-Students-1stSem"
         ></StudentsDataTable>
 
-        <div v-if="isAdmin && !isCompleted && status == 'For Approval'" class="space-x-5">
+        <div
+          v-if="isAdmin && !isCompleted && status == 'For Approval'"
+          class="space-x-5"
+        >
           <button class="btn-sm btn-default btn-outline">Back</button>
           <button class="btn-sm btn-default bg-error text-light-100 border-0">
             Reject
@@ -277,11 +280,10 @@ export default {
     query.matches("objectId", this.appId);
     query.select("status");
     const self = this;
-    query.first().then(function(results) {
+    query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      if(results.get("status") == 'For Approval')
-        self.getStudents();
+      if (results.get("status") == "For Approval") self.getStudents();
     });
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
@@ -607,6 +609,9 @@ export default {
     toggleConfirmModal() {
       this.confirm = !this.confirm;
       console.log(this.confirm);
+    },
+    reject(reason) {
+      console.log(reason);
     },
     confirmed() {
       this.approve();
