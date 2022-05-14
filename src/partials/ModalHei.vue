@@ -82,6 +82,7 @@
                 :options="sortHEIs"
                 :settings="{ width: '100%', placeholder: 'Select' }"
               />
+              <p class="text-xs text-error">{{ errorMsg }}</p>
               <!-- @change="myChangeEvent($event)" @select="mySelectEvent($event)" -->
             </div>
           </div>
@@ -134,6 +135,7 @@ export default {
       results: false,
       value: "",
       placeholder: "Select",
+      errorMsg: null,
     };
   },
   props: {
@@ -161,7 +163,11 @@ export default {
   },
   methods: {
     nextPage() {
-      this.$emit("createApplication", this.value);
+      if (this.value == "") {
+        this.errorMsg = "This field is required!";
+      } else {
+        this.$emit("createApplication", this.value);
+      }
     },
     myChangeEvent(val) {
       console.log(val);

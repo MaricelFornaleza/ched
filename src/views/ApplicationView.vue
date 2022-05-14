@@ -509,9 +509,7 @@ export default {
             });
           },
           (error) => {
-            alert(
-              "Failed to create new object, with error code: " + error.message
-            );
+            console.log(error);
           }
         );
       } else if (this.application_type == "additional") {
