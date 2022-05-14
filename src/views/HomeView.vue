@@ -81,7 +81,7 @@
             v-else
             class="py-20 flex flex-col justify-center w-full text-light-400"
           >
-            <SearchIcon class="h-20" />
+            <img :src="EmptyGraph" alt="" class="h-56 mb-10" />
             <h2 class="font-body">No Data Found</h2>
           </div>
           <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
@@ -165,6 +165,8 @@ import Parse from "parse";
 import router from "../router";
 import html2pdf from "html2pdf.js";
 import EmptyState from "@/components/EmptyState.vue";
+import EmptyGraph from "@/assets/img/EmptyGraph.svg";
+
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -189,6 +191,7 @@ export default {
   },
   data() {
     return {
+      EmptyGraph,
       hei: {
         total: 0,
         countSuc: 0,
