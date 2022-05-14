@@ -5,16 +5,17 @@
         w-3/5
         m-auto
         mt-20
-        px-4 py-10
+        px-4
+        py-10
         flex flex-col
         justify-center
         items-center
-        space-y-5
-        border-4 border-dashed border-dark-100
         rounded-md
+        text-center
       "
     >
-      <DocumentAddIcon class="h-24 text-dark-100 mb-5" />
+      <img :src="NoDataFound" alt="" class="h-60 mb-10 pr-4" />
+
       <slot></slot>
     </div>
 
@@ -23,11 +24,14 @@
 </template>
 
 <script>
-import { DocumentAddIcon } from "@heroicons/vue/outline";
+import NoDataFound from "@/assets/img/NoDataFound.svg";
 export default {
   name: "EmptyState",
-  components: {
-    DocumentAddIcon,
+  data() {
+    return {
+      NoDataFound,
+    };
   },
+  components: {},
 };
 </script>
