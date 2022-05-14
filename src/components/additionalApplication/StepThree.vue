@@ -238,7 +238,7 @@ export default {
       femaleNum: 0,
       worker: undefined,
       confirm: false,
-      staus: "",
+      status: "",
 
       isAdmin: false,
       data: {
@@ -274,13 +274,13 @@ export default {
     };
     return { dropzoneFile, drop, selectedFile };
   },
-  created() {
+  async created() {
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
-    query.matches("objectId", this.appId);
-    query.select("status");
+    query.equalTo("objectId", this.appId);
+
     const self = this;
-    query.first().then(function (results) {
+    await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
       if (results.get("status") == "For Approval") self.getStudents();
@@ -289,7 +289,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.isCompleted);
   },
   methods: {
     forceRerender() {
@@ -506,7 +505,9 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
+      query.include("applicationId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
@@ -564,8 +565,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -608,7 +607,6 @@ export default {
     },
     toggleConfirmModal() {
       this.confirm = !this.confirm;
-      console.log(this.confirm);
     },
     reject(reason) {
       console.log(reason);
