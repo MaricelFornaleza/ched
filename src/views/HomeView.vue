@@ -124,8 +124,11 @@
               v-if="recenApplications == null"
               class="py-20 flex flex-col justify-center w-full text-light-400"
             >
-              <SearchIcon class="h-20" />
-              <h2 class="font-body">No Application Found</h2>
+              <empty-state class="pt-0 mt-0">
+                <p class="text-4xl font-bold text-light-400">
+                  No Application Found
+                </p>
+              </empty-state>
             </div>
 
             <list-item
@@ -161,12 +164,12 @@ import { Chart, registerables } from "chart.js";
 import Parse from "parse";
 import router from "../router";
 import html2pdf from "html2pdf.js";
+import EmptyState from "@/components/EmptyState.vue";
 import {
   AcademicCapIcon,
   LibraryIcon,
   DocumentTextIcon,
   DownloadIcon,
-  SearchIcon,
 } from "@heroicons/vue/solid";
 
 Chart.register(...registerables);
@@ -178,7 +181,7 @@ export default {
     LibraryIcon,
     DocumentTextIcon,
     DownloadIcon,
-    SearchIcon,
+    EmptyState,
     DataCount,
     BarChart,
     ProgressBar,

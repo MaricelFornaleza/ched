@@ -4,7 +4,7 @@
     <div v-else>
       <!-- When application is empty -->
       <div v-if="applications == ''">
-        <EmptyState>
+        <EmptyState class="mt-20">
           <p class="text-4xl font-bold text-dark-200">No Application Found</p>
           <p class="body-base text-dark-200">
             Get started by creating a new application.

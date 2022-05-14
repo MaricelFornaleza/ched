@@ -4,7 +4,7 @@
   <div v-else>
     <!-- When hei is empty -->
     <div v-if="heis == ''">
-      <EmptyState>
+      <EmptyState class="mt-20">
         <p class="text-4xl font-bold text-dark-200">No HEI Found</p>
         <p class="body-base text-dark-200">
           Get started by creating a new HEI or by uploading an excel file.

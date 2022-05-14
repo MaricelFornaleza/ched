@@ -1,10 +1,9 @@
 <template>
-  <div class="my-auto">
+  <div>
     <div
       class="
         w-full
         m-auto
-        mt-20
         px-4
         py-10
         flex flex-col
