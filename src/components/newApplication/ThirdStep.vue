@@ -97,7 +97,7 @@
             class="btn-sm btn-default btn-outline"
             type="button"
           >
-            Cancel
+            Back
           </button>
         </div>
       </div>
