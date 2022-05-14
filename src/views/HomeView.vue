@@ -138,6 +138,7 @@
               :school="application.hei"
               :type="application.type"
               :date="application.dateApplied"
+              :status="application.status"
               @click="viewApplication(application.type, application.id)"
             ></list-item>
           </ul>
@@ -469,6 +470,7 @@ export default {
             }),
             hei: object.get("heiId").get("name"),
             type: object.get("applicationType"),
+            status: object.get("status"),
           });
         }
         this.recentApplications = list;
