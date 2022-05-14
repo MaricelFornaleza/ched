@@ -72,7 +72,18 @@
             </button>
           </div>
 
-          <BarChart :chartData="testData" :options="options" />
+          <BarChart
+            v-if="testData != null"
+            :chartData="testData"
+            :options="options"
+          />
+          <div
+            v-else
+            class="py-20 flex flex-col justify-center w-full text-light-400"
+          >
+            <SearchIcon class="h-20" />
+            <h2 class="font-body">No Data Found</h2>
+          </div>
           <div class="grid grid-cols-2 gap-10 py-5 px-20 mt-10">
             <progress-bar
               label="CWTS Graduates"
@@ -109,6 +120,13 @@
                 View all
               </button>
             </li>
+            <div
+              v-if="recenApplications == null"
+              class="py-20 flex flex-col justify-center w-full text-light-400"
+            >
+              <SearchIcon class="h-20" />
+              <h2 class="font-body">No Application Found</h2>
+            </div>
 
             <list-item
               v-for="application in recentApplications"
@@ -148,6 +166,7 @@ import {
   LibraryIcon,
   DocumentTextIcon,
   DownloadIcon,
+  SearchIcon,
 } from "@heroicons/vue/solid";
 
 Chart.register(...registerables);
@@ -159,6 +178,7 @@ export default {
     LibraryIcon,
     DocumentTextIcon,
     DownloadIcon,
+    SearchIcon,
     DataCount,
     BarChart,
     ProgressBar,
@@ -416,7 +436,8 @@ export default {
         console.log("heiHome subscription closed");
       });
     },
-    async getApplications() {   //better if queue is used instead of the usual array
+    async getApplications() {
+      //better if queue is used instead of the usual array
       const Applications = Parse.Object.extend("Application");
       const query = new Parse.Query(Applications);
       query.include("heiId");
@@ -451,10 +472,11 @@ export default {
       appSubscription.on("create", (object) => {
         console.log("object created" + object);
         // console.log("length: " + this.recentApplications.length);
-        if(this.recentApplications.length >= 9) {
-          this.recentApplications.splice(8, 1);   //remove oldest application if apps > 9
+        if (this.recentApplications.length >= 9) {
+          this.recentApplications.splice(8, 1); //remove oldest application if apps > 9
         }
-        this.recentApplications.unshift({   //place latest app in the first index
+        this.recentApplications.unshift({
+          //place latest app in the first index
           id: object.id,
           dateApplied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "short",
@@ -475,8 +497,8 @@ export default {
 
       appSubscription.on("enter", (object) => {
         console.log("object entered" + object);
-        if(this.recentApplications.length >= 9) {
-          this.recentApplications.splice(8, 1);   //remove oldest application if apps > 9
+        if (this.recentApplications.length >= 9) {
+          this.recentApplications.splice(8, 1); //remove oldest application if apps > 9
         }
         this.recentApplications.unshift({
           id: object.id,
@@ -495,8 +517,11 @@ export default {
       appSubscription.on("leave", (object) => {
         console.log("object left" + object);
 
-        var index = this.recentApplications.findIndex((app) => app.id == object.id);
-        if(index > -1)  //only delete if it exists
+        var index = this.recentApplications.findIndex(
+          (app) => app.id == object.id
+        );
+        if (index > -1)
+          //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });
@@ -504,9 +529,12 @@ export default {
       appSubscription.on("delete", (object) => {
         console.log("object deleted" + object);
 
-        var index = this.recentApplications.findIndex((app) => app.id == object.id);
+        var index = this.recentApplications.findIndex(
+          (app) => app.id == object.id
+        );
         console.log(index);
-        if(index > -1)  //only delete if it exists
+        if (index > -1)
+          //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });
@@ -537,7 +565,7 @@ export default {
       const gradsSubscription = await query.subscribe();
       gradsSubscription.on("open", async () => {
         console.log("gradsHome subscription opened");
-        this.countGraduates();  //lazy counting
+        this.countGraduates(); //lazy counting
       });
 
       gradsSubscription.on("create", (object) => {
@@ -568,7 +596,6 @@ export default {
       gradsSubscription.on("close", () => {
         console.log("gradsApp subscription closed");
       });
-
     },
     async countGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
