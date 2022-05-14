@@ -568,7 +568,10 @@ export default {
       );
       query.include("studentId");
       query.include("nstpId");
+      query.include("applicationId");
+
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
