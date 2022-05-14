@@ -90,7 +90,7 @@
         <div class="bg-light-100 p-5 text-right sm:px-6">
           <button
             type="button"
-            @click="$emit('close')"
+            @click="close()"
             class="
               w-full
               justify-center
@@ -147,6 +147,7 @@ export default {
     Select2,
     SearchCircleIcon,
   },
+
   computed: {
     sortHEIs() {
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
@@ -168,6 +169,9 @@ export default {
       } else {
         this.$emit("createApplication", this.value);
       }
+    },
+    close() {
+      (this.errorMsg = null), this.$emit("close");
     },
     myChangeEvent(val) {
       console.log(val);
