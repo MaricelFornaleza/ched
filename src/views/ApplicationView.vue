@@ -5,11 +5,11 @@
       <!-- When application is empty -->
       <div v-if="applications == ''">
         <EmptyState>
-          <p class="text-4xl font-medium text-dark-300">No Applications</p>
-          <p class="body-l text-dark-200">
-            Get started by creating a new application
+          <p class="text-4xl font-bold text-dark-200">No Application Found</p>
+          <p class="body-base text-dark-200">
+            Get started by creating a new application.
           </p>
-          <div class="px-4 mb-4 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="px-4 mt-10 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
             <button
               typ="button"
               @click="toggleModal('new')"

@@ -2,7 +2,7 @@
   <div class="my-auto">
     <div
       class="
-        w-3/5
+        w-full
         m-auto
         mt-20
         px-4
