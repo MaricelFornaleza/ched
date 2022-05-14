@@ -334,14 +334,14 @@ export default {
     };
     return { dropzoneFile, drop, selectedFile };
   },
-  created() {
+  async created() {
     // if(this.isCompleted)
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
-    query.matches("objectId", this.appId);
-    query.select("status");
+    query.equalTo("objectId", this.appId);
+
     const self = this;
-    query.first().then(function (results) {
+    await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
       if (results.get("status") == "For Approval") self.getStudents();
@@ -719,7 +719,7 @@ export default {
     setStatus(status) {
       this.$emit("setStatus", status);
 
-      this.getData();
+      this.getStudents();
     },
     confirmed() {
       this.approve();

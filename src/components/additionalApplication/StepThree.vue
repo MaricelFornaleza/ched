@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="status != 'For Approval'"
+        v-if="status != 'For Approval' && status != 'Rejected'"
         class="
           container
           w-full
@@ -89,6 +89,19 @@
           </button>
         </div>
       </div>
+      <div v-else-if="status == 'Rejected'">
+        <ApplicationDetails :appId="appId" />
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
 
       <div
         v-else
@@ -127,7 +140,10 @@
           class="space-x-5"
         >
           <button class="btn-sm btn-default btn-outline">Back</button>
-          <button class="btn-sm btn-default bg-error text-light-100 border-0">
+          <button
+            @click="toggleRejectModal()"
+            class="btn-sm btn-default bg-error text-light-100 border-0"
+          >
             Reject
           </button>
           <button
@@ -158,6 +174,7 @@
       @toggleConfirmModal="toggleConfirmModal"
       @confirmed="confirmed"
     />
+    <RejectModal v-if="reject" @rejectApplication="rejectApplication" />
     <ModalWidget v-show="pending">
       <template #body>
         <div
@@ -215,6 +232,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import RejectModal from "@/partials/RejectModal.vue";
 import ApplicationModal from "@/partials/ApplicationModal.vue";
 import ApplicationDetails from "@/partials/ApplicationDetails.vue";
 import { XCircleIcon } from "@heroicons/vue/outline";
@@ -237,6 +255,7 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      reject: false,
       confirm: false,
       status: "",
 
@@ -263,6 +282,7 @@ export default {
     XCircleIcon,
     ApplicationDetails,
     ApplicationModal,
+    RejectModal,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -289,6 +309,7 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
+    console.log(this.status);
   },
   methods: {
     forceRerender() {
@@ -608,8 +629,24 @@ export default {
     toggleConfirmModal() {
       this.confirm = !this.confirm;
     },
-    reject(reason) {
-      console.log(reason);
+    toggleRejectModal() {
+      this.reject = !this.reject;
+    },
+    async rejectApplication(reason) {
+      const Application = Parse.Object.extend("Application");
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      const results = await application.first();
+      results.set("reason", reason);
+      results.save();
+      this.data.reason = reason;
+      this.setStatus("Rejected");
+      this.toggleRejectModal();
+    },
+    setStatus(status) {
+      this.$emit("setStatus", status);
+
+      this.getStudents();
     },
     confirmed() {
       this.approve();
