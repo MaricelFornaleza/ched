@@ -565,11 +565,18 @@ export default {
       this.enrollees.total = result.filter(
         (data) => data.get("applicationId").get("status") != "Rejected"
       ).length;
-      // this.enrollees.total = await query.count();
-      query.equalTo("takenNstp1", true);
-      this.enrollees.first = await query.count();
-      query.equalTo("takenNstp2", true);
-      this.enrollees.second = await query.count();
+
+      this.enrollees.first = result.filter(
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp1") == true
+      ).length;
+
+      this.enrollees.second = result.filter(
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp2") == true
+      ).length;
 
       query.exists("serialNumber");
       this.graduates.total = await query.count();
