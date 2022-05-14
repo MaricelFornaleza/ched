@@ -121,7 +121,7 @@
               </button>
             </li>
             <div
-              v-if="recenApplications == null"
+              v-if="recentApplications == null"
               class="py-20 flex flex-col justify-center w-full text-light-400"
             >
               <empty-state class="pt-0 mt-0">
