@@ -69,12 +69,12 @@
             <div class="w-full bg-error p-5 flex justify-between items-center">
               <div class="text-left text-light-100">
                 <h5 class="font-body font-bold" id="modal-title">
-                  Generate Serial Numbers?
+                  Delete Application?
                 </h5>
                 <p class="text-sm">This action cannot be undone!</p>
               </div>
               <div class="text-light-100">
-                <InformationCircleIcon class="h-10" />
+                <ExclamationCircleIcon class="h-10" />
               </div>
             </div>
 
@@ -110,7 +110,7 @@
         <div class="bg-light-100 p-5 text-right">
           <button
             type="button"
-            @click="$emit('toggleConfirmModal')"
+            @click="$emit('close')"
             class="
               mt-3
               w-full
@@ -143,11 +143,11 @@
   </div>
 </template>
 <script>
-import { InformationCircleIcon } from "@heroicons/vue/outline";
+import { ExclamationCircleIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
 export default {
   components: {
-    InformationCircleIcon,
+    ExclamationCircleIcon,
   },
   data() {
     return {
@@ -155,6 +155,11 @@ export default {
       error: null,
     };
   },
+  props: { deleteParams: Object },
+  mounted() {
+    console.log(this.deleteParams);
+  },
+
   methods: {
     async confirm() {
       console.log(this.password);
@@ -168,7 +173,7 @@ export default {
           usermasterKey: true,
         })
           .then(() => {
-            this.$emit("confirmed");
+            this.$emit("deleteApplication", this.deleteParams);
           })
           .catch((error) => {
             this.error = "Invalid password.";
