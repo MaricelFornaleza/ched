@@ -51,7 +51,7 @@
 
         <div
           v-else
-          class="my-20 w-full flex justify-between p-5 border border-light-300"
+          class="my-20 w-fit flex justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -65,7 +65,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -240,7 +240,8 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    this.getStudents();
+    if(this.isCompleted)
+      this.getStudents();
     console.log(this.allow);
   },
   methods: {

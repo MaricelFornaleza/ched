@@ -1,5 +1,6 @@
 <template>
-  <div class="p-10">
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div class="p-10" v-else>
     <div class="flex justify-between">
       <div class="flex justify-start space-x-5 mb-5">
         <div class="inline-flex">
@@ -80,8 +81,8 @@
           "
         >
           <option
-            v-for="year in years"
-            :key="year"
+            v-for="(year, index) in years"
+            :key="index"
             class="bg-light-100 text-dark-300"
           >
             {{ year }}
@@ -317,18 +318,21 @@ export default {
       rejected: [],
       month: null,
       year: null,
+
+      loading: true,
     };
   },
-  created() {
+  async created() {
     this.filter.condition = new Date().toLocaleString("en", { month: "long" });
 
-    this.year = this.years[0];
-
     this.month = new Date().toLocaleString("en", { month: "long" });
-    this.getHeis();
-    this.getApplications();
-    this.getGraduates();
-    this.getMonthlyData();
+    await this.getHeis();
+    await this.getApplications();
+    // this.year = this.years[0];
+    await this.getGraduates();
+    await this.getMonthlyData();
+
+    this.loading = false;
   },
   methods: {
     exportToPDF() {
@@ -471,9 +475,10 @@ export default {
       this.rejected = [];
       this.labels = [];
       this.count = [];
-      this.year = new Date().toLocaleString("en", {
-        year: "numeric",
-      });
+      // this.year = new Date().toLocaleString("en", {
+      //   year: "numeric",
+      // });  //this will cause to
+      // this.year = this.years[0];
     },
     sum(array) {
       var count = 0;
@@ -496,33 +501,48 @@ export default {
       this.hei.countOgs = await query.count();
     },
     async getApplications() {
-      var list = [];
+      // var list = [];
       const Applications = Parse.Object.extend("Application");
       const query = new Parse.Query(Applications);
-      query.limit(9);
-      query.include("heiId");
-      query.descending("dateApplied");
+      // query.limit(9);
+      // query.include("heiId");
+      // query.descending("dateApplied");
 
-      var results = await query.find();
-      for (let i = 0; i < results.length; i++) {
-        const object = results[i];
-        list.push({
-          id: object.id,
-          dateApplied: object.get("dateApplied").toLocaleDateString("en", {
-            weekday: "short",
+      // var results = await query.find();      //not needed
+      // for (let i = 0; i < results.length; i++) {
+      //   const object = results[i];
+      //   list.push({
+      //     id: object.id,
+      //     dateApplied: object.get("dateApplied").toLocaleDateString("en", {
+      //       weekday: "short",
+      //       year: "numeric",
+      //       month: "long",
+      //       day: "numeric",
+      //     }),
+      //     hei: object.get("heiId").get("name"),
+      //     type: object.get("applicationType"),
+      //   });
+      // }
+      // this.recentApplications = list;
+
+      // query.distinct("updatedAt").then((res) => {
+      //   console.log(res);
+      //   this.years = res;
+      //   this.year = this.years[0];
+      // });
+      query.descending("updatedAt");
+      const result = await query.find();
+      let temp = [];
+      for (let index = 0; index < result.length; index++) {
+        const element = result[index];
+        temp.push(
+          element.get("updatedAt").toLocaleDateString("en", {
             year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-          hei: object.get("heiId").get("name"),
-          type: object.get("applicationType"),
-        });
+          })
+        );
       }
-      this.recentApplications = list;
-
-      query.distinct("awardYear").then((res) => {
-        this.years = res;
-      });
+      this.years = [...new Set(temp)];
+      this.year = this.years[0];
 
       this.applications.total = await query.count();
       query.equalTo("status", "For Approval");
@@ -539,7 +559,13 @@ export default {
     async getGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
-      this.enrollees.total = await query.count();
+      query.include("applicationId");
+
+      const result = await query.find();
+      this.enrollees.total = result.filter(
+        (data) => data.get("applicationId").get("status") != "Rejected"
+      ).length;
+      // this.enrollees.total = await query.count();
       query.equalTo("takenNstp1", true);
       this.enrollees.first = await query.count();
       query.equalTo("takenNstp2", true);

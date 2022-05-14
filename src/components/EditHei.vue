@@ -253,13 +253,14 @@
 
         <div class="flex items-center justify-center space-x-5 mt-10">
           <button
-            class="btn-sm border-none bg-light-300 font-bold"
+            @click="goToHei()"
+            class="btn-sm btn-default btn-outline"
             type="button"
           >
             Cancel
           </button>
           <button
-            class="btn-sm bg-brand-blue text-light-100 font-bold"
+            class="btn-sm btn-default"
             type="submit"
           >
             Submit
@@ -349,6 +350,9 @@ export default {
     this.getProvinceCode();
   },
   methods: {
+    goToHei() {
+      this.$router.push({ name: "hei" });
+    },
     handleProvince(e) {
       this.regionName = e.target.selectedOptions[0].text;
       this.regionNo = e.target.value;
@@ -412,7 +416,7 @@ export default {
         });
       }
     },
-    async editHei() {
+    async editHei() { // better if this is done in cloud code
       const User = Parse.Object.extend(Parse.User);
       const q = new Parse.Query(User);
       q.matches("objectId", this.id);
@@ -435,8 +439,7 @@ export default {
 
       result
         .save(
-          { useMasterKey: true },
-          { sessionToken: result.get("sessionToken") }
+          // { useMasterKey: true }
         )
         .then((user) => {
           if (this.usertype == "admin") {

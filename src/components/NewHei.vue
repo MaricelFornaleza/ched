@@ -376,7 +376,7 @@ export default {
       this.isLoading = true;
       var password = Math.random().toString(36).slice(-12);
       const user = new Parse.User();
-      user.set("name", this.name);
+      user.set("name", this.name.toUpperCase());
       user.set("email", this.email);
       user.set("username", this.username);
       user.set("contactNumber", this.contact_number);
@@ -391,6 +391,12 @@ export default {
       user.set("type", this.hei_type);
       user.set("password", password);
       user.set("userType", "hei");
+      
+      const ACL = new Parse.ACL();
+      ACL.setReadAccess(Parse.User.current(), true);
+      ACL.setWriteAccess(Parse.User.current(), true);
+      user.setACL(ACL);
+
       user.save().then((user) => {
         const params = {
           name: this.name,

@@ -70,11 +70,11 @@ const routes = [
             {name: 'Home'},
           ]
         },
-        beforeEnter: () => {
-          if (Parse.User.current().get("userType") !== "admin" ) {
-            return { name: '403' }
-          } 
-        },
+        // beforeEnter: () => {
+        //   if (Parse.User.current().get("userType") !== "admin" ) {
+        //     return { name: '403' }
+        //   } 
+        // },
       },
       {
         path: "/hei",

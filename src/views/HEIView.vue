@@ -196,8 +196,20 @@ export default {
       this.alert.msg = msg;
       console.log("success");
     },
+    async count() {
+      const query = new Parse.Query(Parse.User);
+      query.equalTo("userType", "hei");
+      query.equalTo("type", "LUC");
+      this.countLUC = await query.count();
+      query.equalTo("type", "SUC");
+      this.countSUC = await query.count();
+      query.equalTo("type", "Private");
+      this.countPrivate = await query.count();
+      query.equalTo("type", "OGS");
+      this.countOGS = await query.count();
+    }
   },
-  async mounted() {
+  async created() {
     this.alert.className = "alert-" + this.$route.query.status;
     this.alert.msg = this.$route.query.msg;
 
@@ -219,16 +231,84 @@ export default {
       });
     }
     this.heis = hei;
+    this.count().then(() => this.loading = false );
+    
+    const subscription = await query.subscribe();
+    subscription.on("open", () => {
+      console.log("hei subscription opened");
+      // can get the list here
+    });
 
-    query.equalTo("type", "LUC");
-    this.countLUC = await query.count();
-    query.equalTo("type", "SUC");
-    this.countSUC = await query.count();
-    query.equalTo("type", "PRIVATE");
-    this.countPrivate = await query.count();
-    query.equalTo("type", "OGS");
-    this.countOGS = await query.count();
-    this.loading = false;
+    subscription.on("create", (object) => {
+      console.log("object created" + object);
+      
+      this.count();
+      this.heis.push({
+        id: object.id,
+        institutional_code: object.get("institutionalCode"),
+        hei_name: object.get("name"),
+        hei_username: object.get("username"),
+        hei_type: object.get("type"),
+        email: object.get("email"),
+        address: object.get("address"),
+      });
+    });
+
+    subscription.on("update", (object) => {
+      console.log("object updated" + object);
+
+      this.count();
+      // find
+      var index = this.heis.findIndex((hei) => hei.id == object.id);
+      // get graduates
+      this.heis[index] = {
+        ...this.heis[index],
+        institutional_code: object.get("institutionalCode"),
+        hei_name: object.get("name"),
+        hei_username: object.get("username"),
+        hei_type: object.get("type"),
+        email: object.get("email"),
+        address: object.get("address"),
+      };
+    });
+
+    subscription.on("enter", (object) => {
+      console.log("object entered" + object);
+      
+      this.count();
+      this.heis.push({
+        id: object.id,
+        institutional_code: object.get("institutionalCode"),
+        hei_name: object.get("name"),
+        hei_username: object.get("username"),
+        hei_type: object.get("type"),
+        email: object.get("email"),
+        address: object.get("address"),
+      });
+    });
+
+    subscription.on("leave", (object) => {
+      console.log("object left" + object);
+
+      this.count();
+      // find
+      var index = this.heis.findIndex((app) => app.id == object.id);
+      this.heis.splice(index, 1); //remove the specific object in the array
+    });
+
+    subscription.on("delete", (object) => {
+      console.log("object deleted" + object);
+
+      this.count();
+      // find
+      var index = this.heis.findIndex((app) => app.id == object.id);
+      this.heis.splice(index, 1); //remove the specific object in the array
+    });
+
+    subscription.on("close", () => {
+      console.log("hei subscription closed");
+    });
+
   },
   components: {
     EmptyState,

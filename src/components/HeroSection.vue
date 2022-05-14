@@ -59,6 +59,11 @@
             "
           >
             <h2 class="text-brand-blue font-bold">Sign In</h2>
+            <div class="w-fit">
+              <AlertWidget :className="alert.className">
+                {{ alert.msg }}
+              </AlertWidget>
+            </div>
             <p class="body-s">
               Welcome back! Please provide the HEI's credentials.
             </p>
@@ -229,12 +234,14 @@
 
 <script>
 import { XIcon } from "@heroicons/vue/outline";
+import AlertWidget from "@/partials/AlertWidget.vue";
 import Parse from "parse";
 
 export default {
   name: "HeroSection",
   components: {
     XIcon,
+    AlertWidget
   },
   data() {
     return {
@@ -244,6 +251,7 @@ export default {
       password: "",
       passwordError: "",
       isLoading: false,
+      alert: {},
     };
   },
   methods: {
@@ -272,16 +280,25 @@ export default {
           self.isLoading = false;
           const user = Parse.User.current();
           const usertype = user.get("userType");
+
           if (usertype == "hei") {
-            this.$router.push({ name: "application" });
+            if (user.get("emailVerified"))
+              this.$router.push({ name: "application" });
+            else 
+              this.displayAlert("error", "Please verify first your email!");
           } else if (usertype == "admin") {
             this.$router.push({ name: "home" });
           }
         })
         .catch((err) => {
           self.isLoading = false;
-          alert("error" + err.message);
+          // alert("error" + err.message);
+          this.displayAlert("error", err.message);
         });
+    },
+    displayAlert(status, msg) {
+      this.alert.className = "alert-" + status;
+      this.alert.msg = msg;
     },
   },
 };
