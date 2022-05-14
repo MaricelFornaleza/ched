@@ -329,6 +329,8 @@ export default {
               }
             );
           }
+          this.displayMsg("success", "Application successfully deleted!");
+
           console.log("Application Deleted!");
         } else {
           this.displayMsg("error", "Cannot delete application after step 1!");
@@ -407,6 +409,7 @@ export default {
                 }
               );
             }*/
+          this.displayMsg("success", "Application successfully deleted!");
           console.log("Application Deleted!");
         } else {
           this.displayMsg("error", "Cannot delete application after step 3!");
