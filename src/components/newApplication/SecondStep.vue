@@ -119,6 +119,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            :status="status"
             @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
@@ -253,6 +254,7 @@ export default {
       maleNumError: 0,
       femaleNumError: 0,
       worker: undefined,
+      status: null,
     };
   },
   props: { isCompleted: Boolean, appId: String, allow: Boolean },
@@ -489,6 +491,7 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {

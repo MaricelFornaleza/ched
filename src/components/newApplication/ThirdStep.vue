@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="status != 'For Approval' && status != 'Rejected'"
+        v-if="status != 'For Approval' && status != 'Rejected' && !isCompleted"
         class="
           container
           w-full
@@ -132,6 +132,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            :status="status"
             fileName="List-of-Students-Graduates"
             @getStudents="getStudents"
           ></StudentsDataTable>
@@ -165,6 +166,7 @@
             newId="datatable2"
             :key="componentKey"
             :students="studentsMissing"
+            :status="status"
             fileName="List-of-Students-Missing"
           ></StudentsDataTable>
         </div>
@@ -345,7 +347,11 @@ export default {
     await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      if (results.get("status") == "For Approval") self.getStudents();
+      if (
+        results.get("status") == "For Approval" ||
+        results.get("status") == "Approved"
+      )
+        self.getStudents();
     });
 
     const user = Parse.User.current();
@@ -573,7 +579,7 @@ export default {
 
       const results = await query.find();
       this.status = results[0].get("applicationId").get("status");
-
+      console.log(results);
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
@@ -632,7 +638,7 @@ export default {
       this.students = studentList;
       this.studentsMissing = studentErrorList;
       this.data.graduates = results.length;
-      console.log(this.data.graduates);
+
       this.forceRerender();
     },
     async approve() {

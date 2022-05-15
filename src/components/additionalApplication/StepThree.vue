@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="status != 'For Approval' && status != 'Rejected'"
+        v-if="status != 'For Approval' && status != 'Rejected' && !isCompleted"
         class="
           container
           w-full
@@ -132,6 +132,7 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          :status="status"
           fileName="List-of-Students-1stSem"
           @getStudents="getStudents"
         ></StudentsDataTable>
@@ -304,7 +305,11 @@ export default {
     await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      if (results.get("status") == "For Approval") self.getStudents();
+      if (
+        results.get("status") == "For Approval" ||
+        results.get("status") == "Approved"
+      )
+        self.getStudents();
     });
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {

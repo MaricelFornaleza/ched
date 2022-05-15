@@ -118,6 +118,7 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          :status="status"
           fileName="List-of-Students-1stSem"
           @getStudents="getStudents"
         ></StudentsDataTable>
@@ -215,6 +216,7 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      status: null,
     };
   },
   props: {
@@ -470,6 +472,7 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {

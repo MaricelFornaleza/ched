@@ -24,7 +24,7 @@
         >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
-              <th></th>
+              <th v-if="allow"></th>
               <th class="p-6">No.</th>
               <th class="text-left">Last Name</th>
               <th>First Name</th>
@@ -47,7 +47,11 @@
               :key="index"
               class="whitespace-nowrap"
             >
-              <td @click="toggleDeleteModal(student.id)" class="cursor-pointer">
+              <td
+                v-if="allow"
+                @click="toggleDeleteModal(student.id)"
+                class="cursor-pointer"
+              >
                 <div class="rounded border text-error">
                   <XIcon class="h-3" />
                 </div>
@@ -109,6 +113,7 @@ export default {
       newFileName: this.fileName,
       deleteStudent: false,
       deleteParams: null,
+      allow: true,
     };
   },
   components: {
@@ -116,11 +121,13 @@ export default {
     XIcon,
     RemoveStudentModal,
   },
-  props: { students: Array, newId: String, fileName: String },
+  props: { students: Array, newId: String, fileName: String, status: String },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
     this.newFileName = this.fileName;
+    console.log(this.status);
+    this.allowDelete();
   },
   watch: {
     students() {
@@ -130,6 +137,10 @@ export default {
     },
   },
   methods: {
+    allowDelete() {
+      if (this.status == "Approved" || this.status == "Rejected")
+        this.allow = false;
+    },
     toggleDeleteModal(id) {
       this.deleteStudent = !this.deleteStudent;
       this.deleteParams = id;
