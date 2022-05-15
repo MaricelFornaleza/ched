@@ -421,8 +421,8 @@ export default {
       });
       student.set("birthdate", studentData.J);
       student.set("gender", studentData.K);
-      student.set("emailAddress", studentData.T);
-      student.set("contactNumber", studentData.U);
+      student.set("emailAddress", studentData.T.toString());
+      student.set("contactNumber", studentData.U.toString());
       student.set("address", {
         street: studentData.L,
         city: studentData.M,
@@ -430,7 +430,7 @@ export default {
         region: studentData.D,
       });
       student.set("program", {
-        programLevelCode: studentData.R,
+        programLevelCode: studentData.R.toString(),
         programName: studentData.S,
       });
       student.set("heiId", this.heiId);
