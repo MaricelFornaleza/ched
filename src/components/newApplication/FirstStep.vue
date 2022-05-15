@@ -244,7 +244,6 @@ export default {
   },
   created() {
     if (this.isCompleted) this.getStudents();
-    console.log(this.allow);
   },
   methods: {
     forceRerender() {
@@ -342,7 +341,7 @@ export default {
       //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
       //if not, store in separate lists
       const studentSet = new Set(studentData);
-      console.log(studentSet);
+
       const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(nstpEnrollment);
       // query.equalTo(
@@ -398,7 +397,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
 
       const query1 = new Parse.Query(Parse.User);
@@ -409,11 +407,24 @@ export default {
       if (Parse.User.current().get("userType") == "hei") {
         const notification = new Parse.Object("Notification");
         notification.set("applicationId", this.appId);
-         notification.set("userId", obj.id);
-        notification.set("message", Parse.User.current().get("username") + ' created a new application with id number '  + this.appId + ' and uploaded the List of Enrollment for First Semester');
+        notification.set("userId", obj.id);
+        notification.set(
+          "message",
+          Parse.User.current().get("username") +
+            " created a new application with id number " +
+            this.appId +
+            " and uploaded the List of Enrollment for First Semester"
+        );
         notification.set("routeName", "1stStep");
         notification.set("isRead", false);
-        notification.save();
+        notification.save().then(
+          (res) => {
+            console.log(res);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
       }
 
       // studentSet.forEach (function(student) {
@@ -472,7 +483,6 @@ export default {
         nstpEnrollment.save();
       });
 
-    
       this.pending = false;
     },
     async getStudents() {

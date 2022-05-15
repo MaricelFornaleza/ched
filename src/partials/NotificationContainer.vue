@@ -4,6 +4,7 @@
       <button @click="viewNotifications" class="relative z-10 block">
         <BellIcon class="h-6" />
         <div
+          v-if="unread != 0"
           class="
             absolute
             w-3
@@ -40,14 +41,48 @@
             overflow-y-auto
           "
         >
-          <li class="notif-child text-center font-bold">Notifications</li>
+          <li
+            class="
+              notif-child
+              text-center
+              flex
+              items-center
+              justify-center
+              font-bold
+            "
+          >
+            <div>Notifications</div>
+            <div
+              v-if="unread != 0"
+              class="
+                text-[10px]
+                ml-4
+                h-5
+                w-5
+                text-light-100
+                justify-center
+                flex
+                items-center
+                rounded-full
+                bg-error
+              "
+            >
+              {{ unread }}
+            </div>
+          </li>
           <li
             v-for="notification in notifications"
             :key="notification.id"
             class="p-4 hover:bg-light-200 cursor-pointer"
             :class="notification.isRead ? 'bg-light-100' : 'bg-light-200'"
-            @click="openNotification(notification.routeName, notification.appId, notification.id)"
-          >  
+            @click="
+              openNotification(
+                notification.routeName,
+                notification.appId,
+                notification.id
+              )
+            "
+          >
             {{ notification.message }}
           </li>
           <li class="notif-child text-center">See more</li>
@@ -69,14 +104,15 @@ export default {
     return {
       show: false,
       notifications: [],
+      unread: 0,
     };
   },
   async mounted() {
-
     const Notification = Parse.Object.extend("Notification");
     const query = new Parse.Query(Notification);
     query.equalTo("userId", Parse.User.current().id);
     const result = await query.find();
+
     var notification = [];
     for (let i = 0; i < result.length; i++) {
       const object = result[i];
@@ -88,8 +124,10 @@ export default {
         isRead: object.get("isRead"),
       });
     }
-    
-    
+
+    query.equalTo("isRead", false);
+    this.unread = await query.count();
+
     const Notif = Parse.Object.extend("Notification");
     const queryApp = new Parse.Query(Notif);
     const applicationSubscription = await queryApp.subscribe();
@@ -97,7 +135,7 @@ export default {
       console.log("notification subscription opened");
     });
     applicationSubscription.on("create", (object) => {
-       console.log("object created" + object);
+      console.log("object created" + object);
       this.notifications.push({
         id: object.id,
         message: object.get("message"),
@@ -105,10 +143,11 @@ export default {
         appId: object.get("applicationId"),
         isRead: object.get("isRead"),
       });
+      this.getUnreadNotifications();
     });
     applicationSubscription.on("update", (object) => {
-       console.log("object updated" + object);
-       var index = this.notifications.findIndex((app) => app.id ==object.id);
+      console.log("object updated" + object);
+      var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications[index] = {
         id: object.id,
         message: object.get("message"),
@@ -116,9 +155,10 @@ export default {
         appId: object.get("applicationId"),
         isRead: object.get("isRead"),
       };
+      this.getUnreadNotifications();
     });
     applicationSubscription.on("enter", (object) => {
-       console.log("object entered" + object);
+      console.log("object entered" + object);
 
       this.notifications.push({
         id: object.id,
@@ -127,16 +167,19 @@ export default {
         appId: object.get("applicationId"),
         isRead: object.get("isRead"),
       });
+      this.getUnreadNotifications();
     });
     applicationSubscription.on("leave", (object) => {
       console.log("object left" + object);
-    var index = this.notifications.findIndex((app) => app.id == object.id);
-    this.notifications.splice(index, 1);
+      var index = this.notifications.findIndex((app) => app.id == object.id);
+      this.notifications.splice(index, 1);
+      this.getUnreadNotifications();
     });
     applicationSubscription.on("delete", (object) => {
-       console.log("object left" + object);
-    var index = this.notifications.findIndex((app) => app.id == object.id);
-    this.notifications.splice(index, 1);
+      console.log("object left" + object);
+      var index = this.notifications.findIndex((app) => app.id == object.id);
+      this.notifications.splice(index, 1);
+      this.getUnreadNotifications();
     });
     applicationSubscription.on("close", () => {
       console.log("app subscription closed");
@@ -148,7 +191,6 @@ export default {
       this.show = !this.show;
     },
     async openNotification(routeName, appId, id) {
-
       const Notification = Parse.Object.extend("Notification");
       const query = new Parse.Query(Notification);
       query.matches("objectId", id);
@@ -164,8 +206,15 @@ export default {
         },
       });
       this.show = false;
-    }
-  }
+    },
+    async getUnreadNotifications() {
+      const Notification = Parse.Object.extend("Notification");
+      const query = new Parse.Query(Notification);
+      query.equalTo("userId", Parse.User.current().id);
+      query.equalTo("isRead", false);
+      this.unread = await query.count();
+    },
+  },
 };
 </script>
 <style>
