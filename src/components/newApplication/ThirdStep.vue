@@ -584,6 +584,7 @@ export default {
           object.get("isGraduated") == true
         ) {
           studentList.push({
+            id: object.get("studentId").id,
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

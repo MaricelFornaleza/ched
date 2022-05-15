@@ -24,6 +24,7 @@
         >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
+              <th></th>
               <th class="p-6">No.</th>
               <th class="text-left">Last Name</th>
               <th>First Name</th>
@@ -46,6 +47,11 @@
               :key="index"
               class="whitespace-nowrap"
             >
+              <td @click="toggleDeleteModal(student.id)" class="cursor-pointer">
+                <div class="rounded border text-error">
+                  <XIcon class="h-3" />
+                </div>
+              </td>
               <td class="px-6 py-4">{{ index + 1 }}</td>
               <td class="px-6 py-4 text-left">
                 {{ student.name.lastName }}
@@ -75,6 +81,11 @@
         </table>
       </div>
     </div>
+    <RemoveStudentModal
+      v-if="deleteStudent"
+      @toggleDeleteModal="toggleDeleteModal"
+      @confirmDeleteStudent="confirmDeleteStudent"
+    />
   </div>
 </template>
 
@@ -86,18 +97,24 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
-import { DownloadIcon } from "@heroicons/vue/outline";
+import { DownloadIcon, XIcon } from "@heroicons/vue/outline";
+import RemoveStudentModal from "@/partials/RemoveStudentModal.vue";
 import * as XLSX from "xlsx";
+import Parse from "parse";
 
 export default {
   data() {
     return {
       tableId: "dataTable",
       newFileName: this.fileName,
+      deleteStudent: false,
+      deleteParams: null,
     };
   },
   components: {
     DownloadIcon,
+    XIcon,
+    RemoveStudentModal,
   },
   props: { students: Array, newId: String, fileName: String },
   created() {
@@ -113,6 +130,37 @@ export default {
     },
   },
   methods: {
+    toggleDeleteModal(id) {
+      this.deleteStudent = !this.deleteStudent;
+      this.deleteParams = id;
+    },
+    async confirmDeleteStudent() {
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query1 = new Parse.Query(NstpEnrollment);
+      query1.equalTo(
+        "studentId",
+        new Parse.Object("Student", { id: this.deleteParams })
+      );
+      query1.first().then(
+        (object) => {
+          object.destroy().then(() => {
+            console.log("Nstp Deleted!");
+            const Student = Parse.Object.extend("Student");
+            const query2 = new Parse.Query(Student);
+            query2.get(this.deleteParams).then((obj) => {
+              obj.destroy().then(async () => {
+                console.log("Student Deleted!");
+                this.updateDt();
+                this.toggleDeleteModal();
+              });
+            });
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    },
     updateDt() {
       if (typeof this.newId !== "undefined") {
         //so that datatable's id is unique even when the component is used more than once
@@ -131,6 +179,7 @@ export default {
             sLengthMenu: "_MENU_",
           },
           scrollX: true,
+          columnDefs: [{ orderable: false, targets: 0 }],
         });
       });
     },
