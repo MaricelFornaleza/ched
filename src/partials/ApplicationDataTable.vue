@@ -1,5 +1,11 @@
 <template>
-  <div class="p-10 w-full">
+  <div class="p-10 w-full text-center">
+    <delete-modal
+      v-if="confirm"
+      @close="close"
+      :deleteParams="deleteParams"
+      @deleteApplication="deleteApplication"
+    ></delete-modal>
     <div class="overflow-x-auto">
       <div class="flex space-x-5 absolute right-20 mt-5 z-10">
         <div class="flex flex-col">
@@ -161,7 +167,7 @@
                 />
                 <TrashIcon
                   @click="
-                    deleteApplication(
+                    confirmDelete(
                       application.id,
                       application.application_type,
                       application.status
@@ -196,6 +202,7 @@ import "jquery/dist/jquery.min.js";
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
+import DeleteModal from "@/partials/DeleteModal.vue";
 import $ from "jquery";
 import * as XLSX from "xlsx";
 import Parse from "parse";
@@ -214,6 +221,7 @@ export default {
     ChevronDownIcon,
     EyeIcon,
     TrashIcon,
+    DeleteModal,
   },
   props: {
     applications: Object,
@@ -237,6 +245,8 @@ export default {
   data: function () {
     return {
       dropdown: false,
+      confirm: false,
+      deleteParams: null,
     };
   },
   methods: {
@@ -256,15 +266,61 @@ export default {
         });
       }
     },
-    deleteApplication(app_id, app_type, app_status) {
+    confirmDelete(app_id, app_type, app_status) {
+      this.confirm = true;
+      this.deleteParams = {
+        app_id: app_id,
+        app_type: app_type,
+        app_status: app_status,
+      };
+    },
+    close() {
+      this.confirm = false;
+    },
+    deleteApplication(deleteParams) {
       //to be updated
-      if (app_type == "New Application") {
-        if (app_status == "1 of 5") {
-          if (confirm("Are you sure to delete?")) {
-            // Application
-            const Application = Parse.Object.extend("Application");
-            const query1 = new Parse.Query(Application);
-            query1.get(app_id).then(
+      if (deleteParams.app_type == "New Application") {
+        if (deleteParams.app_status == "1 of 4") {
+          // Application
+          const Application = Parse.Object.extend("Application");
+          const query1 = new Parse.Query(Application);
+          query1.get(deleteParams.app_id).then(
+            (object) => {
+              object.destroy();
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+
+          // NstpEnrollment
+          const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+          const query3 = new Parse.Query(NstpEnrollment);
+          query3.equalTo(
+            "applicationId",
+            new Parse.Object("Application", { id: deleteParams.app_id })
+          );
+          // query3.include("studentId");
+          let studentList = [];
+          query3.find().then(
+            (results) => {
+              for (let i = 0; i < results.length; i++) {
+                studentList.push(results[i].get("studentId"));
+                results[i].destroy();
+              }
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+          console.log("studentList: " + studentList);
+          // Student
+          const Student = Parse.Object.extend("Student");
+          const query4 = new Parse.Query(Student);
+
+          for (let i = 0; i < studentList.length; i++) {
+            console.log("student id: " + studentList[i]);
+            query4.get(studentList[i]).then(
               (object) => {
                 object.destroy();
               },
@@ -272,88 +328,52 @@ export default {
                 console.log(error);
               }
             );
-
-            // NstpEnrollment
-            const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-            const query3 = new Parse.Query(NstpEnrollment);
-            query3.equalTo(
-              "applicationId",
-              new Parse.Object("Application", { id: app_id })
-            );
-            // query3.include("studentId");
-            let studentList = [];
-            query3.find().then(
-              (results) => {
-                for (let i = 0; i < results.length; i++) {
-                  studentList.push(results[i].get("studentId"));
-                  results[i].destroy();
-                }
-              },
-              (error) => {
-                console.log(error);
-              }
-            );
-            console.log("studentList: " + studentList);
-            // Student
-            const Student = Parse.Object.extend("Student");
-            const query4 = new Parse.Query(Student);
-
-            for (let i = 0; i < studentList.length; i++) {
-              console.log("student id: " + studentList[i]);
-              query4.get(studentList[i]).then(
-                (object) => {
-                  object.destroy();
-                },
-                (error) => {
-                  console.log(error);
-                }
-              );
-            }
-            console.log("Application Deleted!");
           }
+          this.displayMsg("success", "Application successfully deleted!");
+
+          console.log("Application Deleted!");
         } else {
           this.displayMsg("error", "Cannot delete application after step 1!");
         }
-      } else if (app_type == "For Additional Graduates") {
+      } else if (deleteParams.app_type == "For Additional Graduates") {
         if (
-          app_status == "1 of 5" ||
-          app_status == "2 of 5" ||
-          app_status == "3 of 5"
+          deleteParams.app_status == "1 of 4" ||
+          deleteParams.app_status == "2 of 4" ||
+          deleteParams.app_status == "3 of 4"
         ) {
-          if (confirm("Are you sure to delete?")) {
-            // to be updated
-            // Application
-            const Application = Parse.Object.extend("Application");
-            const query1 = new Parse.Query(Application);
-            query1.get(app_id).then(
-              (object) => {
-                object.destroy();
-              },
-              (error) => {
-                console.log(error);
+          // to be updated
+          // Application
+          const Application = Parse.Object.extend("Application");
+          const query1 = new Parse.Query(Application);
+          query1.get(deleteParams.app_id).then(
+            (object) => {
+              object.destroy();
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+          // ApplicationDocument
+          const Document = Parse.Object.extend("ApplicationDocument");
+          const query2 = new Parse.Query(Document);
+          query2.equalTo(
+            "applicationId",
+            new Parse.Object("Application", { id: deleteParams.app_id })
+          );
+          query2.find().then(
+            (results) => {
+              for (let i = 0; i < results.length; i++) {
+                results[i].destroy();
               }
-            );
-            // ApplicationDocument
-            const Document = Parse.Object.extend("ApplicationDocument");
-            const query2 = new Parse.Query(Document);
-            query2.equalTo(
-              "applicationId",
-              new Parse.Object("Application", { id: app_id })
-            );
-            query2.find().then(
-              (results) => {
-                for (let i = 0; i < results.length; i++) {
-                  results[i].destroy();
-                }
-              },
-              (error) => {
-                console.log(error);
-              }
-            );
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
 
-            // May remove this since application can't be deleted after step 3
-            // NstpEnrollment
-            /*const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+          // May remove this since application can't be deleted after step 3
+          // NstpEnrollment
+          /*const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
             const query3 = new Parse.Query(NstpEnrollment);
             query3.equalTo(
               "applicationId",
@@ -389,12 +409,13 @@ export default {
                 }
               );
             }*/
-            console.log("Application Deleted!");
-          }
+          this.displayMsg("success", "Application successfully deleted!");
+          console.log("Application Deleted!");
         } else {
           this.displayMsg("error", "Cannot delete application after step 3!");
         }
       }
+      this.close();
     },
     exportToExcel() {
       //this.displayMsg("success", "Application Deleted!");

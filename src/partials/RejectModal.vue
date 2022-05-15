@@ -15,7 +15,6 @@
         pt-4
         px-4
         pb-20
-        text-center
         sm:block sm:p-0
       "
     >
@@ -58,7 +57,6 @@
           align-bottom
           bg-light-100
           rounded-md
-          text-center
           overflow-hidden
           shadow-xl
           transform
@@ -66,32 +64,48 @@
           sm:my-8 sm:align-middle sm:max-w-lg sm:w-full
         "
       >
-        <div class="bg-light-100 border-b-2 border-light-300">
+        <div class="bg-light-100">
           <div class="mt-3 sm:mt-0">
-            <div class="w-full bg-info p-5 flex justify-between items-center">
+            <div class="w-full bg-error p-5 flex justify-between items-center">
               <div class="text-left text-light-100">
-                <h5 class="font-body font-bold" id="modal-title">Select HEI</h5>
+                <h5 class="font-body font-bold" id="modal-title">
+                  Reject this Application?
+                </h5>
+                <p class="text-sm">This action cannot be undone!</p>
               </div>
               <div class="text-light-100">
-                <SearchCircleIcon class="h-10" />
+                <ExclamationCircleIcon class="h-10" />
               </div>
             </div>
-            <div class="p-5">
-              <Select2
-                v-model="value"
-                :options="sortHEIs"
-                :settings="{ width: '100%', placeholder: 'Select' }"
-              />
-              <p class="text-xs text-error">{{ errorMsg }}</p>
+
+            <div class="p-5 w-full text-left border-b-2 border-light-300">
+              <div>
+                <p class="text-sm font-bold text-dark-200">
+                  Please state the reason for rejection.
+                </p>
+              </div>
+              <div>
+                <textarea
+                  :value="value"
+                  @input="value = $event.target.value"
+                  required
+                  rows="10"
+                  class="border border-light-400 w-full p-3 mt-1"
+                  placeholder="Reason..."
+                />
+                <p class="text-xs text-error">{{ error }}</p>
+              </div>
+
               <!-- @change="myChangeEvent($event)" @select="mySelectEvent($event)" -->
             </div>
           </div>
         </div>
-        <div class="bg-light-100 p-5 text-right sm:px-6">
+        <div class="bg-light-100 p-5 text-right">
           <button
             type="button"
-            @click="close()"
+            @click="$emit('toggleRejectModal')"
             class="
+              mt-3
               w-full
               justify-center
               inline-flex
@@ -103,83 +117,48 @@
           </button>
           <button
             type="button"
-            @click="nextPage()"
+            @click="confirm()"
             class="
               w-full
               inline-flex
               justify-center
               btn-sm btn-default
-              bg-info
+              bg-error
               border-0
               sm:ml-3 sm:w-auto sm:text-sm
             "
           >
-            Next
+            Yes, proceed.
           </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
-// import { SearchIcon } from "@heroicons/vue/outline";
-
-import Select2 from "vue3-select2-component";
-import { SearchCircleIcon } from "@heroicons/vue/outline";
+import { ExclamationCircleIcon } from "@heroicons/vue/outline";
 
 export default {
-  name: "ModalHei",
+  components: {
+    ExclamationCircleIcon,
+  },
   data() {
     return {
-      results: false,
-      value: "",
-      placeholder: "Select",
-      errorMsg: null,
+      value: null,
+      error: null,
     };
   },
-  props: {
-    lists: Object,
-    application_type: String,
-  },
-  components: {
-    // SearchIcon,
-    Select2,
-    SearchCircleIcon,
-  },
 
-  computed: {
-    sortHEIs() {
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-      function compare(a, b) {
-        const heiA = a.text.toUpperCase(); // ignore upper and lowercase
-        const heiB = b.text.toUpperCase(); // ignore upper and lowercase
-        if (heiA < heiB) return -1;
-        if (heiA > heiB) return 1;
-        return 0;
-      }
-      var heiList = this.lists;
-      return heiList.sort(compare);
-    },
-  },
   methods: {
-    nextPage() {
-      if (this.value == "") {
-        this.errorMsg = "This field is required!";
+    async confirm() {
+      if (this.value == null) {
+        this.error = "This field is required.";
       } else {
-        this.$emit("createApplication", this.value);
+        this.$emit("rejectApplication", this.value);
       }
-    },
-    close() {
-      (this.errorMsg = null), this.$emit("close");
-    },
-    myChangeEvent(val) {
-      console.log(val);
-    },
-    mySelectEvent({ id, text }) {
-      console.log({ id, text });
     },
   },
 };
 </script>
+
 

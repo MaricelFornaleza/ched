@@ -327,6 +327,9 @@ export default {
       this.visible = !this.visible;
       this.value = "";
     },
+    reject(reason) {
+      console.log(reason);
+    },
     async send() {
       const Application = Parse.Object.extend("Application");
       const application = new Parse.Query(Application);

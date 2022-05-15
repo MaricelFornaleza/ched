@@ -14,7 +14,7 @@
         justify-center
         items-center
         space-y-5
-        border-4 border-dashed border-dark-100
+        border-2 border-dashed border-dark-100
         rounded-md
         transition
         duration-300

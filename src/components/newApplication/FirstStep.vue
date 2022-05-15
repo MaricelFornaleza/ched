@@ -10,7 +10,8 @@
         v-if="!isCompleted"
         class="
           container
-          w-fit
+          w-full
+          xl:w-6/12
           mx-auto
           flex flex-col
           items-center
@@ -117,7 +118,9 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          :status="status"
           fileName="List-of-Students-1stSem"
+          @getStudents="getStudents"
         ></StudentsDataTable>
 
         <div class="flex items-center justify-center space-x-5 mt-5">
@@ -213,6 +216,7 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      status: null,
     };
   },
   props: {
@@ -239,8 +243,7 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    if(this.isCompleted)
-      this.getStudents();
+    if (this.isCompleted) this.getStudents();
     console.log(this.allow);
   },
   methods: {
@@ -469,6 +472,7 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
@@ -476,6 +480,8 @@ export default {
 
         if (object.get("takenNstp1") == true) {
           studentList.push({
+            id: object.get("studentId").id,
+
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

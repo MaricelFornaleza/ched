@@ -4,10 +4,12 @@
   <div v-else>
     <!-- When hei is empty -->
     <div v-if="heis == ''">
-      <EmptyState>
-        <p class="text-4xl font-medium text-dark-300">No Heis</p>
-        <p class="body-l text-dark-200">Get started by creating a new hei</p>
-        <div class="px-4 mb-4 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
+      <EmptyState class="mt-20">
+        <p class="text-4xl font-bold text-dark-200">No HEI Found</p>
+        <p class="body-base text-dark-200">
+          Get started by creating a new HEI or by uploading an excel file.
+        </p>
+        <div class="px-4 mt-10 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
           <router-link to="/hei/new">
             <p
               class="
@@ -20,7 +22,7 @@
                 mb-4
               "
             >
-              New Hei
+              New HEI
             </p>
           </router-link>
           <router-link to="/hei/upload">
@@ -33,7 +35,7 @@
                 items-center
               "
             >
-              Upload Hei
+              Upload Excel File
             </p>
           </router-link>
         </div>
@@ -207,7 +209,7 @@ export default {
       this.countPrivate = await query.count();
       query.equalTo("type", "OGS");
       this.countOGS = await query.count();
-    }
+    },
   },
   async created() {
     this.alert.className = "alert-" + this.$route.query.status;
@@ -231,8 +233,8 @@ export default {
       });
     }
     this.heis = hei;
-    this.count().then(() => this.loading = false );
-    
+    this.count().then(() => (this.loading = false));
+
     const subscription = await query.subscribe();
     subscription.on("open", () => {
       console.log("hei subscription opened");
@@ -241,7 +243,7 @@ export default {
 
     subscription.on("create", (object) => {
       console.log("object created" + object);
-      
+
       this.count();
       this.heis.push({
         id: object.id,
@@ -274,7 +276,7 @@ export default {
 
     subscription.on("enter", (object) => {
       console.log("object entered" + object);
-      
+
       this.count();
       this.heis.push({
         id: object.id,
@@ -308,7 +310,6 @@ export default {
     subscription.on("close", () => {
       console.log("hei subscription closed");
     });
-
   },
   components: {
     EmptyState,

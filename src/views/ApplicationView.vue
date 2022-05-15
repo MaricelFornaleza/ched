@@ -4,12 +4,12 @@
     <div v-else>
       <!-- When application is empty -->
       <div v-if="applications == ''">
-        <EmptyState>
-          <p class="text-4xl font-medium text-dark-300">No Applications</p>
-          <p class="body-l text-dark-200">
-            Get started by creating a new application
+        <EmptyState class="mt-20">
+          <p class="text-4xl font-bold text-dark-200">No Application Found</p>
+          <p class="body-base text-dark-200">
+            Get started by creating a new application.
           </p>
-          <div class="px-4 mb-4 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="px-4 mt-10 py-3 sm:px-6 sm:grid sm:grid-cols-2 sm:gap-4">
             <button
               typ="button"
               @click="toggleModal('new')"
@@ -519,7 +519,7 @@ export default {
         const application = new Application();
 
         application.set("dateApplied", currentDate);
-        application.set("status", "1 of 5");
+        application.set("status", "1 of 4");
         application.set("steps", this.newSteps);
         application.set("applicationType", "New Application");
         application.set("heiId", new Parse.User({ id: hei }));
@@ -532,9 +532,7 @@ export default {
             });
           },
           (error) => {
-            alert(
-              "Failed to create new object, with error code: " + error.message
-            );
+            console.log(error);
           }
         );
       } else if (this.application_type == "additional") {
@@ -547,7 +545,7 @@ export default {
         const application = new Application();
 
         application.set("dateApplied", currentDate);
-        application.set("status", "1 of 5");
+        application.set("status", "1 of 4");
         application.set("steps", this.additionalSteps);
         application.set("applicationType", "For Additional Graduates");
         application.set("heiId", new Parse.User({ id: hei }));

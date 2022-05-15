@@ -194,6 +194,7 @@ export default {
       enrollment.include("applicationId");
       enrollment.include("studentId");
       enrollment.include("nstpId");
+      enrollment.exists("serialNumber");
 
       const Application = Parse.Object.extend("Application");
       const application = new Parse.Query(Application);
@@ -282,6 +283,7 @@ export default {
       query.include("studentId");
       query.include("applicationId");
       query.include("nstpId");
+      query.exists("serialNumber");
 
       query.equalTo("takenNstp1", true);
       query.equalTo("takenNstp2", true);

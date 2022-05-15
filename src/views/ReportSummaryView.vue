@@ -495,7 +495,7 @@ export default {
       this.hei.countLuc = await query.count();
       query.equalTo("type", "SUC");
       this.hei.countSuc = await query.count();
-      query.equalTo("type", "Private");
+      query.equalTo("type", "PRIVATE");
       this.hei.countPrivate = await query.count();
       query.equalTo("type", "OGS");
       this.hei.countOgs = await query.count();
@@ -563,13 +563,22 @@ export default {
 
       const result = await query.find();
       this.enrollees.total = result.filter(
-        (data) => data.get("applicationId").get("status") != "Rejected"
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp1") != null
       ).length;
-      // this.enrollees.total = await query.count();
-      query.equalTo("takenNstp1", true);
-      this.enrollees.first = await query.count();
-      query.equalTo("takenNstp2", true);
-      this.enrollees.second = await query.count();
+
+      this.enrollees.first = result.filter(
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp1") == true
+      ).length;
+
+      this.enrollees.second = result.filter(
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp2") == true
+      ).length;
 
       query.exists("serialNumber");
       this.graduates.total = await query.count();

@@ -8,7 +8,15 @@
 
     <div
       v-if="!isCompleted && allow"
-      class="container w-fit mx-auto flex flex-col items-center justify-center"
+      class="
+        container
+        w-full
+        xl:w-6/12
+        mx-auto
+        flex flex-col
+        items-center
+        justify-center
+      "
     >
       <AlertWidget :className="className">
         Please Upload a Notarized Transmittal Letter.

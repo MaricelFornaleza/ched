@@ -10,7 +10,8 @@
         v-if="!isCompleted"
         class="
           container
-          w-fit
+          w-full
+          xl:w-6/12
           mx-auto
           flex flex-col
           items-center
@@ -118,6 +119,8 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            :status="status"
+            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
       </div>
@@ -251,6 +254,7 @@ export default {
       maleNumError: 0,
       femaleNumError: 0,
       worker: undefined,
+      status: null,
     };
   },
   props: { isCompleted: Boolean, appId: String, allow: Boolean },
@@ -273,8 +277,7 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    if(this.isCompleted)
-      this.getStudents();
+    if (this.isCompleted) this.getStudents();
   },
   methods: {
     forceRerender() {
@@ -315,7 +318,9 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.verifyStudents(event.data.rows, event.data.nstp).then(() => self.pending = false );
+            self
+              .verifyStudents(event.data.rows, event.data.nstp)
+              .then(() => (self.pending = false));
             self.$emit("complete", step);
             self.$emit("setStatus", "3 of 4");
             self.$emit(
@@ -486,6 +491,7 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
@@ -496,6 +502,8 @@ export default {
           object.get("takenNstp2") == true
         ) {
           studentList.push({
+            id: object.get("studentId").id,
+
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

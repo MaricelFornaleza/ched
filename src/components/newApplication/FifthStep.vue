@@ -141,6 +141,7 @@ export default {
       query.include("applicationId");
       query.include("studentId");
       query.include("nstpId");
+      query.exists("serialNumber");
       const results = await query.find();
 
       for (let i = 0; i < results.length; i++) {
@@ -251,6 +252,7 @@ export default {
       query.equalTo("applicationId", application);
       query.include("applicationId");
       query.include("nstpId");
+      query.exists("serialNumber");
 
       await query.find().then(function (results) {
         _this.data.graduates = results.length;

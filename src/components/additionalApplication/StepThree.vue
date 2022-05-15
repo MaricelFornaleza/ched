@@ -7,10 +7,11 @@
     </div>
     <div v-else>
       <div
-        v-if="status != 'For Approval'"
+        v-if="status != 'For Approval' && status != 'Rejected' && !isCompleted"
         class="
           container
-          w-fit
+          w-full
+          xl:w-6/12
           mx-auto
           flex flex-col
           items-center
@@ -88,6 +89,19 @@
           </button>
         </div>
       </div>
+      <div v-else-if="status == 'Rejected'">
+        <ApplicationDetails :appId="appId" />
+
+        <div class="flex items-center justify-center space-x-5 mt-5">
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Back
+          </button>
+        </div>
+      </div>
 
       <div
         v-else
@@ -118,12 +132,20 @@
         <StudentsDataTable
           :key="componentKey"
           :students="students"
+          :status="status"
           fileName="List-of-Students-1stSem"
+          @getStudents="getStudents"
         ></StudentsDataTable>
 
-        <div v-if="isAdmin && !isCompleted && status == 'For Approval'" class="space-x-5">
+        <div
+          v-if="isAdmin && !isCompleted && status == 'For Approval'"
+          class="space-x-5"
+        >
           <button class="btn-sm btn-default btn-outline">Back</button>
-          <button class="btn-sm btn-default bg-error text-light-100 border-0">
+          <button
+            @click="toggleRejectModal()"
+            class="btn-sm btn-default bg-error text-light-100 border-0"
+          >
             Reject
           </button>
           <button
@@ -153,6 +175,11 @@
       v-if="confirm"
       @toggleConfirmModal="toggleConfirmModal"
       @confirmed="confirmed"
+    />
+    <RejectModal
+      v-if="reject"
+      @rejectApplication="rejectApplication"
+      @toggleRejectModal="toggleRejectModal"
     />
     <ModalWidget v-show="pending">
       <template #body>
@@ -211,6 +238,7 @@ import SuccessAlert from "@/partials/SuccessAlert.vue";
 // import studentsData from "@/assets/json/students.json";
 import StudentsDataTable from "@/partials/StudentsDatatable.vue";
 import ModalWidget from "@/partials/ModalWidget.vue";
+import RejectModal from "@/partials/RejectModal.vue";
 import ApplicationModal from "@/partials/ApplicationModal.vue";
 import ApplicationDetails from "@/partials/ApplicationDetails.vue";
 import { XCircleIcon } from "@heroicons/vue/outline";
@@ -233,8 +261,9 @@ export default {
       maleNum: 0,
       femaleNum: 0,
       worker: undefined,
+      reject: false,
       confirm: false,
-      staus: "",
+      status: "",
 
       isAdmin: false,
       data: {
@@ -259,6 +288,7 @@ export default {
     XCircleIcon,
     ApplicationDetails,
     ApplicationModal,
+    RejectModal,
   },
   setup() {
     let dropzoneFile = ref("");
@@ -270,23 +300,26 @@ export default {
     };
     return { dropzoneFile, drop, selectedFile };
   },
-  created() {
+  async created() {
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
-    query.matches("objectId", this.appId);
-    query.select("status");
+    query.equalTo("objectId", this.appId);
+
     const self = this;
-    query.first().then(function(results) {
+    await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      if(results.get("status") == 'For Approval')
+      if (
+        results.get("status") == "For Approval" ||
+        results.get("status") == "Approved"
+      )
         self.getStudents();
     });
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.isCompleted);
+    console.log(this.status);
   },
   methods: {
     forceRerender() {
@@ -503,13 +536,17 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
+      query.include("applicationId");
       const results = await query.find();
+      this.status = results[0].get("applicationId").get("status");
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
         this.data.program = object.get("nstpId").get("programName");
         studentList.push({
+          id: object.get("studentId").id,
+
           name: object.get("studentId").get("name"),
           birthdate: object.get("studentId").get("birthdate"),
           gender: object.get("studentId").get("gender"),
@@ -561,8 +598,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -605,7 +640,25 @@ export default {
     },
     toggleConfirmModal() {
       this.confirm = !this.confirm;
-      console.log(this.confirm);
+    },
+    toggleRejectModal() {
+      this.reject = !this.reject;
+    },
+    async rejectApplication(reason) {
+      const Application = Parse.Object.extend("Application");
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      const results = await application.first();
+      results.set("reason", reason);
+      results.save();
+      this.data.reason = reason;
+      this.setStatus("Rejected");
+      this.toggleRejectModal();
+    },
+    setStatus(status) {
+      this.$emit("setStatus", status);
+
+      this.getStudents();
     },
     confirmed() {
       this.approve();
