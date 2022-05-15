@@ -103,7 +103,7 @@
         <div class="bg-light-100 p-5 text-right">
           <button
             type="button"
-            @click="$emit('close')"
+            @click="$emit('toggleRejectModal')"
             class="
               mt-3
               w-full

@@ -214,7 +214,11 @@
       @toggleConfirmModal="toggleConfirmModal"
       @confirmed="confirmed"
     />
-    <RejectModal v-if="reject" @rejectApplication="rejectApplication" />
+    <RejectModal
+      v-if="reject"
+      @rejectApplication="rejectApplication"
+      @toggleRejectModal="toggleRejectModal"
+    />
     <ModalWidget v-show="pending">
       <template #body>
         <div
