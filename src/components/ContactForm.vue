@@ -2,7 +2,7 @@
   <div>
     <div class="w-full p-10 md:p-20 mx-auto xxl:w-1/2">
       <h2 class="text-brand-blue pb-5">Send a message</h2>
-      <form action="">
+      <form @submit.prevent="sendEmail">
         <div class="flex flex-col lg:flex-row gap-5 lg:gap-10">
           <div class="w-full space-y-5">
             <label class="block">
@@ -160,7 +160,7 @@
                 placeholder="Your message"
               ></textarea>
               <button
-                @click="sendEmail()"
+                type="submit"
                 class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
               >
                 Submit
@@ -173,6 +173,7 @@
   </div>
 </template>
 <script>
+import Parse from "parse";
 export default {
   mounted() {
     let externalScript = document.createElement("script");
@@ -190,8 +191,12 @@ export default {
   methods: {
     sendEmail() {
       //just commented out to work, pass is not defined error
-      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
-      // Parse.Cloud.run("contactForm", params);
+      const params = {
+        type: "Contact",
+        message: this.message,
+        approved: true,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
 
       this.province = "";
       this.name = "";
