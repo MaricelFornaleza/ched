@@ -19,12 +19,23 @@
         src="../assets/img/map.png"
         alt=""
       />
+
+      <!-- <iframe
+        class="h-full w-full inset-0 -z-20 absolute object-cover"
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1373.662956152822!2d123.72573012892842!3d13.143115599303496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a103e6cf2485f7%3A0x34cb9f4614c355ec!2sCOMMISSION%20OF%20HIGHER%20EDUCATION!5e0!3m2!1sen!2sph!4v1652468466063!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        width="100%"
+        height="100%"
+        style="border: 0"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe> -->
       <div
         class="
           z-50
           bg-light-100
-          p-5
-          md:p-10
+          p-4
+          md:p-8
           w-full
           lg:w-[fit-content]
           xxl:w-1/4
@@ -76,8 +87,16 @@
             </p>
           </div>
         </div>
-        <button class="flex gap-2 text-brand-blue">
-          <p class="label-text my-auto font-bold">Get Directions</p>
+        <button
+          class="flex gap-2 text-brand-blue px-4 rounded-md hover:bg-light-200"
+        >
+          <a
+            href="https://maps.google.com/maps/dir//COMMISSION+OF+HIGHER+EDUCATION+CHED+Building+EM's+Barrio+S+Legazpi+City,+4500+Albay/@13.1430069,123.7256197,18z/data=!4m5!4m4!1m0!1m2!1m1!1s0x33a103e6cf2485f7:0x34cb9f4614c355ec"
+            class="label-text my-auto font-bold"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Get Directions</a
+          >
           <ArrowNarrowRightIcon class="w-8 stroke-1 h-10" />
         </button>
       </div>
