@@ -10,7 +10,7 @@ import HeiGraduatesView from "../views/HeiGraduatesView.vue";
 import SerialNumbersView from "../views/SerialNumbersView.vue";
 import ReportSummaryView from "../views/ReportSummaryView.vue";
 import StudentsView from "../views/StudentsView.vue";
-import SampleView from "../views/SampleView.vue";
+
   
 import NewHei from "../components/NewHei.vue";
 import UploadHei from "../components/UploadHei.vue";
@@ -32,6 +32,9 @@ import StepThree from '../components/additionalApplication/StepThree.vue'
 import StepFive from '../components/additionalApplication/StepFive.vue'
 import EditHei from '../components/EditHei.vue'
 
+import NotFoundError from "../components/error/NotFoundError.vue"
+import ForbiddenError from "../components/error/ForbiddenError.vue"
+
 import Parse from "parse";
 
 
@@ -47,20 +50,25 @@ const routes = [
     }
   },
   {
+    path: "/:pathMatch(.*)*",
+    name: "404",
+    component: NotFoundError
+    
+
+  },
+  {
+    path: "/403",
+    name: "403",
+    component: ForbiddenError
+    
+
+  },
+  {
     path: "/nstp",
     component: ViewLayout,
      
     children: [
-      {
-        path: "/sample",
-        name: "sample",
-        component: SampleView,
-        meta:{
-          breadcrumb: [
-            {name: 'sample'},
-          ]
-        }
-      },
+     
       {
         path: "/home",
         name: "home",
@@ -70,11 +78,11 @@ const routes = [
             {name: 'Home'},
           ]
         },
-        // beforeEnter: () => {
-        //   if (Parse.User.current().get("userType") !== "admin" ) {
-        //     return { name: '403' }
-        //   } 
-        // },
+        beforeEnter: () => {
+          if (Parse.User.current().get("userType") == "hei" ) {
+            return { name: 'application' }
+          } 
+        },
       },
       {
         path: "/hei",
@@ -359,6 +367,7 @@ const routes = [
         },
       },
     ],
+
   },
 ];
 
