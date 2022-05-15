@@ -400,6 +400,22 @@ export default {
         await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
+
+      const query1 = new Parse.Query(Parse.User);
+      query1.equalTo("userType", "admin");
+      const result1 = await query1.find({ useMasterKey: true });
+      const obj = result1[0];
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const notification = new Parse.Object("Notification");
+        notification.set("applicationId", this.appId);
+         notification.set("userId", obj.id);
+        notification.set("message", Parse.User.current().get("username") + ' created a new application with id number '  + this.appId + ' and uploaded the List of Enrollment for First Semester');
+        notification.set("routeName", "1stStep");
+        notification.set("isRead", false);
+        notification.save();
+      }
+
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
       // });
@@ -456,6 +472,7 @@ export default {
         nstpEnrollment.save();
       });
 
+    
       this.pending = false;
     },
     async getStudents() {
