@@ -252,6 +252,7 @@ export default {
       query.equalTo("applicationId", application);
       query.include("applicationId");
       query.include("nstpId");
+      query.exists("serialNumber");
 
       await query.find().then(function (results) {
         _this.data.graduates = results.length;

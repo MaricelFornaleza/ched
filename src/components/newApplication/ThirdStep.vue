@@ -637,7 +637,7 @@ export default {
       }
       this.students = studentList;
       this.studentsMissing = studentErrorList;
-      this.data.graduates = results.length;
+      this.data.graduates = this.students.length;
 
       this.forceRerender();
     },

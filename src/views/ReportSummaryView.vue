@@ -563,7 +563,9 @@ export default {
 
       const result = await query.find();
       this.enrollees.total = result.filter(
-        (data) => data.get("applicationId").get("status") != "Rejected"
+        (data) =>
+          data.get("applicationId").get("status") != "Rejected" &&
+          data.get("takenNstp1") != null
       ).length;
 
       this.enrollees.first = result.filter(
