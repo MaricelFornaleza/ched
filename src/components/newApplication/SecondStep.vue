@@ -119,6 +119,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
       </div>
@@ -274,8 +275,7 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    if(this.isCompleted)
-      this.getStudents();
+    if (this.isCompleted) this.getStudents();
   },
   methods: {
     forceRerender() {
@@ -316,7 +316,9 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.verifyStudents(event.data.rows, event.data.nstp).then(() => self.pending = false );
+            self
+              .verifyStudents(event.data.rows, event.data.nstp)
+              .then(() => (self.pending = false));
             self.$emit("complete", step);
             self.$emit("setStatus", "3 of 4");
             self.$emit(
@@ -497,6 +499,8 @@ export default {
           object.get("takenNstp2") == true
         ) {
           studentList.push({
+            id: object.get("studentId").id,
+
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

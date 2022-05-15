@@ -119,6 +119,7 @@
           :key="componentKey"
           :students="students"
           fileName="List-of-Students-1stSem"
+          @getStudents="getStudents"
         ></StudentsDataTable>
 
         <div class="flex items-center justify-center space-x-5 mt-5">
@@ -240,8 +241,7 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   created() {
-    if(this.isCompleted)
-      this.getStudents();
+    if (this.isCompleted) this.getStudents();
     console.log(this.allow);
   },
   methods: {
@@ -477,6 +477,8 @@ export default {
 
         if (object.get("takenNstp1") == true) {
           studentList.push({
+            id: object.get("studentId").id,
+
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),

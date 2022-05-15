@@ -133,6 +133,7 @@
             :key="componentKey"
             :students="students"
             fileName="List-of-Students-Graduates"
+            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 

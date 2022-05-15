@@ -150,6 +150,7 @@ export default {
             query2.get(this.deleteParams).then((obj) => {
               obj.destroy().then(async () => {
                 console.log("Student Deleted!");
+                this.$emit("getStudents");
                 this.updateDt();
                 this.toggleDeleteModal();
               });

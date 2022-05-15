@@ -133,6 +133,7 @@
           :key="componentKey"
           :students="students"
           fileName="List-of-Students-1stSem"
+          @getStudents="getStudents"
         ></StudentsDataTable>
 
         <div
@@ -535,6 +536,8 @@ export default {
         const object = results[i];
         this.data.program = object.get("nstpId").get("programName");
         studentList.push({
+          id: object.get("studentId").id,
+
           name: object.get("studentId").get("name"),
           birthdate: object.get("studentId").get("birthdate"),
           gender: object.get("studentId").get("gender"),
