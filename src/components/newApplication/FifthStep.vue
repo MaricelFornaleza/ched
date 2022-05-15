@@ -141,6 +141,7 @@ export default {
       query.include("applicationId");
       query.include("studentId");
       query.include("nstpId");
+      query.exists("serialNumber");
       const results = await query.find();
 
       for (let i = 0; i < results.length; i++) {

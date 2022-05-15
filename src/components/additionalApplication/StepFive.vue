@@ -181,6 +181,8 @@ export default {
       query.include("applicationId");
       query.include("studentId");
       query.include("nstpId");
+      query.exists("serialNumber");
+
       const results = await query.find();
 
       let students = [];

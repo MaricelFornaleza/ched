@@ -684,6 +684,8 @@ export default {
         "applicationId",
         new Parse.Object("Application", { id: this.appId })
       );
+      enrollment.equalTo("takenNstp1", true);
+      enrollment.equalTo("takenNstp2", true);
       await enrollment.find().then(function (results) {
         var start = newStart;
         // save serial number for each student
@@ -697,8 +699,6 @@ export default {
             "-" +
             year;
           results[i].set("serialNumber", sn);
-          results[i].set("takenNstp1", true);
-          results[i].set("takenNstp2", true);
           results[i].set("isGraduated", true);
           results[i].save();
           start++;
