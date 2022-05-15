@@ -18,6 +18,7 @@
                 Province
               </span>
               <select
+                required
                 name="province"
                 id="province"
                 v-model="province"
@@ -40,10 +41,11 @@
                 "
               >
                 <option value="">Select Province</option>
-                <option value="Camarines Sur">Camarines Sur</option>
-                <option value="Catanduanes">Catanduanes</option>
-                <option value="Camarines Norte">Camarines Norte</option>
                 <option value="Albay">Albay</option>
+                <option value="Camarines Sur">Camarines Sur</option>
+                <option value="Camarines Norte">Camarines Norte</option>
+                <option value="Catanduanes">Catanduanes</option>
+                <option value="Sorsogon">Sorsogon</option>
               </select>
             </label>
             <label class="block">
@@ -59,6 +61,7 @@
                 Name
               </span>
               <input
+                required
                 type="text"
                 name="name"
                 v-model="name"
@@ -96,6 +99,7 @@
                 Email Address
               </span>
               <input
+                required
                 v-model="email"
                 type="email"
                 name="email"
@@ -134,6 +138,7 @@
                 >Message</label
               >
               <textarea
+                required
                 v-model="message"
                 class="
                   my-1
@@ -159,12 +164,17 @@
                 rows="10"
                 placeholder="Your message"
               ></textarea>
-              <button
-                type="submit"
-                class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
-              >
-                Submit
-              </button>
+              <div class="flex space-x-4 items-baseline">
+                <button
+                  type="submit"
+                  class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
+                >
+                  Submit
+                </button>
+                <div class="text-sm text-success italic">
+                  {{ successMsg }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -186,6 +196,7 @@ export default {
       name: "",
       email: "",
       message: "",
+      successMsg: null,
     };
   },
   methods: {
@@ -202,6 +213,7 @@ export default {
       this.name = "";
       this.email = "";
       this.message = "";
+      this.successMsg = "Message sent successfully!";
     },
   },
 };
