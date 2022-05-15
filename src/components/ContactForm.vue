@@ -204,6 +204,9 @@ export default {
       //just commented out to work, pass is not defined error
       const params = {
         type: "Contact",
+        province: this.province,
+        name: this.name,
+        email: this.email,
         message: this.message,
         approved: true,
       };
