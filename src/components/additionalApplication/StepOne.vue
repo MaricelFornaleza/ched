@@ -185,7 +185,7 @@ export default {
         return false;
       }
     },
-    upload(step) {
+    async upload(step) {
       var validation = this.validate(this.dropzoneFile);
 
       if (this.dropzoneFile == "") {
@@ -199,7 +199,7 @@ export default {
         let _this = this;
         const parseFile = new Parse.File(this.filename, this.dropzoneFile);
         parseFile.save().then(
-          function () {
+         function () {
             // The file has been saved to Parse.
             // set application document attributes:
             // documentType, filename, document, applicationId
@@ -220,12 +220,28 @@ export default {
                 .getElementById("fileurl")
                 .setAttribute("href", docs.url());
             });
+
           },
           function (error) {
             // The file either could not be read, or could not be saved to Parse.
             console.log("Error: " + error);
           }
         );
+
+      const query1 = new Parse.Query(Parse.User);
+      query1.equalTo("userType", "admin");
+      const result1 = await query1.find({ useMasterKey: true });
+      const obj = result1[0];
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const notification = new Parse.Object("Notification");
+        notification.set("applicationId", _this.appId);
+         notification.set("userId", obj.id);
+        notification.set("message", Parse.User.current().get("username") + ' created additional application with id number '  + _this.appId + ' and uploaded a Notarized Transmittal Letter.');
+        notification.set("routeName", "Step1");
+        notification.set("isRead", false);
+        notification.save();
+      }
 
         this.$emit("complete", step);
         this.$emit("setStatus", "2 of 5");

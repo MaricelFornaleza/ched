@@ -306,6 +306,18 @@ export default {
           start++;
         }
       });
+
+      query.matches("objectId", this.appId);
+      const result = await query.find();
+
+      const notification = new Parse.Object("Notification");
+      notification.set("applicationId", this.appId);
+      notification.set("userId", result[0].get("heiId").id);
+      notification.set("message", "Additional application with id number " + this.appId + " is Approved");
+      notification.set("routeName", "Step4");
+      notification.set("isRead", false);
+      notification.save();
+
       this.$emit("setStatus", "Approved");
       this.$emit("complete", 4);
       this.$emit("nextStep");
@@ -319,10 +331,22 @@ export default {
       const application = new Parse.Query(Application);
       application.equalTo("objectId", this.appId);
       const results = await application.first();
-      results.set("reason", this.value);
+      results.set("reason", this.value); 
       results.save();
       this.data.reason = this.value;
       this.setStatus("Rejected");
+
+      const query1 = new Parse.Query(Application);
+      query1.matches("objectId", this.appId);
+      const result = await query1.find();
+
+      const notification = new Parse.Object("Notification");
+      notification.set("applicationId", this.appId);
+      notification.set("userId", result[0].get("heiId").id);
+      notification.set("message", "Additional application with id number " + this.appId + " is Rejected");
+      notification.set("routeName", "Step4");
+      notification.set("isRead", false);
+      notification.save();
 
       this.toggleModal();
     },

@@ -428,6 +428,23 @@ export default {
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
       // });
+
+            const query1 = new Parse.Query(Parse.User);
+      query1.equalTo("userType", "admin");
+      const result1 = await query1.find({ useMasterKey: true });
+      const obj = result1[0];
+      console.log();
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const notification = new Parse.Object("Notification");
+        notification.set("applicationId", this.appId);
+         notification.set("userId", obj.id);
+        notification.set("message", Parse.User.current().get("username") + ' uploaded the List of Graduates for application with id number ' + this.appId);
+        notification.set("routeName", "3rdStep");
+        notification.set("isRead", false);
+        notification.save();
+      }
+
       await this.getStudents();
     },
     async storeStudents(studentData, nstpProgram) {

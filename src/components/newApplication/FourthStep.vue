@@ -308,10 +308,14 @@ export default {
         }
       });
 
+      query.matches("objectId", this.appId);
+      const result = await query.find();
+
       const notification = new Parse.Object("Notification");
       notification.set("applicationId", this.appId);
-      notification.set("message", "Application with id number ${this.appId} is Approved");
-      notification.set("routeName", "Step4");
+      notification.set("userId", result[0].get("heiId").id);
+      notification.set("message", "Application with id number " + this.appId + " is Approved");
+      notification.set("routeName", "4thStep");
       notification.set("isRead", false);
       notification.save();
 
@@ -348,6 +352,19 @@ export default {
 
       this.data.reason = this.value;
       this.setStatus("Rejected");
+
+      const query = new Parse.Query(Application);
+      query.matches("objectId", this.appId);
+      const result = await query.find();
+
+      const notification = new Parse.Object("Notification");
+      notification.set("applicationId", this.appId);
+      notification.set("userId", result[0].get("heiId").id);
+      notification.set("message", "Application with id number " + this.appId + " is Rejected ");
+      notification.set("routeName", "4thStep");
+      notification.set("isRead", false);
+      notification.save();
+
       this.toggleModal();
     },
   },
