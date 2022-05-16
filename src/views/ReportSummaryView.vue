@@ -602,15 +602,16 @@ export default {
             data: Object.values(this.forApproval),
             backgroundColor: ["#FECA84"],
           },
-          {
-            label: "Approved",
-            data: Object.values(this.approved),
-            backgroundColor: ["#47D28F"],
-          },
+
           {
             label: "Rejected",
             data: Object.values(this.rejected),
             backgroundColor: ["#FF5C5C"],
+          },
+          {
+            label: "Approved",
+            data: Object.values(this.approved),
+            backgroundColor: ["#47D28F"],
           },
         ],
       };
