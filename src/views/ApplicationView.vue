@@ -188,7 +188,6 @@ export default {
     const user = new Parse.User.current();
     const usertype = user.get("userType");
 
-    var data = [];
     const Applications = Parse.Object.extend("Application");
     const query = new Parse.Query(Applications);
     query.include("heiId");
@@ -197,73 +196,73 @@ export default {
       query.equalTo("heiId", new Parse.Object("_User", { id: user.id }));
     }
 
-    const results = await query.find();
-
-    for (let i = 0; i < results.length; i++) {
-      const object = results[i];
-      var countGrads = 0;
-      // get nstp enrollment
-      var NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-      var query2 = new Parse.Query(NstpEnrollment);
-      query2.matches("applicationId", object.id);
-      query2.include("nstpId");
-      await query2.find().then(function (res) {
-        for (let x = 0; x < res.length; x++) {
-          if (
-            typeof res[x].get("serialNumber") !== "undefined" &&
-            res[x].get("isGraduated")
-          )
-            countGrads++;
-        }
-      });
-      // if (
-      //   object.get("status") == "For Approval" ||
-      //   object.get("status") == "Rejected" ||
-      //   object.get("status") == "Approved"
-      // ) {
-      //   await query2.first().then(function (res) {
-      //     prog = res.get("nstpId").get("programName");
-      //   });
-      // }
-      query2.exists("nstpId");
-      var result = await query2.first();
-      var prog = "";
-      if (typeof result !== "undefined") {
-        await query2.first().then(function (res) {
-          prog = res.get("nstpId").get("programName");
-        });
-      }
-
-      data.push({
-        id: object.id,
-        hei_id: object.get("heiId").id,
-        hei_name: object.get("heiId").get("name"),
-        application_type: object.get("applicationType"),
-        program: prog,
-        no_of_graduates: countGrads,
-        date_applied: object.get("dateApplied").toLocaleDateString("en", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-        date_approved: object.get("dateApproved"),
-        status: object.get("status"),
-      });
-    }
-
-    this.applications = data;
-    this.count().then(() => (this.loading = false));
-
     // add subscription here
     // for applications, use the id to find the data
     //add subscription PROBLEM: opens new subscriptions when not closed(when to close?)....
-    const App = Parse.Object.extend("Application");
-    const queryApp = new Parse.Query(App);
-    const applicationSubscription = await queryApp.subscribe();
-    applicationSubscription.on("open", () => {
+    // const App = Parse.Object.extend("Application");
+    // const queryApp = new Parse.Query(App);
+    const applicationSubscription = await query.subscribe();
+    applicationSubscription.on("open", async () => {
       console.log("app subscription opened");
       // can get the list here
+      var data = [];
+      const results = await query.find();
+      
+      for (let i = 0; i < results.length; i++) {
+        const object = results[i];
+        var countGrads = 0;
+        // get nstp enrollment
+        var NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+        var query2 = new Parse.Query(NstpEnrollment);
+        query2.matches("applicationId", object.id);
+        query2.include("nstpId");
+        await query2.find().then(function (res) {
+          for (let x = 0; x < res.length; x++) {
+            if (
+              typeof res[x].get("serialNumber") !== "undefined" &&
+              res[x].get("isGraduated")
+            )
+              countGrads++;
+          }
+        });
+        // if (
+        //   object.get("status") == "For Approval" ||
+        //   object.get("status") == "Rejected" ||
+        //   object.get("status") == "Approved"
+        // ) {
+        //   await query2.first().then(function (res) {
+        //     prog = res.get("nstpId").get("programName");
+        //   });
+        // }
+        query2.exists("nstpId");
+        var result = await query2.first();
+        var prog = "";
+        if (typeof result !== "undefined") {
+          await query2.first().then(function (res) {
+            prog = res.get("nstpId").get("programName");
+          });
+        }
+
+        data.push({
+          id: object.id,
+          hei_id: object.get("heiId").id,
+          hei_name: object.get("heiId").get("name"),
+          application_type: object.get("applicationType"),
+          program: prog,
+          no_of_graduates: countGrads,
+          date_applied: object.get("dateApplied").toLocaleDateString("en", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          date_approved: object.get("dateApproved"),
+          status: object.get("status"),
+        });
+      }
+
+      this.applications = data;
+      this.count().then(() => (this.loading = false));
     });
 
     applicationSubscription.on("create", (object) => {

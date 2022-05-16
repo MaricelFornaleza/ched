@@ -126,7 +126,7 @@
       </div>
 
       <div
-        v-if="errorStudents()"
+        v-if="true"
         class="container mx-auto flex flex-col items-center justify-center"
       >
         <AlertWidget className="alert-warning">
@@ -460,8 +460,8 @@ export default {
       });
       student.set("birthdate", studentData.J);
       student.set("gender", studentData.K);
-      student.set("emailAddress", studentData.T);
-      student.set("contactNumber", studentData.U);
+      student.set("emailAddress", studentData.T.toString());
+      student.set("contactNumber", studentData.U.toString());
       student.set("address", {
         street: studentData.L,
         city: studentData.M,
@@ -469,7 +469,7 @@ export default {
         region: studentData.D,
       });
       student.set("program", {
-        programLevelCode: studentData.R,
+        programLevelCode: studentData.R.toString(),
         programName: studentData.S,
       });
       student.set("heiId", heiId);
@@ -485,8 +485,8 @@ export default {
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
-        // nstpEnrollment.set("takenNstp1", false);   //defaults to false when the seeder is used
-        // nstpEnrollment.set("takenNstp2", false);
+        nstpEnrollment.set("takenNstp1", false);
+        nstpEnrollment.set("takenNstp2", false);
         nstpEnrollment.save();
       });
     },
@@ -520,7 +520,6 @@ export default {
         ) {
           studentList.push({
             id: object.get("studentId").id,
-
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
@@ -546,10 +545,14 @@ export default {
         ) {
           console.log(object.get("studentId").get("name"));
           studentErrorList.push({
+            id: object.get("studentId").id,
             name: object.get("studentId").get("name"),
             birthdate: object.get("studentId").get("birthdate"),
             gender: object.get("studentId").get("gender"),
             address: object.get("studentId").get("address"),
+            program: object.get("studentId").get("program"),
+            emailAddress: object.get("studentId").get("emailAddress"),
+            contactNumber: object.get("studentId").get("contactNumber"),
           });
           if (
             object.get("studentId").get("gender").toUpperCase() == "F" ||
