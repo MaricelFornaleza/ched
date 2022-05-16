@@ -124,7 +124,7 @@ export default {
         isRead: object.get("isRead"),
       });
     }
-
+    this.notifications = notification.slice().reverse();
     query.equalTo("isRead", false);
     this.unread = await query.count();
 
@@ -135,6 +135,7 @@ export default {
       console.log("notification subscription opened");
     });
     applicationSubscription.on("create", (object) => {
+      this.notifications = this.notifications.slice().reverse();
       console.log("object created" + object);
       this.notifications.push({
         id: object.id,
@@ -144,8 +145,10 @@ export default {
         isRead: object.get("isRead"),
       });
       this.getUnreadNotifications();
+      this.notifications = this.notifications.slice().reverse();
     });
     applicationSubscription.on("update", (object) => {
+      this.notifications = this.notifications.slice().reverse();
       console.log("object updated" + object);
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications[index] = {
@@ -156,8 +159,10 @@ export default {
         isRead: object.get("isRead"),
       };
       this.getUnreadNotifications();
+      this.notifications = this.notifications.slice().reverse();
     });
     applicationSubscription.on("enter", (object) => {
+      this.notifications = this.notifications.slice().reverse();
       console.log("object entered" + object);
 
       this.notifications.push({
@@ -168,23 +173,28 @@ export default {
         isRead: object.get("isRead"),
       });
       this.getUnreadNotifications();
+      this.notifications = this.notifications.slice().reverse();
     });
     applicationSubscription.on("leave", (object) => {
+      this.notifications = this.notifications.slice().reverse();
       console.log("object left" + object);
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
+      this.notifications = this.notifications.slice().reverse();
     });
     applicationSubscription.on("delete", (object) => {
+      this.notifications = this.notifications.slice().reverse();
       console.log("object left" + object);
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
+      this.notifications = this.notifications.slice().reverse();
     });
     applicationSubscription.on("close", () => {
       console.log("app subscription closed");
     });
-    this.notifications = notification.slice().reverse();
+    
   },
   methods: {
     viewNotifications() {
