@@ -245,7 +245,10 @@ export default {
         const notification = new Parse.Object("Notification");
         notification.set("applicationId", _this.appId);
          notification.set("userId", obj.id);
-        notification.set("message", Parse.User.current().get("username") + ' created additional application with id number '  + _this.appId + ' and uploaded a Notarized Transmittal Letter.');
+        notification.set(
+          "message", Parse.User.current().get("username") + 
+          ' uploaded a Notarized Transmittal Letter for application with id number '  
+          + _this.appId);
         notification.set("routeName", "Step1");
         notification.set("isRead", false);
         notification.save();

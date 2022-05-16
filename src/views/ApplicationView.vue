@@ -525,7 +525,33 @@ export default {
         application.set("heiId", new Parse.User({ id: hei }));
 
         application.save().then(
-          (application) => {
+        async  (application) => {
+            const query1 = new Parse.Query(Parse.User);
+            query1.equalTo("userType", "admin");
+            const result1 = await query1.find({ useMasterKey: true });
+            const obj = result1[0];
+
+            if (Parse.User.current().get("userType") == "hei") {
+              const notification = new Parse.Object("Notification");
+              notification.set("applicationId", application.id);
+              notification.set("userId", obj.id);
+              notification.set(
+                "message",
+                Parse.User.current().get("username") +
+                  " created a new application with id number " +
+                  application.id
+              );
+              notification.set("routeName", "1stStep");
+              notification.set("isRead", false);
+              notification.save().then(
+                (res) => {
+                  console.log(res);
+                },
+                (error) => {
+                  console.log(error);
+                }
+              );
+            }
             router.push({
               name: "1stStep",
               params: { step: 1, application: application.id },
@@ -551,7 +577,33 @@ export default {
         application.set("heiId", new Parse.User({ id: hei }));
 
         application.save().then(
-          (application) => {
+        async (application) => {
+            const query1 = new Parse.Query(Parse.User);
+            query1.equalTo("userType", "admin");
+            const result1 = await query1.find({ useMasterKey: true });
+            const obj = result1[0];
+
+            if (Parse.User.current().get("userType") == "hei") {
+              const notification = new Parse.Object("Notification");
+              notification.set("applicationId", application.id);
+              notification.set("userId", obj.id);
+              notification.set(
+                "message",
+                Parse.User.current().get("username") +
+                  " created additional application with id number " +
+                  application.id
+              );
+              notification.set("routeName", "Step1");
+              notification.set("isRead", false);
+              notification.save().then(
+                (res) => {
+                  console.log(res);
+                },
+                (error) => {
+                  console.log(error);
+                }
+              );
+            }
             router.push({
               name: "Step1",
               params: {

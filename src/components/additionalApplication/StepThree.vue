@@ -482,7 +482,7 @@ export default {
         notification.set("applicationId", this.appId);
          notification.set("userId", obj.id);
         notification.set("message", Parse.User.current().get("username") + ' uploaded the List of Graduates for application with id number ' + this.appId + ' and waiting for approval');
-        notification.set("routeName", "Step3");
+        notification.set("routeName", "Step4");
         notification.set("isRead", false);
         notification.save();
       }
