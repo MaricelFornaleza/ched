@@ -428,20 +428,16 @@ export default {
       //   self.storeStudents(student, null , nstpProgram);
       // });
 
-      const query1 = new Parse.Query(Parse.User);
-      query1.equalTo("userType", "admin");
-      const result1 = await query1.find({ useMasterKey: true });
-      const obj = result1[0];
-      console.log();
-
       if (Parse.User.current().get("userType") == "hei") {
-        const notification = new Parse.Object("Notification");
-        notification.set("applicationId", this.appId);
-         notification.set("userId", obj.id);
-        notification.set("message", Parse.User.current().get("username") + ' uploaded the List of Enrollment for Second Semester for application with id ' + this.appId);
-        notification.set("routeName", "2ndStep");
-        notification.set("isRead", false);
-        notification.save();
+        const params = {
+          senderId: Parse.User.current().id,
+
+          action: "uploaded a ",
+          output: "List of Enrollment for Second Semester",
+          routeName: "2ndStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
       }
 
       await this.getStudents();

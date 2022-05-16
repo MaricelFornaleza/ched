@@ -52,6 +52,7 @@
         @setStatus="setStatus"
         @checkActive="checkActive"
         @sendEmail="sendEmail"
+        @sendNotification="sendNotification"
         :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
@@ -229,6 +230,26 @@ export default {
         date: date,
       };
       Parse.Cloud.run("sendEmailNotification", params);
+    },
+    sendNotification(params) {
+      const notification = new Parse.Object("Notification");
+      notification.set("senderId", new Parse.User({ id: params.senderId }));
+      if (params.receiverId != null) {
+        notification.set(
+          "receiverId",
+          new Parse.User({ id: params.receiverId })
+        );
+      }
+      notification.set("action", params.action);
+      notification.set(
+        "applicationId",
+        new Parse.Object("Application", { id: params.applicationId })
+      );
+      notification.set("output", params.output);
+      notification.set("routeName", params.routeName);
+      notification.save().then((res) => {
+        console.log(res);
+      });
     },
   },
 };

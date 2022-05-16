@@ -578,17 +578,7 @@ export default {
         );
       }
     },
-    notify() {
-      const params = {
-        senderId: Parse.User.current().id,
-        receiverId: Parse.User.current().id,
-        action: "created a ",
-        output: "New Application",
-        routeName: "1stStep",
-        applicationId: "HfmZG6ivYK",
-      };
-      this.sendNotification(params);
-    },
+
     sendNotification(params) {
       const notification = new Parse.Object("Notification");
       notification.set("senderId", new Parse.User({ id: params.senderId }));
