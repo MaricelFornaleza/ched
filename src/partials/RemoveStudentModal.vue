@@ -116,7 +116,6 @@
 </template>
 <script>
 import { ExclamationCircleIcon } from "@heroicons/vue/outline";
-
 export default {
   components: {
     ExclamationCircleIcon,
