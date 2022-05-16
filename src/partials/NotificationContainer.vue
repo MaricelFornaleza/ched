@@ -70,6 +70,7 @@
               {{ unread }}
             </div>
           </li>
+
           <li
             v-for="notification in notifications"
             :key="notification.id"
@@ -83,7 +84,26 @@
               )
             "
           >
-            {{ notification.message }}
+            <div class="relative w-full">
+              <p>
+                <b>{{ notification.sender }}</b> {{ notification.action }}
+                <b>{{ notification.output }}</b>
+              </p>
+              <p class="text-xs mt-2">{{ notification.date }}</p>
+
+              <div
+                v-if="!notification.isRead"
+                class="
+                  absolute
+                  right-0
+                  top-0
+                  w-2
+                  h-2
+                  rounded-full
+                  bg-error-dark
+                "
+              ></div>
+            </div>
           </li>
           <li class="notif-child text-center">See more</li>
         </ul>
@@ -110,18 +130,38 @@ export default {
   async mounted() {
     const Notification = Parse.Object.extend("Notification");
     const query = new Parse.Query(Notification);
-    query.equalTo("userId", Parse.User.current().id);
-    const result = await query.find();
+    if (Parse.User.current().get("userType") == "hei") {
+      query.equalTo(
+        "receiverId",
+        new Parse.User({ id: Parse.User.current().id })
+      );
+    } else if (Parse.User.current().get("userType") == "admin") {
+      query.doesNotExist("receiverId");
+    }
 
+    query.include("senderId");
+    const result = await query.find();
+    console.log(result);
     var notification = [];
     for (let i = 0; i < result.length; i++) {
       const object = result[i];
       notification.push({
         id: object.id,
-        message: object.get("message"),
+        sender: object.get("senderId").get("username"),
+        action: object.get("action"),
+        output: object.get("output"),
         routeName: object.get("routeName"),
-        appId: object.get("applicationId"),
+        appId: object.get("applicationId").id,
         isRead: object.get("isRead"),
+        date: object.get("createdAt").toLocaleDateString("en", {
+          weekday: "short",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
       });
     }
 
@@ -130,6 +170,15 @@ export default {
 
     const Notif = Parse.Object.extend("Notification");
     const queryApp = new Parse.Query(Notif);
+    queryApp.descending("createdAt");
+    if (Parse.User.current().get("userType") == "hei") {
+      queryApp.equalTo(
+        "receiverId",
+        new Parse.User({ id: Parse.User.current().id })
+      );
+    } else if (Parse.User.current().get("userType") == "admin") {
+      queryApp.doesNotExist("receiverId");
+    }
     const applicationSubscription = await queryApp.subscribe();
     applicationSubscription.on("open", () => {
       console.log("notification subscription opened");
@@ -138,10 +187,21 @@ export default {
       console.log("object created" + object);
       this.notifications.push({
         id: object.id,
-        message: object.get("message"),
+        sender: object.get("senderId").get("username"),
+        action: object.get("action"),
+        output: object.get("output"),
         routeName: object.get("routeName"),
-        appId: object.get("applicationId"),
+        appId: object.get("applicationId").id,
         isRead: object.get("isRead"),
+        date: object.get("createdAt").toLocaleDateString("en", {
+          weekday: "short",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
       });
       this.getUnreadNotifications();
     });
@@ -150,10 +210,21 @@ export default {
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications[index] = {
         id: object.id,
-        message: object.get("message"),
+        sender: object.get("senderId").get("username"),
+        action: object.get("action"),
+        output: object.get("output"),
         routeName: object.get("routeName"),
-        appId: object.get("applicationId"),
+        appId: object.get("applicationId").id,
         isRead: object.get("isRead"),
+        date: object.get("createdAt").toLocaleDateString("en", {
+          weekday: "short",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
       };
       this.getUnreadNotifications();
     });
@@ -162,10 +233,21 @@ export default {
 
       this.notifications.push({
         id: object.id,
-        message: object.get("message"),
+        sender: object.get("senderId").get("username"),
+        action: object.get("action"),
+        output: object.get("output"),
         routeName: object.get("routeName"),
-        appId: object.get("applicationId"),
+        appId: object.get("applicationId").id,
         isRead: object.get("isRead"),
+        date: object.get("createdAt").toLocaleDateString("en", {
+          weekday: "short",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
       });
       this.getUnreadNotifications();
     });
@@ -210,7 +292,14 @@ export default {
     async getUnreadNotifications() {
       const Notification = Parse.Object.extend("Notification");
       const query = new Parse.Query(Notification);
-      query.equalTo("userId", Parse.User.current().id);
+      if (Parse.User.current().get("userType") == "hei") {
+        query.equalTo(
+          "receiverId",
+          new Parse.User({ id: Parse.User.current().id })
+        );
+      } else if (Parse.User.current().get("userType") == "admin") {
+        query.doesNotExist("receiverId");
+      }
       query.equalTo("isRead", false);
       this.unread = await query.count();
     },
