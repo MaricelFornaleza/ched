@@ -563,6 +563,17 @@ export default {
 
         application.save().then(
           (application) => {
+            if (Parse.User.current().get("userType") == "hei") {
+              const params = {
+                senderId: Parse.User.current().id,
+
+                action: "created a",
+                output: "New Application for Additional Graduates",
+                routeName: "Step1",
+                applicationId: application.id,
+              };
+              this.sendNotification(params);
+            }
             router.push({
               name: "Step1",
               params: {
