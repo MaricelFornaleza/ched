@@ -9,7 +9,7 @@
       text-center
     "
   >
-    <img :src="img" alt="" class="" />
+    <img :src="img" alt="" class="mb-10" />
     <h2
       class="
         font-body
