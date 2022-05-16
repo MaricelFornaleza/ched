@@ -671,6 +671,8 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
+      query.include("heiId");
+
       const results = await query.first();
       //get serialNumber, if undefined; set startSerialNum to 1
       //if not, set startSerialNum to the last saved endSerialNumber + 1
@@ -724,6 +726,18 @@ export default {
           start++;
         }
       });
+      if (Parse.User.current().get("userType") == "admin") {
+        const params = {
+          senderId: Parse.User.current().id,
+          receiverId: results.get("heiId").id,
+
+          action: "approved your",
+          output: "Serial Number Application",
+          routeName: "4thStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
       this.$emit("complete", 3);
 
       this.$emit("setStatus", "Approved");

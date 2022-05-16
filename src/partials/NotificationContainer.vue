@@ -140,7 +140,7 @@ export default {
     }
 
     query.include("senderId");
-    const result = await query.find();
+    const result = await query.find({ useMasterKey: true });
     console.log(result);
     var notification = [];
     for (let i = 0; i < result.length; i++) {
