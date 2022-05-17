@@ -107,7 +107,7 @@ export default {
       show: false,
       notifications: [],
       unread: 0,
-      limit: 2,
+      limit: 10,
       count: 0,
     };
   },
@@ -123,7 +123,7 @@ export default {
     const result = await query.find();
     this.count = result.length;
     var notification = [];
-    for (let i = 0; i < result.length; i++) {
+    for (let i = 0; i < result.length; i++) { 
       const object = result[i];
       notification.push({
         id: object.id,
