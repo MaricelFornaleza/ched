@@ -90,38 +90,72 @@
         </div>
       </div>
 
-      <div
-        v-else
-        class="container mx-auto flex flex-col items-center justify-center"
-      >
-        <SuccessAlert className="alert-success">
-          The list for the 1st semester was successfully uploaded. An
-          Acknowledgement letter was sent to the email address.
-        </SuccessAlert>
+      <div v-else>
+        <div
+          v-if="finishedStudents()"
+          class="container mx-auto flex flex-col items-center justify-center"
+        >
+          <SuccessAlert className="alert-success">
+            The list for the 1st semester was successfully uploaded. An
+            Acknowledgement letter was sent to the email address.
+          </SuccessAlert>
 
-        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ femaleNum }}</h2>
-            <p class="uppercase">female</p>
+          <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ femaleNum }}</h2>
+              <p class="uppercase">female</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNum }}</h2>
+              <p class="uppercase">male</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNum + femaleNum }}</h2>
+              <p class="uppercase">total</p>
+            </div>
           </div>
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ maleNum }}</h2>
-            <p class="uppercase">male</p>
-          </div>
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ maleNum + femaleNum }}</h2>
-            <p class="uppercase">total</p>
-          </div>
+
+          <!-- pass props lists -->
+          <StudentsDataTable
+            :key="componentKey"
+            :students="students"
+            :status="status"
+            fileName="List-of-Students-1stSem"
+            @getStudents="getStudents"
+          ></StudentsDataTable>
         </div>
 
-        <!-- pass props lists -->
-        <StudentsDataTable
-          :key="componentKey"
-          :students="students"
-          :status="status"
-          fileName="List-of-Students-1stSem"
-          @getStudents="getStudents"
-        ></StudentsDataTable>
+        <div
+          v-if="errorStudents()"
+          class="container mx-auto flex flex-col items-center justify-center"
+        >
+          <AlertWidget className="alert-warning">
+            The following students' record conflicts with other applications.
+          </AlertWidget>
+
+          <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ femaleNumError }}</h2>
+              <p class="uppercase">female</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNumError }}</h2>
+              <p class="uppercase">male</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNumError + femaleNumError }}</h2>
+              <p class="uppercase">total</p>
+            </div>
+          </div>
+
+          <StudentsDataTable
+            newId="datatable2"
+            :key="componentKey"
+            :students="studentsMissing"
+            :showError="true"
+            fileName="List-of-Students-Missing"
+          ></StudentsDataTable>
+        </div>
 
         <div class="flex items-center justify-center space-x-5 mt-5">
           <button
@@ -212,9 +246,12 @@ export default {
       heiId: "",
       className: "alert-info",
       students: [],
+      studentsMissing: [],
       excelData: [],
       maleNum: 0,
       femaleNum: 0,
+      maleNumError: 0,
+      femaleNumError: 0,
       worker: undefined,
       status: null,
     };
@@ -250,6 +287,14 @@ export default {
     forceRerender() {
       this.componentKey += 1;
     },
+    finishedStudents() {
+      if (this.maleNum > 0 || this.femaleNum > 0) return true;
+      else return false;
+    },
+    errorStudents() {
+      if (this.maleNumError > 0 || this.femaleNumError > 0) return true;
+      else return false;
+    },
     validate(filename) {
       var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
       if (filename === "") {
@@ -277,11 +322,13 @@ export default {
             self.maleNum = event.data.male;
             self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.verifyStudents(
-              event.data.rows,
-              event.data.acadYear,
-              event.data.nstp
-            );
+            self
+              .verifyStudents(
+                event.data.rows,
+                event.data.acadYear,
+                event.data.nstp
+              )
+              .then(() => (self.pending = false));
             // self.pending = false;
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 4");
@@ -335,31 +382,38 @@ export default {
       var result = await query.first();
       return result.id;
     },
+    verificationLevel(takenNstp1, takenNstp2, isGraduated) {
+      var reason = "";
+      if (isGraduated) {
+        reason = "The student has graduated from the same nstp program but with no serial number yet.";
+      } else if (takenNstp1 && takenNstp2) {
+        reason = "The student already exists in the database and has already taken nstp1 and nstp2.";
+      } else if (takenNstp1) {
+        reason = "The student already exists in the database and has already taken nstp1.";
+      }
+      return reason;
+    },
     async verifyStudents(studentData, acadYear, nstpProgram) {
       await this.setAcadYear(acadYear);
       //check first if student exists
       //get nstpEnrollment using the studentId, then check nstpId to get the nstpProgram
-      //check if student's 1st sem nstpProgram is the same with 2nd Sem and takenNstp1 & 2 is true
+      //check if student's 1st sem nstpProgram is the same and takenNstp1 & 2 is true
       //if not, store in separate lists
       const studentSet = new Set(studentData);
-      console.log(studentSet);
       const nstpEnrollment = new Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(nstpEnrollment);
-      // query.equalTo(
-      //   "applicationId",
-      //   new Parse.Object("Application", { id: this.appId })
-      // );
       query.include("studentId");
       query.include("nstpId");
-      const results = await query.find();
 
+      const results = await query.find();
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
         var program = results[i].get("nstpId").get("programName");
         var takenNstp1 = results[i].get("takenNstp1");
-        // var takenNstp2 = results[i].get("takenNstp2");
-        // var serialNum = results[i].get("serialNumber");
+        var takenNstp2 = results[i].get("takenNstp2");
+        var isGraduated = results[i].get("isGraduated");
+        var serialNum = results[i].get("serialNumber");
 
         for (let x = 0; x < studentData.length; x++) {
           //check student's name and bday
@@ -371,24 +425,51 @@ export default {
             name.middleName == studentData[x].I &&
             bday == studentData[x].J
           ) {
+            var reason = "";
             //check program
-            if (program == nstpProgram) {
+            if (program == nstpProgram && serialNum == null) {
+              reason = this.verificationLevel(takenNstp1, takenNstp2, isGraduated);
+              if(reason == "") {
+                // student has taken the same nstp but has not finished yet
+                results[i].set(
+                  "applicationId",
+                  new Parse.Object("Application", { id: this.appId })
+                );
+                results[i].set("takenNstp1", true);
+                results[i].save();
+              }
+              else {
+                // student already exists and has taken nstp
+                const StudentConflict = Parse.Object.extend("StudentConflict");
+                const conflict = new StudentConflict();
+                conflict.set("studentId", results[i].get("studentId"));
+                conflict.set(
+                  "applicationId",
+                  new Parse.Object("Application", { id: this.appId })
+                );
+                conflict.set("reason", reason);
+                conflict.set("status", "1 of 4");
+                conflict.save();
+              }
               studentSet.delete(studentData[x]);
-              results[i].set(
+            } else {
+              // found the student but there are mismatch in stored info
+              if (program != nstpProgram) {
+                reason = "The student already exists in the database but was enrolled with a different nstp program.";
+              } else {
+                reason = "The student has already graduated from the nstp program and already has a serial number.";
+              }
+              const StudentConflict = Parse.Object.extend("StudentConflict");
+              const conflict = new StudentConflict();
+              conflict.set("studentId", results[i].get("studentId"));
+              conflict.set(
                 "applicationId",
                 new Parse.Object("Application", { id: this.appId })
               );
-              results[i].set("takenNstp1", true);
-              await results[i].save();
-            } else if (program != nstpProgram && !takenNstp1) {
-              //found the student but there are mismatch in stored info
-              const newEnrollment = new Parse.Object.extend("NstpEnrollment");
-              newEnrollment.set(
-                "applicationId",
-                new Parse.Object("Application", { id: this.appId })
-              );
-              newEnrollment.set("takenNstp1", true);
-              newEnrollment.save();
+              conflict.set("reason", reason);
+              conflict.set("status", "1 of 4");
+              conflict.save();
+              studentSet.delete(studentData[x]);
             }
             break;
           }
@@ -400,16 +481,10 @@ export default {
         await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
-      // studentSet.forEach (function(student) {
-      //   self.storeStudents(student, null , nstpProgram);
-      // });
       await this.getStudents();
     },
     async storeStudents(studentData, nstpProgram) {
       var nstpId = await this.getNstpId(nstpProgram);
-
-      //TO-DO: still need to check if student already exists in db
-      //if exists, dont save. if not, save
 
       const student = new Parse.Object("Student");
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
@@ -436,13 +511,6 @@ export default {
       student.set("heiId", this.heiId);
 
       await student.save().then((student) => {
-        // this.students.push({
-        //   name: student.get("name"),
-        //   birthdate: student.get("birthdate"),
-        //   gender: student.get("gender"),
-        //   address: student.get("address"),
-        // });
-        // this.forceRerender(); //solution to updating DOM of child component
         nstpEnrollment.set(
           "studentId",
           new Parse.Object("Student", { id: student.id })
@@ -455,14 +523,16 @@ export default {
         nstpEnrollment.set("takenNstp1", true);
         nstpEnrollment.save();
       });
-
-      this.pending = false;
     },
     async getStudents() {
-      var studentList = [];
+      var studentList = [],
+        studentErrorList = [];
       //reset the numbers to be sure
       this.femaleNum = 0;
       this.maleNum = 0;
+      this.femaleNumError = 0;
+      this.maleNumError = 0;
+
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       // query.equalTo("applicationId", this.appId);
@@ -474,36 +544,74 @@ export default {
       const results = await query.find();
       this.status = results[0].get("applicationId").get("status");
 
-      if (results.length == 0) return;
-      for (let i = 0; i < results.length; i++) {
-        const object = results[i];
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const object = results[i];
 
-        if (object.get("takenNstp1") == true) {
-          studentList.push({
-            id: object.get("studentId").id,
-
-            name: object.get("studentId").get("name"),
-            birthdate: object.get("studentId").get("birthdate"),
-            gender: object.get("studentId").get("gender"),
-            address: object.get("studentId").get("address"),
-            program: object.get("studentId").get("program"),
-            emailAddress: object.get("studentId").get("emailAddress"),
-            contactNumber: object.get("studentId").get("contactNumber"),
-          });
-          if (
-            object.get("studentId").get("gender").toUpperCase() == "F" ||
-            object.get("studentId").get("gender").toUpperCase() == "FEMALE"
-          ) {
-            this.femaleNum++;
-          } else if (
-            object.get("studentId").get("gender").toUpperCase() == "M" ||
-            object.get("studentId").get("gender").toUpperCase() == "MALE"
-          ) {
-            this.maleNum++;
+          if (object.get("takenNstp1") == true) {
+            studentList.push({
+              id: object.get("studentId").id,
+              name: object.get("studentId").get("name"),
+              birthdate: object.get("studentId").get("birthdate"),
+              gender: object.get("studentId").get("gender"),
+              address: object.get("studentId").get("address"),
+              program: object.get("studentId").get("program"),
+              emailAddress: object.get("studentId").get("emailAddress"),
+              contactNumber: object.get("studentId").get("contactNumber"),
+            });
+            if (
+              object.get("studentId").get("gender").toUpperCase() == "F" ||
+              object.get("studentId").get("gender").toUpperCase() == "FEMALE"
+            ) {
+              this.femaleNum++;
+            } else if (
+              object.get("studentId").get("gender").toUpperCase() == "M" ||
+              object.get("studentId").get("gender").toUpperCase() == "MALE"
+            ) {
+              this.maleNum++;
+            }
           }
         }
       }
+
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "1 of 4");
+      conflict.include("studentId");
+      const res = await conflict.find();
+      for (let index = 0; index < res.length; index++) {
+        const element = res[index];
+        studentErrorList.push({
+          id: element.get("studentId").id,
+          name: element.get("studentId").get("name"),
+          birthdate: element.get("studentId").get("birthdate"),
+          gender: element.get("studentId").get("gender"),
+          address: element.get("studentId").get("address"),
+          program: element.get("studentId").get("program"),
+          emailAddress: element.get("studentId").get("emailAddress"),
+          contactNumber: element.get("studentId").get("contactNumber"),
+          reason: element.get("reason"),
+        });
+        if (
+          element.get("studentId").get("gender").toUpperCase() == "F" ||
+          element.get("studentId").get("gender").toUpperCase() == "FEMALE"
+        ) {
+          this.femaleNumError++;
+        } else if (
+          element.get("studentId").get("gender").toUpperCase() == "M" ||
+          element.get("studentId").get("gender").toUpperCase() == "MALE"
+        ) {
+          this.maleNumError++;
+        }
+      }
+
       this.students = studentList;
+      this.studentsMissing = studentErrorList;
+      console.log(this.studentsMissing);
       this.forceRerender();
     },
     removeFile() {
