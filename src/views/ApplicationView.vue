@@ -207,7 +207,7 @@ export default {
       // can get the list here
       var data = [];
       const results = await query.find();
-      
+
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
         var countGrads = 0;
@@ -524,33 +524,19 @@ export default {
         application.set("heiId", new Parse.User({ id: hei }));
 
         application.save().then(
-        async  (application) => {
-            const query1 = new Parse.Query(Parse.User);
-            query1.equalTo("userType", "admin");
-            const result1 = await query1.find({ useMasterKey: true });
-            const obj = result1[0];
-
+          (application) => {
             if (Parse.User.current().get("userType") == "hei") {
-              const notification = new Parse.Object("Notification");
-              notification.set("applicationId", application.id);
-              notification.set("userId", obj.id);
-              notification.set(
-                "message",
-                Parse.User.current().get("username") +
-                  " created a new application with id number " +
-                  application.id
-              );
-              notification.set("routeName", "1stStep");
-              notification.set("isRead", false);
-              notification.save().then(
-                (res) => {
-                  console.log(res);
-                },
-                (error) => {
-                  console.log(error);
-                }
-              );
+              const params = {
+                senderId: Parse.User.current().id,
+
+                action: "created a ",
+                output: "New Application",
+                routeName: "1stStep",
+                applicationId: application.id,
+              };
+              this.sendNotification(params);
             }
+
             router.push({
               name: "1stStep",
               params: { step: 1, application: application.id },
@@ -576,32 +562,17 @@ export default {
         application.set("heiId", new Parse.User({ id: hei }));
 
         application.save().then(
-        async (application) => {
-            const query1 = new Parse.Query(Parse.User);
-            query1.equalTo("userType", "admin");
-            const result1 = await query1.find({ useMasterKey: true });
-            const obj = result1[0];
-
+          (application) => {
             if (Parse.User.current().get("userType") == "hei") {
-              const notification = new Parse.Object("Notification");
-              notification.set("applicationId", application.id);
-              notification.set("userId", obj.id);
-              notification.set(
-                "message",
-                Parse.User.current().get("username") +
-                  " created additional application with id number " +
-                  application.id
-              );
-              notification.set("routeName", "Step1");
-              notification.set("isRead", false);
-              notification.save().then(
-                (res) => {
-                  console.log(res);
-                },
-                (error) => {
-                  console.log(error);
-                }
-              );
+              const params = {
+                senderId: Parse.User.current().id,
+
+                action: "created a",
+                output: "New Application for Additional Graduates",
+                routeName: "Step1",
+                applicationId: application.id,
+              };
+              this.sendNotification(params);
             }
             router.push({
               name: "Step1",
@@ -617,6 +588,27 @@ export default {
           }
         );
       }
+    },
+
+    sendNotification(params) {
+      const notification = new Parse.Object("Notification");
+      notification.set("senderId", new Parse.User({ id: params.senderId }));
+      if (params.receiverId != null) {
+        notification.set(
+          "receiverId",
+          new Parse.User({ id: params.receiverId })
+        );
+      }
+      notification.set("action", params.action);
+      notification.set(
+        "applicationId",
+        new Parse.Object("Application", { id: params.applicationId })
+      );
+      notification.set("output", params.output);
+      notification.set("routeName", params.routeName);
+      notification.save().then((res) => {
+        console.log(res);
+      });
     },
     displayAlert(status, msg) {
       this.alert.className = "alert-" + status;
