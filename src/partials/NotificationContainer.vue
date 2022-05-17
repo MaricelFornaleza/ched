@@ -132,7 +132,7 @@ export default {
       show: false,
       notifications: [],
       unread: 0,
-      limit: 2,
+      limit: 10,
       count: 0,
     };
   },
