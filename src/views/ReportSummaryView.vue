@@ -232,6 +232,7 @@
         </div>
       </div>
     </div>
+    <div @click="sendSampleEmail">export</div>
   </div>
 </template>
 
@@ -368,6 +369,44 @@ export default {
         .then(function (pdf) {
           window.open(pdf.output("bloburl"), "_blank");
         });
+    },
+    sampleExport() {
+      html2pdf()
+        .from(this.$refs.graph)
+        .toPdf()
+        .output("datauristring")
+        .then(function (pdfBase64) {
+          const file = new File([pdfBase64], "samplepdf.pdf", {
+            type: "application/pdf",
+          });
+          const formData = new FormData();
+          formData.append("file", file);
+          console.log(formData);
+          const parseFile = new Parse.File("sample.pdf", formData.get("file"));
+          console.log(parseFile);
+          parseFile.save().then(() => {
+            var Document = new Parse.Object("Document");
+            Document.set("documentType", "sample");
+            Document.set("filename", "samplefilename");
+            Document.set("document", parseFile);
+
+            Document.save().then(() => {
+              // get the url of the document saved in parse
+              // then set it as the href of element with id=fileurl
+              const docs = Document.get("document");
+
+              console.log("file saved!");
+              console.log(docs.url());
+            });
+          });
+        });
+    },
+    sendSampleEmail() {
+      const params = {
+        type: "Sample",
+        approved: true,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
     },
     setToMonth() {
       this.monthly = !this.monthly;
