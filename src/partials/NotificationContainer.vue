@@ -71,7 +71,7 @@
             </div>
           </li>
           <li
-            v-for="notification in notifications"
+            v-for="notification in notifData"
             :key="notification.id"
             class="p-4 hover:bg-light-200 cursor-pointer"
             :class="notification.isRead ? 'bg-light-100' : 'bg-light-200'"
@@ -85,7 +85,9 @@
           >
             {{ notification.message }}
           </li>
-          <li class="notif-child text-center">See more</li>
+  
+          <li v-if="count > 10" @click="limit = limit + 5" 
+            class="notif-child text-center hover:bg-light-200 cursor-pointer">See more</li>
         </ul>
       </div>
     </div>
@@ -105,14 +107,21 @@ export default {
       show: false,
       notifications: [],
       unread: 0,
+      limit: 2,
+      count: 0,
     };
+  },
+  computed: {
+    notifData() {
+      return this.limit ? this.notifications.slice(0, this.limit) : this.notifications;
+    }
   },
   async mounted() {
     const Notification = Parse.Object.extend("Notification");
     const query = new Parse.Query(Notification);
     query.equalTo("userId", Parse.User.current().id);
     const result = await query.find();
-
+    this.count = result.length;
     var notification = [];
     for (let i = 0; i < result.length; i++) {
       const object = result[i];
@@ -200,6 +209,10 @@ export default {
     viewNotifications() {
       this.show = !this.show;
     },
+    seeMoreNotification() {
+      console.log("see more");
+      this.seeMore = !this.seeMore;
+    }, 
     async openNotification(routeName, appId, id) {
       const Notification = Parse.Object.extend("Notification");
       const query = new Parse.Query(Notification);
