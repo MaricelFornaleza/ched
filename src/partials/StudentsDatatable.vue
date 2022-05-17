@@ -97,7 +97,6 @@
 
 <script>
 //Bootstrap and jQuery libraries
-
 import "jquery/dist/jquery.min.js";
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables";
@@ -107,7 +106,6 @@ import { DownloadIcon, XIcon } from "@heroicons/vue/outline";
 import RemoveStudentModal from "@/partials/RemoveStudentModal.vue";
 import * as XLSX from "xlsx";
 import Parse from "parse";
-
 export default {
   data() {
     return {
@@ -202,11 +200,9 @@ export default {
         .toLocaleDateString()
         .replace(/[^\w\s]/gi, "-");
       var workbook = XLSX.utils.book_new();
-
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
-
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       if (typeof this.newFileName == "undefined")
         this.newFileName = `List-of-Applications_${currentDate}.xlsx`;

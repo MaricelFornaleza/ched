@@ -232,6 +232,7 @@
         </div>
       </div>
     </div>
+    <div @click="sendSampleEmail">export</div>
   </div>
 </template>
 
@@ -368,6 +369,61 @@ export default {
         .then(function (pdf) {
           window.open(pdf.output("bloburl"), "_blank");
         });
+    },
+    sampleExport() {
+      html2pdf()
+        .from(this.$refs.graph)
+        .toPdf()
+        .output("datauristring")
+        .then(function (pdfBase64) {
+          const file = new File([pdfBase64], "samplepdf.pdf", {
+            type: "application/pdf",
+          });
+          const formData = new FormData();
+          formData.append("file", file);
+          console.log(formData);
+          const parseFile = new Parse.File("sample.pdf", formData.get("file"));
+          console.log(parseFile);
+          parseFile.save().then(() => {
+            var Document = new Parse.Object("Document");
+            Document.set("documentType", "sample");
+            Document.set("filename", "samplefilename");
+            Document.set("document", parseFile);
+
+            Document.save().then(() => {
+              // get the url of the document saved in parse
+              // then set it as the href of element with id=fileurl
+              const docs = Document.get("document");
+
+              console.log("file saved!");
+              console.log(docs.url());
+            });
+          });
+        });
+    },
+    sendSampleEmail() {
+      const params = {
+        type: "Transmittal",
+        approved: true,
+        hei: {
+          name: "Bicol State College of Applied Sciences and Technology",
+          username: "BISCAST",
+          email: "maformaleza@gbox.adnu.edu.ph",
+          address: {
+            barangay: "San Juan",
+            city: "Minalabac",
+            province: "Camarines Sur",
+          },
+        },
+        date: "May 17, 2022",
+        application: {
+          dateApplied: "May 15, 2022",
+          schoolYear: "2021-2022",
+          snRange: "C-000010-000012-22",
+          students: 3,
+        },
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
     },
     setToMonth() {
       this.monthly = !this.monthly;
@@ -602,15 +658,16 @@ export default {
             data: Object.values(this.forApproval),
             backgroundColor: ["#FECA84"],
           },
-          {
-            label: "Approved",
-            data: Object.values(this.approved),
-            backgroundColor: ["#47D28F"],
-          },
+
           {
             label: "Rejected",
             data: Object.values(this.rejected),
             backgroundColor: ["#FF5C5C"],
+          },
+          {
+            label: "Approved",
+            data: Object.values(this.approved),
+            backgroundColor: ["#47D28F"],
           },
         ],
       };

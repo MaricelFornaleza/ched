@@ -551,6 +551,21 @@ export default {
         await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
+      // studentSet.forEach (function(student) {
+      //   self.storeStudents(student, null , nstpProgram);
+      // });
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const params = {
+          senderId: Parse.User.current().id,
+
+          action: "uploaded a ",
+          output: "List of Graduates",
+          routeName: "3rdStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
       await this.getStudents();
     },
     async storeStudents(studentData, nstpProgram) {
@@ -712,6 +727,8 @@ export default {
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
+      query.include("heiId");
+
       const results = await query.first();
       //get serialNumber, if undefined; set startSerialNum to 1
       //if not, set startSerialNum to the last saved endSerialNumber + 1
@@ -765,10 +782,61 @@ export default {
           start++;
         }
       });
+      if (Parse.User.current().get("userType") == "admin") {
+        const params = {
+          senderId: Parse.User.current().id,
+          receiverId: results.get("heiId").id,
+
+          action: "approved your",
+          output: "Serial Number Application",
+          routeName: "4thStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+        var range =
+          program +
+          "-" +
+          _this.hei_region_code.padStart(2, "0") +
+          "-" +
+          (newStart + "").padStart(6, "0") +
+          "-" +
+          (newEnd + "").padStart(6, "0") +
+          "-" +
+          year;
+        const emailParams = {
+          type: "Transmittal",
+          approved: true,
+          hei: {
+            name: results.get("heiId").get("name"),
+            username: results.get("heiId").get("username"),
+            email: results.get("heiId").get("email"),
+            address: results.get("heiId").get("address"),
+          },
+          date: date.toLocaleDateString("en", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }),
+          application: {
+            dateApplied: results.get("dateApplied").toLocaleDateString("en", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }),
+            schoolYear: results.get("academicYear"),
+            snRange: range,
+            students: this.data.graduates,
+          },
+        };
+        this.sendTransmittalLetter(emailParams);
+      }
       this.$emit("complete", 3);
 
       this.$emit("setStatus", "Approved");
       this.$emit("nextStep");
+    },
+    sendTransmittalLetter(emailParams) {
+      Parse.Cloud.run("sendEmailNotification", emailParams);
     },
     toggleConfirmModal() {
       this.confirm = !this.confirm;

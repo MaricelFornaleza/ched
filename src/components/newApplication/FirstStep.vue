@@ -281,7 +281,6 @@ export default {
   },
   created() {
     if (this.isCompleted) this.getStudents();
-    console.log(this.allow);
   },
   methods: {
     forceRerender() {
@@ -479,8 +478,23 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const params = {
+          senderId: Parse.User.current().id,
+
+          action: "uploaded a ",
+          output: "List of Enrollment for First Semester",
+          routeName: "1stStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
+
+      // studentSet.forEach (function(student) {
+      //   self.storeStudents(student, null , nstpProgram);
+      // });
       await this.getStudents();
     },
     async storeStudents(studentData, nstpProgram) {

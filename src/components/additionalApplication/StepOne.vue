@@ -193,7 +193,7 @@ export default {
         return false;
       }
     },
-    upload(step) {
+    async upload(step) {
       var validation = this.validate(this.dropzoneFile);
 
       if (this.dropzoneFile == "") {
@@ -234,6 +234,18 @@ export default {
             console.log("Error: " + error);
           }
         );
+
+        if (Parse.User.current().get("userType") == "hei") {
+          const params = {
+            senderId: Parse.User.current().id,
+
+            action: "uploaded a ",
+            output: "Notarized Transmittal Letter",
+            routeName: "Step1",
+            applicationId: this.appId,
+          };
+          this.$emit("sendNotification", params);
+        }
 
         this.$emit("complete", step);
         this.$emit("setStatus", "2 of 4");

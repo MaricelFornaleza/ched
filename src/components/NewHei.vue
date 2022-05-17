@@ -10,7 +10,7 @@
         py-10
         bg-light-100
         w-4/5
-        xl:w-4/12
+        xl:w-4/12 
       "
     >
       <div

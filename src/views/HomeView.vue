@@ -328,7 +328,7 @@ export default {
           data.get("type").match("SUC")
         ).length;
         this.hei.countPrivate = heis.filter((data) =>
-          data.get("type").match("Private")
+          data.get("type").match("PRIVATE")
         ).length;
         this.hei.countOgs = heis.filter((data) =>
           data.get("type").match("OGS")
@@ -354,7 +354,7 @@ export default {
           case "SUC":
             this.hei.countSuc++;
             break;
-          case "Private":
+          case "PRIVATE":
             this.hei.countPrivate++;
             break;
           case "OGS":
@@ -375,7 +375,7 @@ export default {
           data.get("type").match("SUC")
         ).length;
         this.hei.countPrivate = heis.filter((data) =>
-          data.get("type").match("Private")
+          data.get("type").match("PRIVATE")
         ).length;
         this.hei.countOgs = heis.filter((data) =>
           data.get("type").match("OGS")
@@ -392,7 +392,7 @@ export default {
           case "SUC":
             this.hei.countSuc++;
             break;
-          case "Private":
+          case "PRIVATE":
             this.hei.countPrivate++;
             break;
           case "OGS":
@@ -411,7 +411,7 @@ export default {
           case "SUC":
             this.hei.countSuc--;
             break;
-          case "Private":
+          case "PRIVATE":
             this.hei.countPrivate--;
             break;
           case "OGS":
@@ -430,7 +430,7 @@ export default {
           case "SUC":
             this.hei.countSuc--;
             break;
-          case "Private":
+          case "PRIVATE":
             this.hei.countPrivate--;
             break;
           case "OGS":

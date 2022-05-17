@@ -2,7 +2,7 @@
   <div>
     <div class="w-full p-10 md:p-20 mx-auto xxl:w-1/2">
       <h2 class="text-brand-blue pb-5">Send a message</h2>
-      <form action="">
+      <form @submit.prevent="sendEmail">
         <div class="flex flex-col lg:flex-row gap-5 lg:gap-10">
           <div class="w-full space-y-5">
             <label class="block">
@@ -18,6 +18,7 @@
                 Province
               </span>
               <select
+                required
                 name="province"
                 id="province"
                 v-model="province"
@@ -40,10 +41,11 @@
                 "
               >
                 <option value="">Select Province</option>
-                <option value="Camarines Sur">Camarines Sur</option>
-                <option value="Catanduanes">Catanduanes</option>
-                <option value="Camarines Norte">Camarines Norte</option>
                 <option value="Albay">Albay</option>
+                <option value="Camarines Sur">Camarines Sur</option>
+                <option value="Camarines Norte">Camarines Norte</option>
+                <option value="Catanduanes">Catanduanes</option>
+                <option value="Sorsogon">Sorsogon</option>
               </select>
             </label>
             <label class="block">
@@ -59,6 +61,7 @@
                 Name
               </span>
               <input
+                required
                 type="text"
                 name="name"
                 v-model="name"
@@ -96,6 +99,7 @@
                 Email Address
               </span>
               <input
+                required
                 v-model="email"
                 type="email"
                 name="email"
@@ -134,6 +138,7 @@
                 >Message</label
               >
               <textarea
+                required
                 v-model="message"
                 class="
                   my-1
@@ -159,12 +164,17 @@
                 rows="10"
                 placeholder="Your message"
               ></textarea>
-              <button
-                @click="sendEmail()"
-                class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
-              >
-                Submit
-              </button>
+              <div class="flex space-x-4 items-baseline">
+                <button
+                  type="submit"
+                  class="btn-sm bg-brand-yellow mt-3 text-light-100 uppercase"
+                >
+                  Submit
+                </button>
+                <div class="text-sm text-success italic">
+                  {{ successMsg }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -173,6 +183,7 @@
   </div>
 </template>
 <script>
+import Parse from "parse";
 export default {
   mounted() {
     let externalScript = document.createElement("script");
@@ -185,18 +196,27 @@ export default {
       name: "",
       email: "",
       message: "",
+      successMsg: null,
     };
   },
   methods: {
     sendEmail() {
       //just commented out to work, pass is not defined error
-      // const params = {name:this.name, email:this.email, password:password, type:"Account", approved:true};
-      // Parse.Cloud.run("contactForm", params);
+      const params = {
+        type: "Contact",
+        province: this.province,
+        name: this.name,
+        email: this.email,
+        message: this.message,
+        approved: true,
+      };
+      Parse.Cloud.run("sendEmailNotification", params);
 
       this.province = "";
       this.name = "";
       this.email = "";
       this.message = "";
+      this.successMsg = "Message sent successfully!";
     },
   },
 };

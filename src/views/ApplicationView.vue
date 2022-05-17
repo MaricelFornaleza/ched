@@ -207,7 +207,7 @@ export default {
       // can get the list here
       var data = [];
       const results = await query.find();
-      
+
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
         var countGrads = 0;
@@ -525,6 +525,18 @@ export default {
 
         application.save().then(
           (application) => {
+            if (Parse.User.current().get("userType") == "hei") {
+              const params = {
+                senderId: Parse.User.current().id,
+
+                action: "created a ",
+                output: "New Application",
+                routeName: "1stStep",
+                applicationId: application.id,
+              };
+              this.sendNotification(params);
+            }
+
             router.push({
               name: "1stStep",
               params: { step: 1, application: application.id },
@@ -551,6 +563,17 @@ export default {
 
         application.save().then(
           (application) => {
+            if (Parse.User.current().get("userType") == "hei") {
+              const params = {
+                senderId: Parse.User.current().id,
+
+                action: "created a",
+                output: "New Application for Additional Graduates",
+                routeName: "Step1",
+                applicationId: application.id,
+              };
+              this.sendNotification(params);
+            }
             router.push({
               name: "Step1",
               params: {
@@ -565,6 +588,27 @@ export default {
           }
         );
       }
+    },
+
+    sendNotification(params) {
+      const notification = new Parse.Object("Notification");
+      notification.set("senderId", new Parse.User({ id: params.senderId }));
+      if (params.receiverId != null) {
+        notification.set(
+          "receiverId",
+          new Parse.User({ id: params.receiverId })
+        );
+      }
+      notification.set("action", params.action);
+      notification.set(
+        "applicationId",
+        new Parse.Object("Application", { id: params.applicationId })
+      );
+      notification.set("output", params.output);
+      notification.set("routeName", params.routeName);
+      notification.save().then((res) => {
+        console.log(res);
+      });
     },
     displayAlert(status, msg) {
       this.alert.className = "alert-" + status;

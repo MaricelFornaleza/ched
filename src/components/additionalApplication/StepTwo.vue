@@ -200,7 +200,7 @@ export default {
         return false;
       }
     },
-    upload(step) {
+    async upload(step) {
       var validation = this.validate(this.dropzoneFile);
       if (this.dropzoneFile == "") {
         this.className = "alert-warning";
@@ -242,6 +242,19 @@ export default {
             console.log("Error: " + error);
           }
         );
+
+        if (Parse.User.current().get("userType") == "hei") {
+          const params = {
+            senderId: Parse.User.current().id,
+
+            action: "uploaded a ",
+            output: "Proof that the student/s Completed NSTP 1 and 2",
+            routeName: "Step2",
+            applicationId: this.appId,
+          };
+          this.$emit("sendNotification", params);
+        }
+
         this.$emit("complete", step);
         this.$emit("setStatus", "3 of 4");
         this.$emit(

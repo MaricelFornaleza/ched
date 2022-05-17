@@ -470,6 +470,22 @@ export default {
         await self.storeStudents(student, nstpProgram);
         console.log(student);
       }
+      // studentSet.forEach (function(student) {
+      //   self.storeStudents(student, null , nstpProgram);
+      // });
+
+      if (Parse.User.current().get("userType") == "hei") {
+        const params = {
+          senderId: Parse.User.current().id,
+
+          action: "uploaded a ",
+          output: "List of Enrollment for Second Semester",
+          routeName: "2ndStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
+
       await this.getStudents();
     },
     async storeStudents(studentData, nstpProgram) {
