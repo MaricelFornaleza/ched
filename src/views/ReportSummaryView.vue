@@ -403,8 +403,25 @@ export default {
     },
     sendSampleEmail() {
       const params = {
-        type: "Sample",
+        type: "Transmittal",
         approved: true,
+        hei: {
+          name: "Bicol State College of Applied Sciences and Technology",
+          username: "BISCAST",
+          email: "maformaleza@gbox.adnu.edu.ph",
+          address: {
+            barangay: "San Juan",
+            city: "Minalabac",
+            province: "Camarines Sur",
+          },
+        },
+        date: "May 17, 2022",
+        application: {
+          dateApplied: "May 15, 2022",
+          schoolYear: "2021-2022",
+          snRange: "C-000010-000012-22",
+          students: 3,
+        },
       };
       Parse.Cloud.run("sendEmailNotification", params);
     },
