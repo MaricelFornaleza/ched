@@ -528,8 +528,7 @@ export default {
         var index = this.recentApplications.findIndex(
           (app) => app.id == object.id
         );
-        if (index > -1)
-          //only delete if it exists
+        if (index > -1) //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });
@@ -541,8 +540,7 @@ export default {
           (app) => app.id == object.id
         );
         console.log(index);
-        if (index > -1)
-          //only delete if it exists
+        if (index > -1) //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });

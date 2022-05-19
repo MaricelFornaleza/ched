@@ -39,6 +39,7 @@
               <th>Main program name</th>
               <th>Email address</th>
               <th>Contact number</th>
+              <th v-if="showError">Reason</th>
             </tr>
           </thead>
           <tbody class="bg-white text-sm">
@@ -80,6 +81,7 @@
               <td class="px-6 py-4">{{ student.program.programName }}</td>
               <td class="px-6 py-4">{{ student.emailAddress }}</td>
               <td class="px-6 py-4">{{ student.contactNumber }}</td>
+              <td v-if="showError" class="px-6 py-4">{{ student.reason }}</td>
             </tr>
           </tbody>
         </table>
@@ -119,12 +121,12 @@ export default {
     XIcon,
     RemoveStudentModal,
   },
-  props: { students: Array, newId: String, fileName: String, status: String },
+  props: { students: Array, newId: String, fileName: String, status: String, showError: Boolean },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
     this.newFileName = this.fileName;
-    console.log(this.status);
+    // console.log(this.status);
     this.allowDelete();
   },
   watch: {
@@ -136,7 +138,7 @@ export default {
   },
   methods: {
     allowDelete() {
-      if (this.status == "Approved" || this.status == "Rejected")
+      if (this.status == "Approved" || this.status == "Rejected" || this.status == null)
         this.allow = false;
     },
     toggleDeleteModal(id) {

@@ -214,9 +214,8 @@ export default {
               _this.table_headers = event.data.headers;
               var heis = event.data.rows;
 
-              _this.storeHeis(heis);
-
               if (event.data.complete) {
+                _this.storeHeis(heis);
                 _this.visible = false;
                 //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
@@ -243,7 +242,7 @@ export default {
         const user = new Parse.User();
         const password = Math.random().toString(36).slice(-12);
         user.set("institutionalCode", data[i].A);
-        user.set("name", data[i].B);
+        user.set("name", data[i].B.toUpperCase());
         user.set("address", {
           barangay: data[i].C,
           city: data[i].D,
@@ -253,10 +252,11 @@ export default {
         });
         user.set("email", data[i].H);
         user.set("contactNumber", data[i].I);
-        user.set("type", data[i].J);
+        user.set("type", data[i].J.toUpperCase());
         user.set("userType", "hei");
         user.set("password", password);
         user.set("username", data[i].K);
+        console.log(data[i].K);
 
         const ACL = new Parse.ACL();
         ACL.setReadAccess(Parse.User.current(), true);

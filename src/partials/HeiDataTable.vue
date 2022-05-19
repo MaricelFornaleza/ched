@@ -118,6 +118,7 @@ export default {
             search: "",
             sLengthMenu: "_MENU_",
           },
+          order: [],
           scrollX: true,
         });
       });
