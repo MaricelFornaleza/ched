@@ -80,7 +80,7 @@
       <!-- dataTables  -->
       <div>
         <hei-data-table
-          :heis="heis"
+          :heis="sortHeis"
           :table_headers="table_headers"
           @displayAlert="displayAlert"
         >
@@ -188,6 +188,19 @@ export default {
       countOGS: 0,
     };
   },
+  computed: {
+    sortHeis() {
+      function compare(a, b) {
+        const heiA = a.hei_name; // ignore upper and lowercase
+        const heiB = b.hei_name; // ignore upper and lowercase
+        if (heiA < heiB) return -1;
+        if (heiA > heiB) return 1;
+        return 0;
+      }
+      var heiList = this.heis;
+      return heiList.sort(compare);
+    },
+  },
 
   methods: {
     dropdownToggle() {
@@ -215,30 +228,30 @@ export default {
     this.alert.className = "alert-" + this.$route.query.status;
     this.alert.msg = this.$route.query.msg;
 
-    var hei = [];
+    // var hei = [];
     const query = new Parse.Query(Parse.User);
-
+    query.descending("username");
     query.equalTo("userType", "hei");
-    const result = await query.find({ useMasterKey: true });
-    for (let i = 0; i < result.length; i++) {
-      const object = result[i];
-      hei.push({
-        id: object.id,
-        institutional_code: object.get("institutionalCode"),
-        hei_name: object.get("name"),
-        hei_username: object.get("username"),
-        hei_type: object.get("type"),
-        email: object.get("email"),
-        address: object.get("address"),
-      });
-    }
-    this.heis = hei;
-    this.count().then(() => (this.loading = false));
 
     const subscription = await query.subscribe();
-    subscription.on("open", () => {
+    subscription.on("open", async () => {
       console.log("hei subscription opened");
       // can get the list here
+      const result = await query.find({ useMasterKey: true });
+      for (let i = 0; i < result.length; i++) {
+        const object = result[i];
+        this.heis.push({
+          id: object.id,
+          institutional_code: object.get("institutionalCode"),
+          hei_name: object.get("name"),
+          hei_username: object.get("username"),
+          hei_type: object.get("type").toUpperCase(),
+          email: object.get("email"),
+          address: object.get("address"),
+        });
+      }
+      // this.heis = hei;
+      this.count().then(() => (this.loading = false));
     });
 
     subscription.on("create", (object) => {
@@ -250,7 +263,7 @@ export default {
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
         hei_username: object.get("username"),
-        hei_type: object.get("type"),
+        hei_type: object.get("type").toUpperCase(),
         email: object.get("email"),
         address: object.get("address"),
       });
@@ -268,7 +281,7 @@ export default {
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
         hei_username: object.get("username"),
-        hei_type: object.get("type"),
+        hei_type: object.get("type").toUpperCase(),
         email: object.get("email"),
         address: object.get("address"),
       };
@@ -283,7 +296,7 @@ export default {
         institutional_code: object.get("institutionalCode"),
         hei_name: object.get("name"),
         hei_username: object.get("username"),
-        hei_type: object.get("type"),
+        hei_type: object.get("type").toUpperCase(),
         email: object.get("email"),
         address: object.get("address"),
       });

@@ -108,9 +108,9 @@ export default {
     hei_username: String,
   },
 
-  mounted() {
+  async created() {
     this.getData();
-    this.getStudents();
+    await this.getStudents();
   },
   methods: {
     forceRerender() {

@@ -621,7 +621,7 @@ export default {
       this.enrollees.total = result.filter(
         (data) =>
           data.get("applicationId").get("status") != "Rejected" &&
-          data.get("takenNstp1") != null
+          data.get("takenNstp1") != false
       ).length;
 
       this.enrollees.first = result.filter(

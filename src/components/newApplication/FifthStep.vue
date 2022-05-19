@@ -108,10 +108,10 @@ export default {
     hei_username: String,
   },
 
-  mounted() {
+  async created() {
     this.getData();
     console.log(this.isCompleted);
-    this.getStudents();
+    await this.getStudents();
   },
   methods: {
     forceRerender() {
@@ -138,37 +138,41 @@ export default {
         "applicationId",
         new Parse.Object("Application", { id: this.appId })
       );
+
       query.include("applicationId");
       query.include("studentId");
       query.include("nstpId");
-      query.exists("serialNumber");
+      // query.exists("serialNumber");
       const results = await query.find();
 
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
-        data.push({
-          no: i,
-          awardYear: object.get("applicationId").get("academicYear"),
-          nstpProgram: object.get("nstpId").get("programName"),
-          region:
-            object.get("applicationId").get("heiId").get("address").regionNo +
-            " - " +
-            object.get("applicationId").get("heiId").get("address").regionName,
-          serialNumber: object.get("serialNumber"),
-          name: object.get("studentId").get("name"),
-          birthdate: object.get("studentId").get("birthdate"),
-          gender: object.get("studentId").get("gender"),
-          address: object.get("studentId").get("address"),
-          heiName: object.get("applicationId").get("heiId").get("name"),
-          institutionalCode: object
-            .get("applicationId")
-            .get("heiId")
-            .get("institutionalCode"),
-          heiType: object.get("applicationId").get("heiId").get("type"),
-          program: object.get("studentId").get("program"),
-          emailAddress: object.get("studentId").get("emailAddress"),
-          contactNumber: object.get("studentId").get("contactNumber"),
-        });
+        if (typeof object.get("serialNumber") !== "undefined") {
+          data.push({
+            no: i,
+            awardYear: object.get("applicationId").get("academicYear"),
+            nstpProgram: object.get("nstpId").get("programName"),
+            region:
+              object.get("applicationId").get("heiId").get("address").regionNo +
+              " - " +
+              object.get("applicationId").get("heiId").get("address")
+                .regionName,
+            serialNumber: object.get("serialNumber"),
+            name: object.get("studentId").get("name"),
+            birthdate: object.get("studentId").get("birthdate"),
+            gender: object.get("studentId").get("gender"),
+            address: object.get("studentId").get("address"),
+            heiName: object.get("applicationId").get("heiId").get("name"),
+            institutionalCode: object
+              .get("applicationId")
+              .get("heiId")
+              .get("institutionalCode"),
+            heiType: object.get("applicationId").get("heiId").get("type"),
+            program: object.get("studentId").get("program"),
+            emailAddress: object.get("studentId").get("emailAddress"),
+            contactNumber: object.get("studentId").get("contactNumber"),
+          });
+        }
       }
       this.students = data;
       this.forceRerender();
@@ -180,6 +184,7 @@ export default {
         "applicationId",
         new Parse.Object("Application", { id: this.appId })
       );
+
       query.include("applicationId");
       query.include("studentId");
       query.include("nstpId");
@@ -188,15 +193,17 @@ export default {
       let students = [];
       for (let index = 0; index < results.length; index++) {
         const element = results[index];
-        students.push({
-          awardYear: element.get("applicationId").get("awardYear"),
-          programName: element.get("nstpId").get("programName"),
-          lastName: element.get("studentId").get("name").lastName,
-          firstName: element.get("studentId").get("name").firstName,
-          middleName: element.get("studentId").get("name").middleName,
-          extensionName: element.get("studentId").get("name").extensionName,
-          serialNumber: element.get("serialNumber"),
-        });
+        if (typeof element.get("serialNumber") !== "undefined") {
+          students.push({
+            awardYear: element.get("applicationId").get("awardYear"),
+            programName: element.get("nstpId").get("programName"),
+            lastName: element.get("studentId").get("name").lastName,
+            firstName: element.get("studentId").get("name").firstName,
+            middleName: element.get("studentId").get("name").middleName,
+            extensionName: element.get("studentId").get("name").extensionName,
+            serialNumber: element.get("serialNumber"),
+          });
+        }
       }
       /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
@@ -250,12 +257,22 @@ export default {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo("applicationId", application);
+      // query.exists("serialNumber");
+
       query.include("applicationId");
       query.include("nstpId");
-      query.exists("serialNumber");
+      // query.exists("serialNumber");
 
       await query.find().then(function (results) {
-        _this.data.graduates = results.length;
+        var count = 0;
+
+        for (let index = 0; index < results.length; index++) {
+          const element = results[index];
+          if (typeof element.get("serialNumber") !== "undefined") {
+            count++;
+          }
+        }
+        _this.data.graduates = count;
         _this.data.dateApplied = results[0]
           .get("applicationId")
           .get("dateApplied")
