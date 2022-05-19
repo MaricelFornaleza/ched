@@ -184,7 +184,7 @@ export default {
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
     };
-
+ 
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {

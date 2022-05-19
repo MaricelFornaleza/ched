@@ -76,7 +76,7 @@
           {{ alert.msg }}
         </AlertWidget>
       </div>
-
+      
       <!-- dataTables  -->
       <div>
         <hei-data-table
