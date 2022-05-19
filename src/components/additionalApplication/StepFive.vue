@@ -200,7 +200,7 @@ export default {
       }
       /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
-      const worksheetName = "List of Students";
+      const worksheetName = "NSTP LIST OF GRADUATES WITH SN";
       const workbook = XLSX.utils.book_new();
       const currentDate = new Date()
         .toLocaleDateString()
