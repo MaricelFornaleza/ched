@@ -223,6 +223,7 @@ export default {
       });
       this.getUnreadNotifications();
       this.notifications = this.notifications.slice().reverse();
+      this.count = this.notifications.length;
     });
     applicationSubscription.on("update", (object) => {
       this.notifications = this.notifications.slice().reverse();
@@ -248,6 +249,7 @@ export default {
       };
       this.getUnreadNotifications();
       this.notifications = this.notifications.slice().reverse();
+      this.count = this.notifications.length;
     });
     applicationSubscription.on("enter", (object) => {
       this.notifications = this.notifications.slice().reverse();
@@ -273,6 +275,7 @@ export default {
       });
       this.getUnreadNotifications();
       this.notifications = this.notifications.slice().reverse();
+      this.count = this.notifications.length;
     });
     applicationSubscription.on("leave", (object) => {
       this.notifications = this.notifications.slice().reverse();
@@ -281,6 +284,7 @@ export default {
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
       this.notifications = this.notifications.slice().reverse();
+      this.count = this.notifications.length;
     });
     applicationSubscription.on("delete", (object) => {
       this.notifications = this.notifications.slice().reverse();
@@ -289,6 +293,7 @@ export default {
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
       this.notifications = this.notifications.slice().reverse();
+      this.count = this.notifications.length;
     });
     applicationSubscription.on("close", () => {
       console.log("app subscription closed");
