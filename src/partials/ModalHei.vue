@@ -80,7 +80,11 @@
               <Select2
                 v-model="value"
                 :options="sortHEIs"
-                :settings="{ width: '100%', placeholder: 'Select' }"
+                :settings="{
+                  width: '100%',
+                  placeholder: 'Select',
+                  dropdownCssClass: 'uppercase',
+                }"
               />
               <p class="text-xs text-error">{{ errorMsg }}</p>
               <!-- @change="myChangeEvent($event)" @select="mySelectEvent($event)" -->

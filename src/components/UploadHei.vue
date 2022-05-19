@@ -258,6 +258,11 @@ export default {
         user.set("password", password);
         user.set("username", data[i].K);
 
+        const ACL = new Parse.ACL();
+        ACL.setReadAccess(Parse.User.current(), true);
+        ACL.setWriteAccess(Parse.User.current(), true);
+        user.setACL(ACL);
+
         user.save().then(() => {
           const params = {
             email: data[i].I,

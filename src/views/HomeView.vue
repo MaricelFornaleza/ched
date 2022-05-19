@@ -121,14 +121,14 @@
               </button>
             </li>
             <div
-              v-if="recentApplications == null"
+              v-if="recentApplications == ''"
               class="py-20 flex flex-col justify-center w-full text-light-400"
             >
-              <empty-state class="pt-0 mt-0">
+              <EmptyState class="pt-0 mt-0">
                 <p class="text-4xl font-bold text-light-400">
                   No Application Found
                 </p>
-              </empty-state>
+              </EmptyState>
             </div>
 
             <list-item
