@@ -252,7 +252,7 @@ export default {
         });
         user.set("email", data[i].H);
         user.set("contactNumber", data[i].I);
-        user.set("type", data[i].J);
+        user.set("type", data[i].J.toUpperCase());
         user.set("userType", "hei");
         user.set("password", password);
         user.set("username", data[i].K);

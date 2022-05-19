@@ -388,7 +388,7 @@ export default {
         regionName: this.regionName,
       });
       user.set("institutionalCode", this.institutional_code);
-      user.set("type", this.hei_type);
+      user.set("type", this.hei_type.toUpperCase());
       user.set("password", password);
       user.set("userType", "hei");
       

@@ -80,7 +80,7 @@
       <!-- dataTables  -->
       <div>
         <hei-data-table
-          :heis="heis"
+          :heis="sortHeis"
           :table_headers="table_headers"
           @displayAlert="displayAlert"
         >
@@ -187,6 +187,19 @@ export default {
       countPrivate: 0,
       countOGS: 0,
     };
+  },
+  computed:{
+    sortHeis() {
+      function compare(a, b) {
+        const heiA = a.hei_name; // ignore upper and lowercase
+        const heiB = b.hei_name; // ignore upper and lowercase
+        if (heiA < heiB) return -1;
+        if (heiA > heiB) return 1;
+        return 0;
+      }
+      var heiList = this.heis;
+      return heiList.sort(compare);
+    },
   },
 
   methods: {
