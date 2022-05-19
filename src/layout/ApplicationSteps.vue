@@ -176,7 +176,7 @@ export default {
       );
     },
     nextStep() {
-      if (this.currentStep < 5) {
+      if (this.currentStep < 4) {
         this.currentStep++;
         this.isCompleted = this.findStep(this.currentStep);
         router.push({

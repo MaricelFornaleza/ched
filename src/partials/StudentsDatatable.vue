@@ -53,7 +53,7 @@
                 @click="toggleDeleteModal(student.id)"
                 class="cursor-pointer"
               >
-                <div class="rounded border text-error">
+                <div class="rounded border w-fit text-error">
                   <XIcon class="h-3" />
                 </div>
               </td>
@@ -121,7 +121,13 @@ export default {
     XIcon,
     RemoveStudentModal,
   },
-  props: { students: Array, newId: String, fileName: String, status: String, showError: Boolean },
+  props: {
+    students: Array,
+    newId: String,
+    fileName: String,
+    status: String,
+    showError: Boolean,
+  },
   created() {
     this.updateDt();
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
@@ -138,7 +144,11 @@ export default {
   },
   methods: {
     allowDelete() {
-      if (this.status == "Approved" || this.status == "Rejected" || this.status == null)
+      if (
+        this.status == "Approved" ||
+        this.status == "Rejected" ||
+        this.status == null
+      )
         this.allow = false;
     },
     toggleDeleteModal(id) {

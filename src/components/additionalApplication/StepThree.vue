@@ -144,7 +144,8 @@
           class="container mx-auto flex flex-col items-center justify-center"
         >
           <AlertWidget className="alert-warning">
-            Please review the following students who have missing records or have conflicts with other applications.
+            Please review the following students who have missing records or
+            have conflicts with other applications.
           </AlertWidget>
 
           <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
@@ -453,7 +454,8 @@ export default {
     verificationLevel(takenNstp1, takenNstp2, isGraduated) {
       var reason = "";
       if (isGraduated) {
-        reason = "The student has graduated from the same nstp program but with no serial number yet.";
+        reason =
+          "The student has graduated from the same nstp program but with no serial number yet.";
       } else if (!takenNstp1 && !takenNstp2) {
         reason = "The student has not yet taken nstp1 and nstp2.";
       } else if (!takenNstp2) {
@@ -498,8 +500,12 @@ export default {
             var reason = "";
             //check program
             if (program == nstpProgram && serialNum == null) {
-              reason = this.verificationLevel(takenNstp1, takenNstp2, isGraduated);
-              if(reason == "") {
+              reason = this.verificationLevel(
+                takenNstp1,
+                takenNstp2,
+                isGraduated
+              );
+              if (reason == "") {
                 // student has taken the same nstp but has not finished yet
                 results[i].set(
                   "applicationId",
@@ -509,8 +515,7 @@ export default {
                 results[i].set("takenNstp2", true);
                 results[i].set("isGraduated", true);
                 results[i].save();
-              }
-              else {
+              } else {
                 // student already exists and has taken nstp
                 const StudentConflict = Parse.Object.extend("StudentConflict");
                 const conflict = new StudentConflict();
@@ -527,9 +532,11 @@ export default {
             } else {
               // found the student but there are mismatch in stored info
               if (program != nstpProgram) {
-                reason = "The student already exists in the database but was enrolled with a different nstp program.";
+                reason =
+                  "The student already exists in the database but was enrolled with a different nstp program.";
               } else {
-                reason = "The student has already graduated from the nstp program and already has a serial number.";
+                reason =
+                  "The student has already graduated from the nstp program and already has a serial number.";
               }
               const StudentConflict = Parse.Object.extend("StudentConflict");
               const conflict = new StudentConflict();
@@ -632,8 +639,11 @@ export default {
         new Parse.Object("Application", { id: this.appId })
       );
       query.include("studentId");
+      query.include("nstpId");
+
       const results = await query.find();
       this.status = results[0].get("applicationId").get("status");
+      this.data.program = results[0].get("nstpId").get("programName");
 
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
@@ -702,6 +712,7 @@ export default {
 
       this.students = studentList;
       this.studentsMissing = studentErrorList;
+      this.data.graduates = studentList.length;
       console.log(this.studentsMissing);
       this.forceRerender();
     },
@@ -817,10 +828,6 @@ export default {
         };
         this.sendTransmittalLetter(emailParams);
       }
-      this.$emit("complete", 3);
-
-      this.$emit("setStatus", "Approved");
-      this.$emit("nextStep");
     },
     sendTransmittalLetter(emailParams) {
       Parse.Cloud.run("sendEmailNotification", emailParams);
@@ -862,7 +869,12 @@ export default {
       this.getStudents();
     },
     confirmed() {
-      this.approve();
+      this.approve().then(() => {
+        this.$emit("complete", 3);
+
+        this.$emit("setStatus", "Approved");
+        this.$emit("nextStep");
+      });
     },
     removeFile() {
       this.dropzoneFile = "";
