@@ -277,8 +277,14 @@ export default {
 
         _this.data.program = results[0].get("nstpId").get("programName");
         const sn = results[0].get("applicationId").get("serialNumber");
+        const region = results[0]
+          .get("applicationId")
+          .get("heiId")
+          .get("address").regionNo;
         _this.data.snRange =
           _this.data.program.charAt(0) +
+          " - " +
+          region +
           " - " +
           (sn.start + "").padStart(6, "0") +
           " — " +
