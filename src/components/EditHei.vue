@@ -87,6 +87,17 @@
             placeholder="09********"
           />
         </div>
+        <div class="mb-4">
+          <label class="text-input-label" for="password"> New Password </label>
+          <input
+            class="text-input"
+            name="password"
+            id="password"
+            v-model="password"
+            type="password"
+            placeholder="Enter new password"
+          />
+        </div>
         <div class="grid grid-cols-2 gap-5">
           <div class="mb-4">
             <label class="text-input-label" for="institutional_code">
@@ -259,12 +270,7 @@
           >
             Cancel
           </button>
-          <button
-            class="btn-sm btn-default"
-            type="submit"
-          >
-            Submit
-          </button>
+          <button class="btn-sm btn-default" type="submit">Submit</button>
         </div>
       </form>
     </div>
@@ -297,6 +303,7 @@ export default {
       username: "",
       email: "",
       contact_number: "",
+      password: null,
       regions: [],
       provinces: [],
       cities: [],
@@ -416,7 +423,8 @@ export default {
         });
       }
     },
-    async editHei() { // better if this is done in cloud code
+    async editHei() {
+      // better if this is done in cloud code
       const User = Parse.Object.extend(Parse.User);
       const q = new Parse.Query(User);
       q.matches("objectId", this.id);
@@ -426,6 +434,9 @@ export default {
       result.set("email", this.email);
       result.set("username", this.username);
       result.set("contactNumber", this.contact_number);
+      if (this.password != null) {
+        result.set("password", this.password);
+      }
       result.set("address", {
         street: this.street,
         barangay: this.barangay,
@@ -438,9 +449,9 @@ export default {
       result.set("type", this.hei_type);
 
       result
-        .save(
-          // { useMasterKey: true }
-        )
+        .save
+        // { useMasterKey: true }
+        ()
         .then((user) => {
           if (this.usertype == "admin") {
             router.push({
