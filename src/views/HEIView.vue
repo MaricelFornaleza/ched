@@ -228,28 +228,33 @@ export default {
     this.alert.className = "alert-" + this.$route.query.status;
     this.alert.msg = this.$route.query.msg;
 
-    // var hei = [];
+    var hei = [];
     const query = new Parse.Query(Parse.User);
     query.descending("username");
     query.equalTo("userType", "hei");
+
+    // ----
+    const result = await query.find({ useMasterKey: true });
+    for (let i = 0; i < result.length; i++) {
+      const object = result[i];
+      hei.push({
+        id: object.id,
+        institutional_code: object.get("institutionalCode"),
+        hei_name: object.get("name"),
+        hei_username: object.get("username"),
+        hei_type: object.get("type").toUpperCase(),
+        email: object.get("email"),
+        address: object.get("address"),
+      });
+    }
+    this.heis = hei;
+    // --
 
     const subscription = await query.subscribe();
     subscription.on("open", async () => {
       console.log("hei subscription opened");
       // can get the list here
-      const result = await query.find({ useMasterKey: true });
-      for (let i = 0; i < result.length; i++) {
-        const object = result[i];
-        this.heis.push({
-          id: object.id,
-          institutional_code: object.get("institutionalCode"),
-          hei_name: object.get("name"),
-          hei_username: object.get("username"),
-          hei_type: object.get("type").toUpperCase(),
-          email: object.get("email"),
-          address: object.get("address"),
-        });
-      }
+
       // this.heis = hei;
       this.count().then(() => (this.loading = false));
     });
