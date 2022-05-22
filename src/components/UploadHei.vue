@@ -273,14 +273,7 @@ export default {
         user.setACL(ACL);
 
         await user.save().then(() => {
-          const params = {
-            email: data[i].I,
-            name: data[i].B,
-            password: password,
-            type: "Account",
-            approved: true,
-          };
-          Parse.Cloud.run("sendEmailNotification", params);
+          
         }).catch(function (error) {
           console.log(error);
           throw new Error(error);

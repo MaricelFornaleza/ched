@@ -398,14 +398,6 @@ export default {
       user.setACL(ACL);
 
       user.save().then((user) => {
-        const params = {
-          name: this.name,
-          email: this.email,
-          password: password,
-          type: "Account",
-          approved: true,
-        };
-        Parse.Cloud.run("sendEmailNotification", params);
 
         router.push({
           name: "hei",

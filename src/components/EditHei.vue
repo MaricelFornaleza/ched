@@ -423,7 +423,9 @@ export default {
       const result = await q.first();
       // user.set();
       result.set("name", this.name);
-      result.set("email", this.email);
+      if (this.email != result.get("email")) {
+      //result.set("email", this.email);
+      }
       result.set("username", this.username);
       result.set("contactNumber", this.contact_number);
       result.set("address", {
@@ -439,7 +441,7 @@ export default {
 
       result
         .save(
-          // { useMasterKey: true }
+           { useMasterKey: true }
         )
         .then((user) => {
           if (this.usertype == "admin") {
