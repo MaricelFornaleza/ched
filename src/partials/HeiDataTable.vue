@@ -39,7 +39,7 @@
             </td>
             <td class="px-6 py-4 text-left">
               <div class="text-xs font-bold text-gray-900 uppercase">
-                {{ hei.hei_username }}
+                {{ hei.hei_username }} &nbsp;
               </div>
               <div class="text-sm text-gray-900 uppercase">
                 {{ hei.hei_name }}
@@ -54,7 +54,7 @@
             <td class="px-6 py-4 text-sm text-left text-gray-500">
               <div class="text-sm text-gray-900">
                 {{ hei.address.barangay }},
-                {{ hei.address.city }}
+                {{ hei.address.city }} &nbsp;
               </div>
               <div class="text-xs text-gray-900">
                 {{ hei.address.province }}, {{ hei.address.regionName }}
@@ -85,7 +85,8 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
+import * as XLSX from "sheetjs-style";
 import router from "../router";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 import Parse from "parse";
@@ -150,10 +151,56 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
+      
+      for (const i in sheet1) {
+        if (typeof sheet1[i] != "object") continue;
+        let cell = XLSX.utils.decode_cell(i);
+
+        sheet1[i].s = {
+          border: {
+            right: {
+                style: "thin",
+                color: "000000"
+            },
+            left: {
+                style: "thin",
+                color: "000000"
+            },
+            top: {
+                style: "thin",
+                color: "000000"
+            },
+            bottom: {
+                style: "thin",
+                color: "000000"
+            },
+          },
+          alignment: {
+            vertical: "center",
+            horizontal: "center",
+            wrapText: '1', // any truthy value here
+          },
+        }
+
+        if (cell.r == 0) {
+          // first row
+          sheet1[i].s.font = {
+            bold: true,
+          };
+        }
+      }
+      
+      sheet1["!cols"] = [
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 30 },
+        { wch: 45 },
+      ];
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-      var filename = "List-of-Applications-" + currentDate + ".xlsx";
-      XLSX.writeFileXLSX(workbook, filename);
+      var filename = "List-of-Heis_" + currentDate + ".xlsx";
+      XLSX.writeFile(workbook, filename);
       this.displayMsg(
         "success",
         "The List of Higher Education Institutions was successfully downloaded."

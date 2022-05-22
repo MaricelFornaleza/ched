@@ -70,6 +70,7 @@
         :sem="sem"
         :year="year"
         @displayAlert="displayAlert"
+        fileName="Summary of Graduates"
       >
         <template v-slot:button>
           <select

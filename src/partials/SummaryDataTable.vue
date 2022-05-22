@@ -119,12 +119,13 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 
 import $ from "jquery";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
+import * as XLSX from "sheetjs-style";
 import router from "../router";
 import { DownloadIcon, EyeIcon } from "@heroicons/vue/outline";
 export default {
   name: "EnrollmentDataTable",
-  props: { objects: Object, table_headers: Array, sem: String, year: String },
+  props: { objects: Object, table_headers: Array, sem: String, year: String, fileName: String },
   components: {
     DownloadIcon,
     EyeIcon,
@@ -134,6 +135,7 @@ export default {
       dropdown: false,
       semester: "",
       acadYear: "",
+      newFileName: this.fileName,
     };
   },
   watch: {
@@ -156,10 +158,75 @@ export default {
       );
       // sheet1['!rows'] = [];
       // sheet1['!rows'][1] = { hidden: true };
+      
+      for (const i in sheet1) {
+        if (typeof sheet1[i] != "object") continue;
+        let cell = XLSX.utils.decode_cell(i);
 
-      XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-      var filename = "Summary-of-Enrollment-" + currentDate + ".xlsx";
-      XLSX.writeFileXLSX(workbook, filename);
+        sheet1[i].s = {
+          border: {
+            right: {
+                style: "thin",
+                color: "000000"
+            },
+            left: {
+                style: "thin",
+                color: "000000"
+            },
+            top: {
+                style: "thin",
+                color: "000000"
+            },
+            bottom: {
+                style: "thin",
+                color: "000000"
+            },
+          },
+          alignment: {
+            horizontal: "center",
+          },
+        }
+
+        if (cell.c == 0) {
+          sheet1[i].s.alignment = {
+            horizontal: "left",
+          };
+        }
+
+        if (cell.r == 0) {
+          // first row
+          sheet1[i].s.font = {
+            bold: true,
+          };
+          sheet1[i].s.alignment = {
+            vertical: "center",
+            horizontal: "center",
+            wrapText: '1', // any truthy value here
+          };
+        }
+        else if (cell.r == 1) {
+          sheet1[i].s.font = {
+            bold: true,
+          };
+        }
+      }
+      
+      sheet1["!cols"] = [
+        { wch: 25 },
+      ];
+      
+      var sheetName = this.semester;
+      if(this.semester == "0") {
+        sheetName = "Summary of Graduates"
+      }
+      if(typeof this.acadYear !== "undefined") {
+        sheetName += "_" + this.acadYear;
+      }
+      XLSX.utils.book_append_sheet(workbook, sheet1, sheetName);
+      if (typeof this.newFileName == "undefined")
+        this.newFileName = `Summary_${currentDate}.xlsx`;
+      else this.newFilename = `${this.newFileName}_${currentDate}.xlsx`;
+      XLSX.writeFile(workbook, this.newFilename);
 
       this.displayMsg("success");
     },

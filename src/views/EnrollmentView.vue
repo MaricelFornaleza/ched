@@ -70,6 +70,7 @@
         :sem="sem"
         :year="year"
         @displayAlert="displayAlert"
+        fileName="Summary of Enrollment"
       >
         <template v-slot:button>
           <select

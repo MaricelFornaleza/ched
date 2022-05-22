@@ -157,9 +157,10 @@ export default {
         { title: "Application Type", key: 1 },
         { title: "NSTP Program", key: 2 },
         { title: "Graduates", key: 3 },
-        { title: "Date Applied", key: 4 },
-        { title: "Date Approved", key: 5 },
-        { title: "Status", key: 6 },
+        { title: "Submitted By", key: 4 },
+        { title: "Date Applied", key: 5 },
+        { title: "Date Approved", key: 6 },
+        { title: "Status", key: 7 },
       ],
       for_approval: 0,
       approved: 0,
@@ -250,6 +251,7 @@ export default {
           application_type: object.get("applicationType"),
           program: prog,
           no_of_graduates: countGrads,
+          submittedBy: object.get("submittedBy").get("username"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -275,6 +277,7 @@ export default {
           application_type: object.get("applicationType"),
           program: nstp.prog,
           no_of_graduates: nstp.gradCount,
+          submittedBy: object.get("submittedBy").get("username"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -319,6 +322,7 @@ export default {
           application_type: object.get("applicationType"),
           program: nstp.prog,
           no_of_graduates: nstp.gradCount,
+          submittedBy: object.get("submittedBy").get("username"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -509,6 +513,7 @@ export default {
       });
     },
     async createApplication(hei) {
+      const user = new Parse.User.current();
       if (this.application_type == "new") {
         //new application
 
@@ -522,6 +527,7 @@ export default {
         application.set("steps", this.newSteps);
         application.set("applicationType", "New Application");
         application.set("heiId", new Parse.User({ id: hei }));
+        application.set("submittedBy", new Parse.User({ id: user.id }));
 
         application.save().then(
           (application) => {
@@ -560,6 +566,7 @@ export default {
         application.set("steps", this.additionalSteps);
         application.set("applicationType", "For Additional Graduates");
         application.set("heiId", new Parse.User({ id: hei }));
+        application.set("submittedBy", new Parse.User({ id: user.id }));
 
         application.save().then(
           (application) => {
