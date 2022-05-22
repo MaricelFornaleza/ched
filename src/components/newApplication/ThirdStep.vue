@@ -377,7 +377,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.data.program);
   },
   methods: {
     forceRerender() {
@@ -447,7 +446,6 @@ export default {
           try {
             self.createWorker(data, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -572,7 +570,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -747,12 +744,11 @@ export default {
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
 
-      console.log(this.studentsMissing);
       this.forceRerender();
     },
     async approve() {
       let _this = this;
-      console.log(this.data.program);
+
       const date = new Date();
       const fullyear = new Date().getFullYear();
       const year = new Date().toLocaleDateString("en", { year: "2-digit" });
@@ -779,8 +775,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -870,7 +864,6 @@ export default {
     },
     toggleConfirmModal() {
       this.confirm = !this.confirm;
-      console.log(this.confirm);
     },
     toggleRejectModal() {
       this.reject = !this.reject;

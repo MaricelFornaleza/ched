@@ -410,7 +410,6 @@ export default {
         barangays.brgy_name.match(this.barangay)
       );
       this.brgy_code = brgy[0].brgy_code;
-      console.log(this.brgy_code);
     },
     async getHeiTypes() {
       const Hei_type = Parse.Object.extend("HeiType");

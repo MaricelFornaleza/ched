@@ -366,7 +366,6 @@ export default {
           try {
             self.createWorker(data, step, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -491,7 +490,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -662,7 +660,7 @@ export default {
 
       this.students = studentList;
       this.studentsMissing = studentErrorList;
-      console.log(this.studentsMissing);
+
       this.forceRerender();
     },
     removeFile() {

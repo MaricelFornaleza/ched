@@ -374,7 +374,6 @@ export default {
           try {
             self.createWorker(data, step, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -581,7 +580,7 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
-      console.log(results);
+
       if (results.length == 0) {
         this.$emit("incompleteStep", 1, "1 of 4");
       }
@@ -654,7 +653,7 @@ export default {
 
       this.students = studentList;
       this.studentsMissing = studentErrorList;
-      console.log(this.studentsMissing);
+
       this.forceRerender();
     },
     removeFile() {

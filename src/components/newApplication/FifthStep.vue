@@ -110,7 +110,7 @@ export default {
 
   async created() {
     this.getData();
-    console.log(this.isCompleted);
+
     await this.getStudents();
   },
   methods: {
@@ -298,7 +298,6 @@ export default {
             hour12: true,
           });
         _this.data.awardYear = results[0].get("applicationId").get("awardYear");
-        console.log(_this.data.dateApproved + " " + _this.data.awardYear);
 
         _this.data.program = results[0].get("nstpId").get("programName");
         const sn = results[0].get("applicationId").get("serialNumber");

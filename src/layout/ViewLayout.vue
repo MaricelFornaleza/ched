@@ -266,7 +266,6 @@ export default {
           },
         ];
       }
-      console.log(this.usertype);
     },
     updateList() {
       this.breadcrumbs = this.$route.meta.breadcrumb;

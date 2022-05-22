@@ -157,10 +157,10 @@ export default {
 
     query.include("senderId");
     const result = await query.find({ useMasterKey: true });
-    console.log(result);
+
     this.count = result.length;
     var notification = [];
-    for (let i = 0; i < result.length; i++) { 
+    for (let i = 0; i < result.length; i++) {
       const object = result[i];
       notification.push({
         id: object.id,
@@ -202,7 +202,7 @@ export default {
     });
     applicationSubscription.on("create", (object) => {
       this.notifications = this.notifications.slice().reverse();
-      console.log("object created" + object);
+
       this.notifications.push({
         id: object.id,
         sender: object.get("senderId").get("username"),
@@ -227,7 +227,7 @@ export default {
     });
     applicationSubscription.on("update", (object) => {
       this.notifications = this.notifications.slice().reverse();
-      console.log("object updated" + object);
+
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications[index] = {
         id: object.id,
@@ -279,7 +279,7 @@ export default {
     });
     applicationSubscription.on("leave", (object) => {
       this.notifications = this.notifications.slice().reverse();
-      console.log("object left" + object);
+
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
@@ -288,7 +288,7 @@ export default {
     });
     applicationSubscription.on("delete", (object) => {
       this.notifications = this.notifications.slice().reverse();
-      console.log("object left" + object);
+
       var index = this.notifications.findIndex((app) => app.id == object.id);
       this.notifications.splice(index, 1);
       this.getUnreadNotifications();
@@ -304,7 +304,6 @@ export default {
       this.show = !this.show;
     },
     seeMoreNotification() {
-      console.log("see more");
       this.seeMore = !this.seeMore;
     },
     async openNotification(routeName, appId, id) {
