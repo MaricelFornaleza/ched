@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col space-y-2 xl:pl-5">
+      <div class="flex flex-col space-y-2 xl:pl-5 mt-0">
         <div class="grid grid-cols-2 text-sm">
           <div class="font-bold">NSTP Program:</div>
           <div class="">{{ data.program }}</div>

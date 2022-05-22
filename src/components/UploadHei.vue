@@ -274,7 +274,7 @@ export default {
 
         await user.save().then(() => {
           const params = {
-            email: data[i].I,
+            email: data[i].H,
             name: data[i].B,
             password: password,
             type: "Account",
