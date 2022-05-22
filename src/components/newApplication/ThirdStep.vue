@@ -342,6 +342,21 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
+
     // if(this.isCompleted)
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
@@ -406,6 +421,7 @@ export default {
             self
               .verifyStudents(event.data.rows, event.data.nstp)
               .then(() => (self.pending = false));
+            self.removeFile();
 
             self.$emit("setStatus", "For Approval");
             self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
@@ -653,6 +669,9 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
       this.status = results[0].get("applicationId").get("status");
       this.data.program = results[0].get("nstpId").get("programName");
       if (results.length > 0) {

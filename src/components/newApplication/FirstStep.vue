@@ -119,6 +119,7 @@
           <StudentsDataTable
             :key="componentKey"
             :students="students"
+            :appId="appId"
             :status="status"
             fileName="List-of-Students-1stSem"
             @getStudents="getStudents"
@@ -151,6 +152,7 @@
           <StudentsDataTable
             newId="datatable2"
             :key="componentKey"
+            :appId="appId"
             :students="studentsMissing"
             :showError="true"
             fileName="List-of-Students-Missing"
@@ -279,8 +281,21 @@ export default {
     };
     return { dropzoneFile, drop, selectedFile };
   },
-  created() {
-    if (this.isCompleted) this.getStudents();
+  async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
   },
   methods: {
     forceRerender() {
@@ -329,8 +344,10 @@ export default {
               )
               .then(() => (self.pending = false));
             // self.pending = false;
+            self.removeFile();
             self.$emit("complete", step);
             self.$emit("setStatus", "2 of 4");
+
             self.$emit(
               "sendEmail",
               "List of Enrollment for the 1st Semester",
@@ -384,11 +401,14 @@ export default {
     verificationLevel(takenNstp1, takenNstp2, isGraduated) {
       var reason = "";
       if (isGraduated) {
-        reason = "The student has graduated from the same nstp program but with no serial number yet.";
+        reason =
+          "The student has graduated from the same nstp program but with no serial number yet.";
       } else if (takenNstp1 && takenNstp2) {
-        reason = "The student already exists in the database and has already taken nstp1 and nstp2.";
+        reason =
+          "The student already exists in the database and has already taken nstp1 and nstp2.";
       } else if (takenNstp1) {
-        reason = "The student already exists in the database and has already taken nstp1.";
+        reason =
+          "The student already exists in the database and has already taken nstp1.";
       }
       return reason;
     },
@@ -427,8 +447,12 @@ export default {
             var reason = "";
             //check program
             if (program == nstpProgram && serialNum == null) {
-              reason = this.verificationLevel(takenNstp1, takenNstp2, isGraduated);
-              if(reason == "") {
+              reason = this.verificationLevel(
+                takenNstp1,
+                takenNstp2,
+                isGraduated
+              );
+              if (reason == "") {
                 // student has taken the same nstp but has not finished yet
                 results[i].set(
                   "applicationId",
@@ -436,8 +460,7 @@ export default {
                 );
                 results[i].set("takenNstp1", true);
                 results[i].save();
-              }
-              else {
+              } else {
                 // student already exists and has taken nstp
                 const StudentConflict = Parse.Object.extend("StudentConflict");
                 const conflict = new StudentConflict();
@@ -454,9 +477,11 @@ export default {
             } else {
               // found the student but there are mismatch in stored info
               if (program != nstpProgram) {
-                reason = "The student already exists in the database but was enrolled with a different nstp program.";
+                reason =
+                  "The student already exists in the database but was enrolled with a different nstp program.";
               } else {
-                reason = "The student has already graduated from the nstp program and already has a serial number.";
+                reason =
+                  "The student has already graduated from the nstp program and already has a serial number.";
               }
               const StudentConflict = Parse.Object.extend("StudentConflict");
               const conflict = new StudentConflict();
@@ -556,6 +581,10 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      console.log(results);
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 1, "1 of 4");
+      }
       this.status = results[0].get("applicationId").get("status");
 
       if (results.length > 0) {

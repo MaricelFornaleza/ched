@@ -281,6 +281,9 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.dateApproved = results[0]
           .get("applicationId")
@@ -290,6 +293,9 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.awardYear = results[0].get("applicationId").get("awardYear");
         console.log(_this.data.dateApproved + " " + _this.data.awardYear);
