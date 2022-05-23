@@ -68,7 +68,8 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
+import * as XLSX from "sheetjs-style";
 
 import { DownloadIcon } from "@heroicons/vue/outline";
 export default {
@@ -106,18 +107,64 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
+
+      for (const i in sheet1) {
+        if (typeof sheet1[i] != "object") continue;
+        let cell = XLSX.utils.decode_cell(i);
+
+        sheet1[i].s = {
+          border: {
+            right: {
+                style: "thin",
+                color: "000000"
+            },
+            left: {
+                style: "thin",
+                color: "000000"
+            },
+            top: {
+                style: "thin",
+                color: "000000"
+            },
+            bottom: {
+                style: "thin",
+                color: "000000"
+            },
+          },
+          alignment: {
+            horizontal: "center",
+          },
+        }
+
+        if (cell.c == 0) {
+          sheet1[i].s.alignment = {
+            horizontal: "left",
+          };
+        }
+        
+        if (cell.r == 0) {
+          // first row
+          sheet1[i].s.font = {
+            bold: true,
+          };
+          sheet1[i].s.alignment = {
+            horizontal: "center",
+          };
+        }
+      }
+      
       sheet1["!cols"] = [
         { wch: 15 },
         { wch: 15 },
-        { wch: 15 },
+        { wch: 20 },
         { wch: 15 },
         { wch: 15 },
       ];
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename =
-        "List-of-Applications-SerialNumbers" + currentDate + ".xlsx";
-      XLSX.writeFileXLSX(workbook, filename);
+        "List-of-SerialNumbers_" + currentDate + ".xlsx";
+      XLSX.writeFile(workbook, filename);
       this.displayMsg(
         "success",
         "The List of Serial Numbers was successfully downloaded."

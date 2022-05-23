@@ -126,12 +126,12 @@
       </div>
 
       <div
-        v-if="errorStudents()"
+        v-if="maleNumError > 0 || femaleNumError > 0 ? true : false"
         class="container mx-auto flex flex-col items-center justify-center"
       >
         <AlertWidget className="alert-warning">
-          Please review the following students who have missing records or have
-          conflicts with other applications.
+          Please review the following students who have missing records or
+          have conflicts with other applications.
         </AlertWidget>
 
         <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
@@ -159,7 +159,7 @@
       </div>
 
       <div
-        v-if="finishedStudents()"
+        v-if="isCompleted"
         class="flex items-center justify-center space-x-5 mt-5"
       >
         <button
@@ -168,6 +168,10 @@
           type="button"
         >
           Cancel
+        </button>
+
+        <button @click="reupload()" class="btn-sm btn-default" type="submit">
+          Reupload
         </button>
 
         <button @click="nextStep()" class="btn-sm btn-default" type="submit">
@@ -305,6 +309,48 @@ export default {
       if (this.maleNumError > 0 || this.femaleNumError > 0) return true;
       else return false;
     },
+    reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "2 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {console.log(error);});
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("takenNstp2", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 2);
+      this.$emit("setStatus", "2 of 4");
+      this.removeFile();
+    },
     validate(filename) {
       var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
       if (filename === "") {
@@ -322,7 +368,7 @@ export default {
         if (typeof self.worker == "undefined") {
           self.worker = new Worker();
         }
-        self.worker.postMessage({ d: data });
+        self.worker.postMessage({ d: data, sheet: 1 });
         //can be improved by abstraction
         self.worker.onmessage = function (event) {
           // _this.table_headers = event.data.headers;
@@ -334,16 +380,17 @@ export default {
             // self.total = self.maleNum + self.femaleNum;
             self
               .verifyStudents(event.data.rows, event.data.nstp)
-              .then(() => (self.pending = false));
-            self.removeFile();
-
-            self.$emit("complete", step);
-            self.$emit("setStatus", "3 of 4");
-            self.$emit(
-              "sendEmail",
-              "List of Enrollment for the 2nd Semester",
-              "Step 2 of 4"
-            );
+              .then(() => {
+                self.pending = false;
+                self.$emit("complete", step);
+                self.$emit("setStatus", "3 of 4");
+                self.$emit(
+                  "sendEmail",
+                  "List of Enrollment for the 2nd Semester",
+                  "Step 2 of 4"
+                );
+              });
+            
 
             // this.completed = !this.completed;
           } else {
@@ -409,8 +456,16 @@ export default {
       const query = new Parse.Query(nstpEnrollment);
       query.include("studentId");
       query.include("nstpId");
-
       const results = await query.find();
+
+      // find the current application's nstp program
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      const res = await query.first();
+      const currentNstp = res.get("nstpId").get("programName");
+
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
@@ -432,13 +487,9 @@ export default {
           ) {
             var reason = "";
             //check program
-            if (program == nstpProgram && serialNum == null) {
-              reason = this.verificationLevel(
-                takenNstp1,
-                takenNstp2,
-                isGraduated
-              );
-              if (reason == "") {
+            if (program == nstpProgram && program == currentNstp && serialNum == null) {
+              reason = this.verificationLevel(takenNstp1, takenNstp2, isGraduated);
+              if(reason == "") {
                 // student has taken the same nstp but has not finished yet
                 results[i].set(
                   "applicationId",
@@ -463,8 +514,9 @@ export default {
             } else {
               // found the student but there are mismatch in stored info
               if (program != nstpProgram) {
-                reason =
-                  "The student already exists in the database but was enrolled with a different nstp program.";
+                reason = "The student already exists in the database but was enrolled with a different nstp program.";
+              } else if (program != currentNstp) {
+                reason = "The student has a different nstp program from this application.";
               } else {
                 reason =
                   "The student has already graduated from the nstp program and already has a serial number.";

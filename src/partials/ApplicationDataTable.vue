@@ -132,6 +132,9 @@
                 {{ application.no_of_graduates }}
               </td>
               <td class="px-6 py-4">
+                {{ application.submittedBy }}
+              </td>
+              <td class="px-6 py-4">
                 {{ application.date_applied }}
               </td>
               <td
@@ -207,7 +210,8 @@ import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import DeleteModal from "@/partials/DeleteModal.vue";
 import $ from "jquery";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
+import * as XLSX from "sheetjs-style";
 import Parse from "parse";
 
 import router from "../router";
@@ -432,9 +436,60 @@ export default {
         document.getElementById("dataTable")
       );
 
+      for (const i in sheet1) {
+        if (typeof sheet1[i] != "object") continue;
+        let cell = XLSX.utils.decode_cell(i);
+
+        sheet1[i].s = {
+          border: {
+            right: {
+                style: "thin",
+                color: "000000"
+            },
+            left: {
+                style: "thin",
+                color: "000000"
+            },
+            top: {
+                style: "thin",
+                color: "000000"
+            },
+            bottom: {
+                style: "thin",
+                color: "000000"
+            },
+          },
+          alignment: {
+            horizontal: "center",
+          },
+        }
+
+        if (cell.c == 0) {
+          sheet1[i].s.alignment = {
+            horizontal: "left",
+          };
+        }
+        
+        if (cell.r == 0) {
+          // first row
+          sheet1[i].s.font = {
+            bold: true,
+          };
+          sheet1[i].s.alignment = {
+            horizontal: "center",
+          };
+        }
+      }
+
+      sheet1["!cols"] = [
+        { wch: 45 },{ wch: 15 },{ wch: 15 },{ wch: 15 },
+        { wch: 15 },{ wch: 20 },{ wch: 15 },{ wch: 10 },
+      ];
+
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-      var filename = "List-of-Applications-" + currentDate + ".xlsx";
-      XLSX.writeFileXLSX(workbook, filename);
+      var filename = "List-of-Applications_" + currentDate + ".xlsx";
+      // XLSX.writeFileXLSX(workbook, filename);
+      XLSX.writeFile(workbook, filename);
       this.displayMsg(
         "success",
         "The List of Applications was successfully downloaded."

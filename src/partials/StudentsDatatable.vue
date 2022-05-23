@@ -255,7 +255,7 @@ export default {
         .replace(/[^\w\s]/gi, "-");
       var workbook = XLSX.utils.book_new();
       var sheet1 = XLSX.utils.table_to_sheet(
-        document.getElementById("dataTable")
+        document.getElementById(`"${this.tableId}"`)
       );
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       if (typeof this.newFileName == "undefined")
