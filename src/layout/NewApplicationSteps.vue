@@ -53,6 +53,7 @@
         @checkActive="checkActive"
         @sendEmail="sendEmail"
         @sendNotification="sendNotification"
+        @stepBack="stepBack"
         :isCompleted="isCompleted"
         :appId="application_id"
         :hei_username="hei_username"
@@ -104,6 +105,20 @@ export default {
     this.isCompleted = this.findStep(this.currentStep);
   },
   methods: {
+    stepBack(currentStep) {
+      for (var i in this.steps) {
+        if (this.steps[i].no == currentStep) {
+          const temp = this.steps[i];
+          console.log(temp);
+          temp.completed = false;
+          this.steps.splice(i, 1, temp);
+          this.isCompleted = false;
+        }
+      }
+
+      this.saveSteps();
+    },
+
     activeStep(step) {
       this.currentStep = step;
       this.isCompleted = this.findStep(step);
