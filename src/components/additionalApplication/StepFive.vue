@@ -1,4 +1,5 @@
 <template>
+  <div v-if="loading" class="text-center">Loading...</div>
   <div>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
@@ -99,6 +100,7 @@ export default {
       },
       students: [],
       componentKey: 0,
+      loading: true,
     };
   },
   props: {
@@ -111,6 +113,7 @@ export default {
   async created() {
     this.getData();
     await this.getStudents();
+    this.loading = false;
   },
   methods: {
     forceRerender() {
