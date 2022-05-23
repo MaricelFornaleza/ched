@@ -52,6 +52,34 @@
           </div>
         </div>
       </div>
+      <div class="my-5 w-full flex justify-between p-5 border border-light-300">
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center space-x-5">
+            <img
+              src="@/assets/img/pdf.png"
+              class="h-8"
+              alt="PDF Icon by Dimitry Miroliubov"
+            />
+            <div class="text-base">Transmittal Letter</div>
+          </div>
+          <div class="space-x-2">
+            <button
+              @click="downloadTransmittal"
+              class="px-3 py-2 bg-dark-200 text-light-100 rounded-sm text-sm"
+            >
+              Download
+              <DownloadIcon class="h-4 inline-flex" />
+            </button>
+            <button
+              @click="sendTransmittal"
+              class="px-3 py-2 bg-error text-light-100 rounded-sm text-sm"
+            >
+              Send to Email
+              <PaperAirplaneIcon class="h-4 inline-flex" />
+            </button>
+          </div>
+        </div>
+      </div>
       <view-students-datatable
         :students="students"
         :key="componentKey"
@@ -80,11 +108,18 @@
 import Parse from "parse";
 import AlertWidget from "@/partials/AlertWidget.vue";
 import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import image from "@/assets/img/ched-logo.png";
+
 import ViewStudentsDatatable from "@/partials/ViewStudentsDatatable.vue";
+import { DownloadIcon, PaperAirplaneIcon } from "@heroicons/vue/outline";
+
 export default {
   components: {
     AlertWidget,
     ViewStudentsDatatable,
+    DownloadIcon,
+    PaperAirplaneIcon,
   },
   data() {
     return {
@@ -96,7 +131,13 @@ export default {
         program: "",
         awardYear: "",
         snRange: "",
+        acadYear: "",
+
+        hei: null,
+        hei_address: null,
       },
+      hei: null,
+      application: null,
       students: [],
       componentKey: 0,
     };
@@ -113,6 +154,110 @@ export default {
     await this.getStudents();
   },
   methods: {
+    downloadTransmittal() {
+      // Default export is a4 paper, portrait, using millimeters for units
+      const doc = new jsPDF("p", "in", "letter");
+      var img = new Image();
+      img.src = image;
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      doc.addImage(img, "png", 1, 1, 0.75, 0.75);
+      doc.setFontSize(11);
+      doc.setFont("Arial");
+      doc.text("Republic of the Philippines", 4.24, 1, "center");
+      doc.text("Office of the President", 4.24, 1.2, "center");
+      doc.setFont("", "", "bold");
+      doc.text("COMMISSION ON HIGHER EDUCATION", 4.24, 1.4, "center");
+      doc.setFont("", "", "normal");
+      doc.text("Regional Office V", 4.24, 1.6, "center");
+      doc.text(date, 7.5, 2.5, "right");
+      doc.setFont("", "", "bold");
+      doc.text("NSTP Coordinator", 1, 3.5, "left");
+      doc.setFont("", "", "normal");
+      doc.text(this.data.hei, 1, 3.7, "left");
+      doc.text(
+        this.data.hei_address.barangay + ", " + this.data.hei_address.city,
+        1,
+        3.9,
+        "left"
+      );
+      doc.text(this.data.hei_address.province, 1, 4.1, "left");
+      var p1 =
+        "This has reference to your application dated " +
+        this.data.dateApplied +
+        ", requesting for issuance of NSTP Serial Number for the following School Year" +
+        this.data.acadYear +
+        ".";
+
+      doc.text(p1, 1, 5, {
+        align: "justify",
+        maxWidth: 6.5,
+        lineHeightFactor: 1.5,
+      });
+      const p2 =
+        "Per CMO No. 27, s. 2015, herewith is your Serial Number for the following aforementioned School Year, to wit:";
+      doc.text(p2, 1, 5.65, {
+        align: "justify",
+        maxWidth: 6.5,
+        lineHeightFactor: 1.5,
+      });
+      doc.setFont("", "", "bold");
+      doc.text(this.data.acadYear, 2, 6.4);
+      doc.setFont("", "", "normal");
+      doc.text(
+        this.data.snRange + " for " + this.data.graduates + " students.",
+        2,
+        6.8
+      );
+      doc.text("Thank you.", 1, 7.4);
+      doc.text("Very truly yours,", 4.5, 8.5);
+      doc.setFont("", "", "bold");
+      doc.text("FREDDIE T. BERNAL, PHD., CESO III", 4.5, 9);
+      doc.setFont("", "", "normal");
+      doc.text("Director IV", 4.5, 9.2);
+
+      window.open(doc.output("bloburl"), "_blank");
+    },
+    async sendTransmittal() {
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const Application = Parse.Object.extend("Application");
+      //get the end of serial number
+      const query = new Parse.Query(Application);
+      query.include("heiId");
+
+      const results = await query.first();
+      const emailParams = {
+        type: "Transmittal",
+        approved: true,
+        hei: {
+          name: results.get("heiId").get("name"),
+          username: results.get("heiId").get("username"),
+          email: results.get("heiId").get("email"),
+          address: results.get("heiId").get("address"),
+        },
+        date: date,
+        application: {
+          dateApplied: results.get("dateApplied").toLocaleDateString("en", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }),
+          schoolYear: results.get("academicYear"),
+          snRange: this.data.snRange,
+          students: this.data.graduates,
+        },
+      };
+      Parse.Cloud.run("sendEmailNotification", emailParams);
+    },
     forceRerender() {
       this.componentKey += 1;
     },
@@ -283,6 +428,17 @@ export default {
 
         _this.data.program = results[0].get("nstpId").get("programName");
         const sn = results[0].get("applicationId").get("serialNumber");
+        _this.data.acadYear = results[0]
+          .get("applicationId")
+          .get("academicYear");
+        _this.data.hei = results[0]
+          .get("applicationId")
+          .get("heiId")
+          .get("name");
+        _this.data.hei_address = results[0]
+          .get("applicationId")
+          .get("heiId")
+          .get("address");
         const region = results[0]
           .get("applicationId")
           .get("heiId")
@@ -297,6 +453,8 @@ export default {
           (sn.end + "").padStart(6, "0") +
           " - " +
           _this.data.awardYear.slice(-2);
+        _this.hei = results[0].get("applicationId").get("heiId");
+        _this.application = results[0].get("applicationId");
       });
     },
     setStatus(status) {
