@@ -263,6 +263,9 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.dateApproved = results[0]
           .get("applicationId")
@@ -272,13 +275,22 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.awardYear = results[0].get("applicationId").get("awardYear");
 
         _this.data.program = results[0].get("nstpId").get("programName");
         const sn = results[0].get("applicationId").get("serialNumber");
+        const region = results[0]
+          .get("applicationId")
+          .get("heiId")
+          .get("address").regionNo;
         _this.data.snRange =
           _this.data.program.charAt(0) +
+          " - " +
+          region +
           " - " +
           (sn.start + "").padStart(6, "0") +
           " — " +

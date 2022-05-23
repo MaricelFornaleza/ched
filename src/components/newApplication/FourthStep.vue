@@ -283,8 +283,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -327,7 +325,10 @@ export default {
       const notification = new Parse.Object("Notification");
       notification.set("applicationId", this.appId);
       notification.set("userId", result[0].get("heiId").id);
-      notification.set("message", "Application with id number " + this.appId + " is Approved");
+      notification.set(
+        "message",
+        "Application with id number " + this.appId + " is Approved"
+      );
       notification.set("routeName", "4thStep");
       notification.set("isRead", false);
       notification.save();
@@ -373,7 +374,10 @@ export default {
       const notification = new Parse.Object("Notification");
       notification.set("applicationId", this.appId);
       notification.set("userId", result[0].get("heiId").id);
-      notification.set("message", "Application with id number " + this.appId + " is Rejected ");
+      notification.set(
+        "message",
+        "Application with id number " + this.appId + " is Rejected "
+      );
       notification.set("routeName", "4thStep");
       notification.set("isRead", false);
       notification.save();

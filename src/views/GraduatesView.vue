@@ -198,6 +198,7 @@ export default {
         const application = new Parse.Query(Application);
         application.equalTo("heiId", new Parse.Object("_User", { id: hei.id }));
         application.equalTo("academicYear", this.year);
+        application.notEqualTo("status", "Rejected");
 
         const Nstp = Parse.Object.extend("Nstp");
         const nstp = new Parse.Query(Nstp);
@@ -256,7 +257,7 @@ export default {
         heiData.push(heiObject);
       }
       this.objects = heiData;
-      console.log(heiData);
+
       this.TOTAL.femaleNum = this.CWTS.femaleNum + this.LTS.femaleNum;
       this.TOTAL.maleNum = this.CWTS.maleNum + this.LTS.maleNum;
       // this.componentKey++;

@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col space-y-2 xl:pl-5">
+      <div class="flex flex-col space-y-2 xl:pl-5 mt-0">
         <div class="grid grid-cols-2 text-sm">
           <div class="font-bold">NSTP Program:</div>
           <div class="">{{ data.program }}</div>
@@ -109,6 +109,9 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.program = results[0].get("nstpId").get("programName");
       });

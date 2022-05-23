@@ -69,7 +69,7 @@
             <div class="w-full bg-error p-5 flex justify-between items-center">
               <div class="text-left text-light-100">
                 <h5 class="font-body font-bold" id="modal-title">
-                  Remove a Student?
+                  Remove {{ studentCount }} Student/s?
                 </h5>
                 <p class="text-sm">This action cannot be undone!</p>
               </div>
@@ -119,6 +119,9 @@ import { ExclamationCircleIcon } from "@heroicons/vue/outline";
 export default {
   components: {
     ExclamationCircleIcon,
+  },
+  props: {
+    studentCount: Number,
   },
 
   methods: {

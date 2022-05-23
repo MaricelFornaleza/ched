@@ -53,6 +53,8 @@ export default {
       const applications = new Parse.Query(Applications);
       applications.equalTo("heiId", new Parse.Object("_User", { id: this.id }));
       applications.equalTo("academicYear", this.year);
+      applications.notEqualTo("status", "Rejected");
+
       const Students = Parse.Object.extend("NstpEnrollment");
       const students = new Parse.Query(Students);
       students.matchesKeyInQuery("applicationId", "objectId", applications);

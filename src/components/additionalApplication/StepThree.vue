@@ -338,6 +338,21 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
+
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
@@ -356,7 +371,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.status);
   },
   methods: {
     forceRerender() {
@@ -405,6 +419,8 @@ export default {
               .then(() => (self.pending = false));
             // self.pending = false;
             // self.$emit("complete", step);
+            self.removeFile();
+
             self.$emit("setStatus", "For Approval");
             self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
             // this.completed = !this.completed;
@@ -427,7 +443,6 @@ export default {
           try {
             self.createWorker(data, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -558,7 +573,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -642,7 +656,12 @@ export default {
       query.include("nstpId");
 
       const results = await query.find();
+
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
       this.status = results[0].get("applicationId").get("status");
+
       this.data.program = results[0].get("nstpId").get("programName");
 
       if (results.length > 0) {
@@ -713,7 +732,7 @@ export default {
       this.students = studentList;
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
-      console.log(this.studentsMissing);
+
       this.forceRerender();
     },
     async approve() {
@@ -814,12 +833,18 @@ export default {
             month: "long",
             day: "numeric",
             year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           }),
           application: {
             dateApplied: results.get("dateApplied").toLocaleDateString("en", {
               month: "long",
               day: "numeric",
               year: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
             }),
             schoolYear: results.get("academicYear"),
             snRange: range,

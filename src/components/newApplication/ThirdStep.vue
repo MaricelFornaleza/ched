@@ -342,6 +342,21 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
+
     // if(this.isCompleted)
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
@@ -362,7 +377,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.data.program);
   },
   methods: {
     forceRerender() {
@@ -406,6 +420,7 @@ export default {
             self
               .verifyStudents(event.data.rows, event.data.nstp)
               .then(() => (self.pending = false));
+            self.removeFile();
 
             self.$emit("setStatus", "For Approval");
             self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
@@ -431,7 +446,6 @@ export default {
           try {
             self.createWorker(data, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -556,7 +570,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -653,6 +666,9 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
       this.status = results[0].get("applicationId").get("status");
       this.data.program = results[0].get("nstpId").get("programName");
       if (results.length > 0) {
@@ -728,12 +744,11 @@ export default {
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
 
-      console.log(this.studentsMissing);
       this.forceRerender();
     },
     async approve() {
       let _this = this;
-      console.log(this.data.program);
+
       const date = new Date();
       const fullyear = new Date().getFullYear();
       const year = new Date().toLocaleDateString("en", { year: "2-digit" });
@@ -760,8 +775,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -851,7 +864,6 @@ export default {
     },
     toggleConfirmModal() {
       this.confirm = !this.confirm;
-      console.log(this.confirm);
     },
     toggleRejectModal() {
       this.reject = !this.reject;

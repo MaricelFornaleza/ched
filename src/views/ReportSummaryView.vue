@@ -232,7 +232,6 @@
         </div>
       </div>
     </div>
-    <div @click="sendSampleEmail">export</div>
   </div>
 </template>
 
