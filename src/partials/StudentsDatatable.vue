@@ -94,7 +94,7 @@
               <td class="px-6 py-4">{{ student.program.programName }}</td>
               <td class="px-6 py-4">{{ student.emailAddress }}</td>
               <td class="px-6 py-4">{{ student.contactNumber }}</td>
-              <td v-if="showError" class="px-6 py-4">{{ student.reason }}</td>
+              <td v-if="showError" class="px-6 py-4 text-left">{{ student.reason }}</td>
             </tr>
           </tbody>
         </table>
@@ -255,8 +255,56 @@ export default {
         .replace(/[^\w\s]/gi, "-");
       var workbook = XLSX.utils.book_new();
       var sheet1 = XLSX.utils.table_to_sheet(
-        document.getElementById("dataTable")
+        document.getElementById(`"${this.tableId}"`)
       );
+
+      for (const i in sheet1) {
+        if (typeof sheet1[i] != "object") continue;
+        let cell = XLSX.utils.decode_cell(i);
+
+        sheet1[i].s = {
+          border: {
+            right: {
+                style: "thin",
+                color: "000000"
+            },
+            left: {
+                style: "thin",
+                color: "000000"
+            },
+            top: {
+                style: "thin",
+                color: "000000"
+            },
+            bottom: {
+                style: "thin",
+                color: "000000"
+            },
+          },
+          alignment: {
+            horizontal: "center",
+          },
+        }
+
+        if (cell.c == 0) {
+          sheet1[i].s.alignment = {
+            horizontal: "left",
+          };
+        }
+
+        if (cell.r == 0) {
+          // first row
+          sheet1[i].s.font = {
+            bold: true,
+          };
+          sheet1[i].s.alignment = {
+            vertical: "center",
+            horizontal: "center",
+            wrapText: '1', // any truthy value here
+          };
+        }
+      }
+
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       if (typeof this.newFileName == "undefined")
         this.newFileName = `List-of-Applications_${currentDate}.xlsx`;

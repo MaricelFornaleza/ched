@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
@@ -109,7 +110,7 @@ import AlertWidget from "@/partials/AlertWidget.vue";
 import * as XLSX from "xlsx";
 import ViewStudentsDatatable from "@/partials/ViewStudentsDatatable.vue";
 import { jsPDF } from "jspdf";
-import logo from "@/assets/CHED_logo.svg";
+
 import image from "@/assets/img/ched-logo.png";
 import { DownloadIcon, PaperAirplaneIcon } from "@heroicons/vue/outline";
 export default {
@@ -137,7 +138,7 @@ export default {
       application: null,
       students: [],
       componentKey: 0,
-      logo,
+      loading: true,
     };
   },
   props: {
@@ -151,6 +152,7 @@ export default {
     this.getData();
 
     await this.getStudents();
+    this.loading = false;
   },
   methods: {
     downloadTransmittal() {
@@ -350,7 +352,7 @@ export default {
       }
       /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
-      const worksheetName = "List of Students";
+      const worksheetName = "NSTP LIST OF GRADUATES WITH SN";
       const workbook = XLSX.utils.book_new();
       const currentDate = new Date()
         .toLocaleDateString()

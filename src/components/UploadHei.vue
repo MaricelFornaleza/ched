@@ -215,8 +215,8 @@ export default {
               var heis = event.data.rows;
 
               if (event.data.complete) {
-                _this.storeHeis(heis);
-                _this.visible = false;
+                _this.storeHeis(heis).then(() => {
+                  _this.visible = false;
                 //_this.$emit("complete", step);
                 _this.completed = !_this.completed;
                 _this.$router.push({
@@ -225,6 +225,15 @@ export default {
                     status: "success",
                     msg: "The HEIs were successfully added.",
                   },
+                });
+                }).catch((error) => {
+                  _this.$router.push({ 
+                    name: "hei",
+                    query: {
+                      status: "error",
+                      msg: error,
+                    },
+                  });
                 });
               } else {
                 _this.visible = false;
@@ -237,7 +246,7 @@ export default {
         alert("Please upload a .xlsx file!");
       }
     },
-    storeHeis(data) {
+    async storeHeis(data) {
       for (let i = 1; i < data.length; i++) {
         const user = new Parse.User();
         const password = Math.random().toString(36).slice(-12);
@@ -263,7 +272,7 @@ export default {
         ACL.setWriteAccess(Parse.User.current(), true);
         user.setACL(ACL);
 
-        user.save().then(() => {
+        await user.save().then(() => {
           const params = {
             email: data[i].H,
             name: data[i].B,
@@ -272,6 +281,9 @@ export default {
             approved: true,
           };
           Parse.Cloud.run("sendEmailNotification", params);
+        }).catch(function (error) {
+          console.log(error);
+          throw new Error(error);
         });
       }
     },

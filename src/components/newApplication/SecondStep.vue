@@ -120,59 +120,64 @@
             :key="componentKey"
             :students="students"
             :status="status"
+            fileName="List-of-Students-2ndSem"
             @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
-      </div>
 
-      <div
-        v-if="errorStudents()"
-        class="container mx-auto flex flex-col items-center justify-center"
-      >
-        <AlertWidget className="alert-warning">
-          Please review the following students who have missing records or have
-          conflicts with other applications.
-        </AlertWidget>
+        <div
+          v-if="maleNumError > 0 || femaleNumError > 0 ? true : false"
+          class="container mx-auto flex flex-col items-center justify-center"
+        >
+          <AlertWidget className="alert-warning">
+            Please review the following students who have missing records or
+            have conflicts with other applications.
+          </AlertWidget>
 
-        <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ femaleNumError }}</h2>
-            <p class="uppercase">female</p>
+          <div class="grid grid-cols-3 gap-20 mt-6 mb-4">
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ femaleNumError }}</h2>
+              <p class="uppercase">female</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNumError }}</h2>
+              <p class="uppercase">male</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <h2 class="">{{ maleNumError + femaleNumError }}</h2>
+              <p class="uppercase">total</p>
+            </div>
           </div>
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ maleNumError }}</h2>
-            <p class="uppercase">male</p>
-          </div>
-          <div class="flex flex-col items-center">
-            <h2 class="">{{ maleNumError + femaleNumError }}</h2>
-            <p class="uppercase">total</p>
-          </div>
+
+          <StudentsDataTable
+            :key="componentKey"
+            :students="studentsMissing"
+            :showError="true"
+            newId="datatable2"
+            fileName="List-of-Students-Missing-2ndSem"
+          ></StudentsDataTable>
         </div>
 
-        <StudentsDataTable
-          :key="componentKey"
-          :students="studentsMissing"
-          :showError="true"
-          newId="datatable2"
-          fileName="List-of-Students-Missing-2ndSem"
-        ></StudentsDataTable>
-      </div>
-
-      <div
-        v-if="finishedStudents()"
-        class="flex items-center justify-center space-x-5 mt-5"
-      >
-        <button
-          @click="goToApplication()"
-          class="btn-sm btn-default btn-outline"
-          type="button"
+        <div
+          v-if="isCompleted"
+          class="flex items-center justify-center space-x-5 mt-5"
         >
-          Cancel
-        </button>
+          <button
+            @click="goToApplication()"
+            class="btn-sm btn-default btn-outline"
+            type="button"
+          >
+            Cancel
+          </button>
 
-        <button @click="nextStep()" class="btn-sm btn-default" type="submit">
-          Next
-        </button>
+          <button @click="reupload()" class="btn-sm btn-default" type="submit">
+            Reupload
+          </button>
+
+          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+            Next
+          </button>
+        </div>
       </div>
     </div>
 
@@ -305,6 +310,51 @@ export default {
       if (this.maleNumError > 0 || this.femaleNumError > 0) return true;
       else return false;
     },
+    reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "2 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("takenNstp2", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 2);
+      this.$emit("setStatus", "2 of 4");
+      this.removeFile();
+    },
     validate(filename) {
       var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
       if (filename === "") {
@@ -322,7 +372,7 @@ export default {
         if (typeof self.worker == "undefined") {
           self.worker = new Worker();
         }
-        self.worker.postMessage({ d: data });
+        self.worker.postMessage({ d: data, sheet: 1 });
         //can be improved by abstraction
         self.worker.onmessage = function (event) {
           // _this.table_headers = event.data.headers;
@@ -332,18 +382,17 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self
-              .verifyStudents(event.data.rows, event.data.nstp)
-              .then(() => (self.pending = false));
-            self.removeFile();
-
-            self.$emit("complete", step);
-            self.$emit("setStatus", "3 of 4");
-            self.$emit(
-              "sendEmail",
-              "List of Enrollment for the 2nd Semester",
-              "Step 2 of 4"
-            );
+            self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
+              self.pending = false;
+              self.removeFile();
+              self.$emit("complete", step);
+              self.$emit("setStatus", "3 of 4");
+              self.$emit(
+                "sendEmail",
+                "List of Enrollment for the 2nd Semester",
+                "Step 2 of 4"
+              );
+            });
 
             // this.completed = !this.completed;
           } else {
@@ -386,17 +435,29 @@ export default {
       var result = await query.first();
       return result.id;
     },
-    verificationLevel(takenNstp1, takenNstp2, isGraduated) {
+    verificationLevel(nstp, studentProg) {
       var reason = "";
-      if (isGraduated) {
+      if (studentProg.program == "") {
+        reason = "The student has not yet been enrolled in any nstp program.";
+      } else if (studentProg.program != studentProg.nstpProgram) {
+        reason =
+          "The student already exists in the database but was enrolled with a different nstp program.";
+      } else if (studentProg.program != studentProg.currentProgram) {
+        reason =
+          "The student has a different nstp program from this application.";
+      } else if (nstp.isGraduated && nstp.serialNum) {
+        reason =
+          "The student has already graduated from the nstp program and already has a serial number.";
+      } else if (nstp.isGraduated) {
         reason =
           "The student has graduated from the same nstp program but with no serial number yet.";
-      } else if (takenNstp1 && takenNstp2) {
+      } else if (nstp.takenNstp1 && nstp.takenNstp2) {
         reason =
           "The student already exists in the database and has already taken nstp1 and nstp2.";
-      } else if (!takenNstp1) {
+      } else if (!nstp.takenNstp1) {
         reason = "The student has not yet taken nstp1.";
       }
+
       return reason;
     },
     async verifyStudents(studentData, nstpProgram) {
@@ -409,12 +470,23 @@ export default {
       const query = new Parse.Query(nstpEnrollment);
       query.include("studentId");
       query.include("nstpId");
-
       const results = await query.find();
+
+      // find the current application's nstp program
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      const res = await query.first();
+      const currentProgram = res.get("nstpId").get("programName");
+
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
-        var program = results[i].get("nstpId").get("programName");
+        var program = "";
+        if (typeof results[i].get("nstpId") !== "undefined") {
+          program = results[i].get("nstpId").get("programName");
+        }
         var takenNstp1 = results[i].get("takenNstp1");
         var takenNstp2 = results[i].get("takenNstp2");
         var isGraduated = results[i].get("isGraduated");
@@ -431,13 +503,24 @@ export default {
             bday == studentData[x].J
           ) {
             var reason = "";
+            var nstp = {
+              takenNstp1: takenNstp1,
+              takenNstp2: takenNstp2,
+              isGraduated: isGraduated,
+              serialNum: serialNum,
+            };
+            var studentProg = {
+              program: program,
+              nstpProgram: nstpProgram,
+              currentProgram: currentProgram,
+            };
             //check program
-            if (program == nstpProgram && serialNum == null) {
-              reason = this.verificationLevel(
-                takenNstp1,
-                takenNstp2,
-                isGraduated
-              );
+            if (
+              program == nstpProgram &&
+              program == currentProgram &&
+              serialNum == null
+            ) {
+              reason = this.verificationLevel(nstp, studentProg);
               if (reason == "") {
                 // student has taken the same nstp but has not finished yet
                 results[i].set(
@@ -445,7 +528,7 @@ export default {
                   new Parse.Object("Application", { id: this.appId })
                 );
                 results[i].set("takenNstp2", true);
-                results[i].save();
+                await results[i].save();
               } else {
                 // student already exists and has taken nstp
                 const StudentConflict = Parse.Object.extend("StudentConflict");
@@ -457,18 +540,14 @@ export default {
                 );
                 conflict.set("reason", reason);
                 conflict.set("status", "2 of 4");
-                conflict.save();
+                await conflict.save();
               }
-              studentSet.delete(studentData[x]);
             } else {
               // found the student but there are mismatch in stored info
-              if (program != nstpProgram) {
-                reason =
-                  "The student already exists in the database but was enrolled with a different nstp program.";
-              } else {
+              reason = this.verificationLevel(nstp, studentProg);
+              if (reason == "")
                 reason =
                   "The student has already graduated from the nstp program and already has a serial number.";
-              }
               const StudentConflict = Parse.Object.extend("StudentConflict");
               const conflict = new StudentConflict();
               conflict.set("studentId", results[i].get("studentId"));
@@ -478,9 +557,9 @@ export default {
               );
               conflict.set("reason", reason);
               conflict.set("status", "2 of 4");
-              conflict.save();
-              studentSet.delete(studentData[x]);
+              await conflict.save();
             }
+            studentSet.delete(studentData[x]);
             break;
           }
         }
@@ -489,7 +568,8 @@ export default {
       const self = this;
       const students = studentSet.values();
       for (const student of students) {
-        await self.storeStudents(student, nstpProgram);
+        await self.storeStudents(student);
+        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -509,9 +589,9 @@ export default {
 
       await this.getStudents();
     },
-    async storeStudents(studentData, nstpProgram) {
+    async storeStudents(studentData) {
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
-      const nstpId = await this.getNstpId(nstpProgram);
+      // const nstpId = await this.getNstpId(nstpProgram);
       const heiId = await this.getHeiId();
 
       const student = new Parse.Object("Student");
@@ -543,7 +623,7 @@ export default {
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+        // nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
         nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
@@ -562,7 +642,10 @@ export default {
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
-        conflict.set("reason", "The student has not yet taken nstp1.");
+        conflict.set(
+          "reason",
+          "The student has not yet been enrolled in any nstp program."
+        );
         conflict.set("status", "2 of 4");
         conflict.save();
       });
@@ -588,9 +671,9 @@ export default {
       if (results.length == 0) {
         this.$emit("incompleteStep", 2, "1 of 4");
       }
-      this.status = results[0].get("applicationId").get("status");
 
       if (results.length > 0) {
+        this.status = results[0].get("applicationId").get("status");
         for (let i = 0; i < results.length; i++) {
           const object = results[i];
 

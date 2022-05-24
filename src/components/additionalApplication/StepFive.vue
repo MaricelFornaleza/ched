@@ -1,4 +1,5 @@
 <template>
+  <div v-if="loading" class="text-center">Loading...</div>
   <div>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
@@ -140,6 +141,7 @@ export default {
       application: null,
       students: [],
       componentKey: 0,
+      loading: true,
     };
   },
   props: {
@@ -152,6 +154,7 @@ export default {
   async created() {
     this.getData();
     await this.getStudents();
+    this.loading = false;
   },
   methods: {
     downloadTransmittal() {
@@ -345,7 +348,7 @@ export default {
       }
       /* generate worksheet and workbook */
       const worksheet = XLSX.utils.json_to_sheet(students);
-      const worksheetName = "List of Students";
+      const worksheetName = "NSTP LIST OF GRADUATES WITH SN";
       const workbook = XLSX.utils.book_new();
       const currentDate = new Date()
         .toLocaleDateString()
