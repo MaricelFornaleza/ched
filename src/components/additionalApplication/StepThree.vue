@@ -854,49 +854,6 @@ export default {
           applicationId: this.appId,
         };
         this.$emit("sendNotification", params);
-
-        var range =
-          program +
-          "-" +
-          _this.hei_region_code.padStart(2, "0") +
-          "-" +
-          (newStart + "").padStart(6, "0") +
-          "-" +
-          (newEnd + "").padStart(6, "0") +
-          "-" +
-          year;
-        const emailParams = {
-          type: "Transmittal",
-          approved: true,
-          hei: {
-            name: results.get("heiId").get("name"),
-            username: results.get("heiId").get("username"),
-            email: results.get("heiId").get("email"),
-            address: results.get("heiId").get("address"),
-          },
-          date: date.toLocaleDateString("en", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            hour12: true,
-          }),
-          application: {
-            dateApplied: results.get("dateApplied").toLocaleDateString("en", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            }),
-            schoolYear: results.get("academicYear"),
-            snRange: range,
-            students: this.data.graduates,
-          },
-        };
-        this.sendTransmittalLetter(emailParams);
       }
     },
     sendTransmittalLetter(emailParams) {
