@@ -170,7 +170,9 @@
           Cancel
         </button>
 
-        <button @click="reupload()" class="btn-sm btn-default" type="submit">
+        <button 
+        v-if="!taken"
+        @click="reupload()" class="btn-sm btn-default" type="submit">
           Reupload
         </button>
 
@@ -260,6 +262,7 @@ export default {
       femaleNumError: 0,
       worker: undefined,
       status: null,
+      taken: false,
     };
   },
   props: { isCompleted: Boolean, appId: String, allow: Boolean },
@@ -282,6 +285,23 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+
+    const Application = Parse.Object.extend("Application");
+    const query1 = new Parse.Query(Application);
+    // query.equalTo("applicationId", this.appId);
+    query1.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    query1.equalTo(
+      "status", "For Approval"
+    );
+    const obj = query1.find();
+    const results = obj;
+    if (results.length != 0) {
+      this.taken = !this.taken;
+    }
+
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     const query = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
