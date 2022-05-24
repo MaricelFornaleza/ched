@@ -168,7 +168,11 @@
           >
             Cancel
           </button>
-
+          <button 
+            v-if="!taken"
+          @click="reupload()" class="btn-sm btn-default" type="submit">
+            Reupload
+          </button>
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
             Next
           </button>
@@ -257,6 +261,7 @@ export default {
       femaleNumError: 0,
       worker: undefined,
       status: null,
+      taken: false,
     };
   },
   props: {
@@ -283,13 +288,20 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
-    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-    const query = new Parse.Query(NstpEnrollment);
+    const Application = Parse.Object.extend("Application");
+    const query = new Parse.Query(Application);
     // query.equalTo("applicationId", this.appId);
     query.equalTo(
       "applicationId",
       new Parse.Object("Application", { id: this.appId })
     );
+    query.equalTo(
+      "status", "2 of 4"
+    );
+    query.find().then(() => {
+        this.taken = true;
+    }); 
+
     const nstpsubscription = await query.subscribe();
     nstpsubscription.on("open", async () => {
       this.getStudents();
@@ -297,6 +309,7 @@ export default {
     nstpsubscription.on("delete", async () => {
       this.getStudents();
     });
+      
   },
   methods: {
     forceRerender() {
@@ -361,6 +374,36 @@ export default {
           }
         };
       }
+    },
+    reupload() {
+      
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo("applicationId", this.appId);
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {console.log(error);});
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("takenNstp1", false);
+          element.save();
+        }
+      });  
+      this.$emit("stepBack", 1);
+      this.$emit("setStatus", "1 of 4");
+      this.removeFile();
     },
     upload(step) {
       var validation = this.validate(this.dropzoneFile);
@@ -542,7 +585,6 @@ export default {
     },
     async storeStudents(studentData, nstpProgram) {
       var nstpId = await this.getNstpId(nstpProgram);
-
       const student = new Parse.Object("Student");
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
       student.set("name", {

@@ -81,7 +81,7 @@
           />
         </div>
         <div class="grid grid-cols-2 gap-5">
-          <div class="mb-4">
+          <div  class="mb-4">
             <label class="text-input-label" for="institutional_code">
               Institutional Code
             </label>
@@ -398,14 +398,6 @@ export default {
       user.setACL(ACL);
 
       user.save().then((user) => {
-        const params = {
-          name: this.name,
-          email: this.email,
-          password: password,
-          type: "Account",
-          approved: true,
-        };
-        Parse.Cloud.run("sendEmailNotification", params);
 
         router.push({
           name: "hei",
@@ -416,6 +408,14 @@ export default {
         });
 
         this.isLoading = false;
+      }).catch(function (error){
+        router.push({
+          name: "hei",
+          query: {
+            status: "error",
+            msg:  error.message,
+          },
+        });
       });
     },
     goToHei() {

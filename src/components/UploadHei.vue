@@ -184,7 +184,7 @@ export default {
     const selectedFile = () => {
       dropzoneFile.value = document.querySelector(".dropzoneFile").files[0];
     };
-
+ 
     return { dropzoneFile, drop, selectedFile };
   },
   methods: {
@@ -273,14 +273,7 @@ export default {
         user.setACL(ACL);
 
         await user.save().then(() => {
-          const params = {
-            email: data[i].H,
-            name: data[i].B,
-            password: password,
-            type: "Account",
-            approved: true,
-          };
-          Parse.Cloud.run("sendEmailNotification", params);
+          
         }).catch(function (error) {
           console.log(error);
           throw new Error(error);
