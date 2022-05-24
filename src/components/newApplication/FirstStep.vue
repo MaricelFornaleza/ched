@@ -312,18 +312,6 @@ export default {
       "applicationId",
       new Parse.Object("Application", { id: this.appId })
     );
-<<<<<<< HEAD
-    query.equalTo(
-      "status", "3 of 4"
-    );
-    const obj = await query.count();
-    console.log(obj)
-    if (obj != 0) {
-      this.taken = !this.taken;
-    }
-    console.log(this.taken)
-=======
->>>>>>> f2609a1a56207d4c27bca36eedc2c4d0e1cf6008
     const nstpsubscription = await query.subscribe();
     nstpsubscription.on("open", async () => {
       this.getStudents();

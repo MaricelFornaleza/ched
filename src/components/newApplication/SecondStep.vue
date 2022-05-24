@@ -170,13 +170,6 @@
             Cancel
           </button>
 
-<<<<<<< HEAD
-        <button 
-        v-if="!taken"
-        @click="reupload()" class="btn-sm btn-default" type="submit">
-          Reupload
-        </button>
-=======
           <button
             v-if="!taken"
             @click="reupload()"
@@ -185,7 +178,6 @@
           >
             Reupload
           </button>
->>>>>>> f2609a1a56207d4c27bca36eedc2c4d0e1cf6008
 
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
             Next
@@ -297,25 +289,6 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
-<<<<<<< HEAD
-
-    const Application = Parse.Object.extend("Application");
-    const query1 = new Parse.Query(Application);
-    // query.equalTo("applicationId", this.appId);
-    query1.equalTo(
-      "applicationId",
-      new Parse.Object("Application", { id: this.appId })
-    );
-    query1.equalTo(
-      "status", "For Approval"
-    );
-    const obj = query1.find();
-    const results = obj;
-    if (results.length != 0) {
-      this.taken = !this.taken;
-    }
-
-=======
     const Application = Parse.Object.extend("Application");
     const query2 = new Parse.Query(Application);
     query2.equalTo("objectId", this.appId);
@@ -328,7 +301,6 @@ export default {
       )
         this.taken = true;
     });
->>>>>>> f2609a1a56207d4c27bca36eedc2c4d0e1cf6008
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     const query = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
