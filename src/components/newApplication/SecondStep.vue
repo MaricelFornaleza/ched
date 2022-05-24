@@ -582,7 +582,7 @@ export default {
         extensionName: studentData.H,
         middleName: studentData.I,
       });
-      student.set("birthdate", studentData.J);
+      student.set("birthdate", studentData.J.toString());
       student.set("gender", studentData.K);
       student.set("emailAddress", studentData.T.toString());
       student.set("contactNumber", studentData.U.toString());
