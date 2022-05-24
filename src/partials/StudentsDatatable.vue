@@ -4,6 +4,13 @@
       <div class="bg-light-100 relative">
         <div class="w-fit absolute z-40 right-5 top-5">
           <button
+            v-if="selectedStudents != ''"
+            @click="toggleDeleteModal()"
+            class="p-2 rounded-sm bg-error text-light-100 mr-4"
+          >
+            <TrashIcon class="h-5" />
+          </button>
+          <button
             @click="exportToExcel()"
             class="
               h-fit
@@ -24,7 +31,15 @@
         >
           <thead class="bg-gray-50 text-xs uppercase">
             <tr>
-              <th v-if="allow"></th>
+              <th v-if="allow">
+                <div class="flex space-x-2 items-center">
+                  <input
+                    @change="selectAll"
+                    type="checkbox"
+                    v-model="allSelected"
+                  />
+                </div>
+              </th>
               <th class="p-6">No.</th>
               <th class="text-left">Last Name</th>
               <th>First Name</th>
@@ -48,14 +63,12 @@
               :key="index"
               class="whitespace-nowrap"
             >
-              <td
-                v-if="allow"
-                @click="toggleDeleteModal(student.id)"
-                class="cursor-pointer"
-              >
-                <div class="rounded border w-fit text-error">
-                  <XIcon class="h-3" />
-                </div>
+              <td v-if="allow">
+                <input
+                  type="checkbox"
+                  :value="student.id"
+                  v-model="selectedStudents"
+                />
               </td>
               <td class="px-6 py-4">{{ index + 1 }}</td>
               <td class="px-6 py-4 text-left">
@@ -91,6 +104,7 @@
       v-if="deleteStudent"
       @toggleDeleteModal="toggleDeleteModal"
       @confirmDeleteStudent="confirmDeleteStudent"
+      :studentCount="studentCount"
     />
   </div>
 </template>
@@ -102,7 +116,7 @@ import "jquery/dist/jquery.min.js";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 import $ from "jquery";
-import { DownloadIcon, XIcon } from "@heroicons/vue/outline";
+import { DownloadIcon, TrashIcon } from "@heroicons/vue/outline";
 import RemoveStudentModal from "@/partials/RemoveStudentModal.vue";
 import * as XLSX from "xlsx";
 import Parse from "parse";
@@ -114,12 +128,16 @@ export default {
       deleteStudent: false,
       deleteParams: null,
       allow: true,
+      selectedStudents: [],
+      allSelected: false,
+      studentCount: 0,
     };
   },
   components: {
     DownloadIcon,
-    XIcon,
+
     RemoveStudentModal,
+    TrashIcon,
   },
   props: {
     students: Array,
@@ -127,9 +145,11 @@ export default {
     fileName: String,
     status: String,
     showError: Boolean,
+    appId: String,
   },
-  created() {
+  async created() {
     this.updateDt();
+
     // console.log(JSON.parse(JSON.stringify(this.table_headers)));
     this.newFileName = this.fileName;
     // console.log(this.status);
@@ -151,37 +171,61 @@ export default {
       )
         this.allow = false;
     },
-    toggleDeleteModal(id) {
+    async selectAll() {
+      if (this.allSelected) {
+        const selected = this.students.map((u) => u.id);
+        this.selectedStudents = selected;
+      } else {
+        this.selectedStudents = [];
+      }
+    },
+    showStudents() {
+      console.log(this.selectedStudents);
+    },
+    toggleDeleteModal() {
+      this.studentCount = this.selectedStudents.length;
       this.deleteStudent = !this.deleteStudent;
-      this.deleteParams = id;
     },
     async confirmDeleteStudent() {
+      await this.deleteStudents().then(() => {
+        this.$emit("getStudents");
+        this.updateDt();
+        this.toggleDeleteModal();
+      });
+    },
+    async deleteStudents() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-      const query1 = new Parse.Query(NstpEnrollment);
-      query1.equalTo(
-        "studentId",
-        new Parse.Object("Student", { id: this.deleteParams })
-      );
-      query1.first().then(
-        (object) => {
-          object.destroy().then(() => {
-            console.log("Nstp Deleted!");
-            const Student = Parse.Object.extend("Student");
-            const query2 = new Parse.Query(Student);
-            query2.get(this.deleteParams).then((obj) => {
-              obj.destroy().then(async () => {
-                console.log("Student Deleted!");
-                this.$emit("getStudents");
-                this.updateDt();
-                this.toggleDeleteModal();
+      var query1 = new Parse.Query(NstpEnrollment);
+      console.log(this.selectedStudents);
+
+      for (let i = 0; i < this.selectedStudents.length; i++) {
+        const studentId = this.selectedStudents[i];
+        console.log(studentId);
+
+        query1.equalTo(
+          "studentId",
+          new Parse.Object("Student", { id: studentId })
+        );
+        await query1.first().then(
+          (object) => {
+            console.log(object);
+            object.destroy().then(async (student) => {
+              console.log("Nstp Deleted!");
+              console.log(student);
+              const Student = Parse.Object.extend("Student");
+              const query2 = new Parse.Query(Student);
+              await query2.get(studentId).then((obj) => {
+                obj.destroy().then(async () => {
+                  console.log("Student Deleted!");
+                });
               });
             });
-          });
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      }
     },
     updateDt() {
       if (typeof this.newId !== "undefined") {

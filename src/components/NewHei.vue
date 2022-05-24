@@ -10,7 +10,7 @@
         py-10
         bg-light-100
         w-4/5
-        xl:w-4/12 
+        xl:w-4/12
       "
     >
       <div
@@ -391,32 +391,35 @@ export default {
       user.set("type", this.hei_type.toUpperCase());
       user.set("password", password);
       user.set("userType", "hei");
-      
+      user.set("receivedCredential", false);
+
       const ACL = new Parse.ACL();
       ACL.setReadAccess(Parse.User.current(), true);
       ACL.setWriteAccess(Parse.User.current(), true);
       user.setACL(ACL);
 
-      user.save().then((user) => {
-        const params = {
-          name: this.name,
-          email: this.email,
-          password: password,
-          type: "Account",
-          approved: true,
-        };
-        Parse.Cloud.run("sendEmailNotification", params);
+      user
+        .save()
+        .then((user) => {
+          router.push({
+            name: "hei",
+            query: {
+              status: "success",
+              msg: user.get("name") + " was successfully added.",
+            },
+          });
 
-        router.push({
-          name: "hei",
-          query: {
-            status: "success",
-            msg: user.get("name") + " was successfully added.",
-          },
+          this.isLoading = false;
+        })
+        .catch(function (error) {
+          router.push({
+            name: "hei",
+            query: {
+              status: "error",
+              msg: error.message,
+            },
+          });
         });
-
-        this.isLoading = false;
-      });
     },
     goToHei() {
       this.$router.push({ name: "hei" });

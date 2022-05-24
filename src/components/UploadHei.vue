@@ -215,26 +215,29 @@ export default {
               var heis = event.data.rows;
 
               if (event.data.complete) {
-                _this.storeHeis(heis).then(() => {
-                  _this.visible = false;
-                //_this.$emit("complete", step);
-                _this.completed = !_this.completed;
-                _this.$router.push({
-                  name: "hei",
-                  query: {
-                    status: "success",
-                    msg: "The HEIs were successfully added.",
-                  },
-                });
-                }).catch((error) => {
-                  _this.$router.push({ 
-                    name: "hei",
-                    query: {
-                      status: "error",
-                      msg: error,
-                    },
+                _this
+                  .storeHeis(heis)
+                  .then(() => {
+                    _this.visible = false;
+                    //_this.$emit("complete", step);
+                    _this.completed = !_this.completed;
+                    _this.$router.push({
+                      name: "hei",
+                      query: {
+                        status: "success",
+                        msg: "The HEIs were successfully added.",
+                      },
+                    });
+                  })
+                  .catch((error) => {
+                    _this.$router.push({
+                      name: "hei",
+                      query: {
+                        status: "error",
+                        msg: error,
+                      },
+                    });
                   });
-                });
               } else {
                 _this.visible = false;
               }
@@ -265,6 +268,8 @@ export default {
         user.set("userType", "hei");
         user.set("password", password);
         user.set("username", data[i].K);
+        user.set("receivedCredential", false);
+
         console.log(data[i].K);
 
         const ACL = new Parse.ACL();
@@ -272,19 +277,13 @@ export default {
         ACL.setWriteAccess(Parse.User.current(), true);
         user.setACL(ACL);
 
-        await user.save().then(() => {
-          const params = {
-            email: data[i].H,
-            name: data[i].B,
-            password: password,
-            type: "Account",
-            approved: true,
-          };
-          Parse.Cloud.run("sendEmailNotification", params);
-        }).catch(function (error) {
-          console.log(error);
-          throw new Error(error);
-        });
+        await user
+          .save()
+          .then(() => {})
+          .catch(function (error) {
+            console.log(error);
+            throw new Error(error);
+          });
       }
     },
     removeFile() {

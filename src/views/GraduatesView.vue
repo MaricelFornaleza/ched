@@ -258,7 +258,7 @@ export default {
         heiData.push(heiObject);
       }
       this.objects = heiData;
-      console.log(heiData);
+
       this.TOTAL.femaleNum = this.CWTS.femaleNum + this.LTS.femaleNum;
       this.TOTAL.maleNum = this.CWTS.maleNum + this.LTS.maleNum;
       // this.componentKey++;

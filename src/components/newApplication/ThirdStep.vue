@@ -342,6 +342,21 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
+
     // if(this.isCompleted)
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
@@ -362,7 +377,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.data.program);
   },
   methods: {
     forceRerender() {
@@ -403,15 +417,13 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self
-              .verifyStudents(event.data.rows, event.data.nstp)
-              .then(() => {
-                self.pending = false;
-                self.$emit("setStatus", "For Approval");
-                self.status = "For Approval";
-                self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
-              });
-
+            self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
+              self.removeFile();
+              self.pending = false;
+              self.$emit("setStatus", "For Approval");
+              self.status = "For Approval";
+              self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+            });
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
             self.pending = false;
@@ -432,7 +444,6 @@ export default {
           try {
             self.createWorker(data, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -458,13 +469,17 @@ export default {
       if (studentProg.program == "") {
         reason = "The student has not yet been enrolled in any nstp program.";
       } else if (studentProg.program != studentProg.nstpProgram) {
-        reason = "The student already exists in the database but was enrolled with a different nstp program.";
+        reason =
+          "The student already exists in the database but was enrolled with a different nstp program.";
       } else if (studentProg.program != studentProg.currentProgram) {
-        reason = "The student has a different nstp program from this application.";
+        reason =
+          "The student has a different nstp program from this application.";
       } else if (nstp.isGraduated && nstp.serialNum) {
-        reason = "The student has already graduated from the nstp program and already has a serial number.";
+        reason =
+          "The student has already graduated from the nstp program and already has a serial number.";
       } else if (nstp.isGraduated) {
-        reason = "The student has graduated from the same nstp program but with no serial number yet.";
+        reason =
+          "The student has graduated from the same nstp program but with no serial number yet.";
       } else if (!nstp.takenNstp1 && !nstp.takenNstp2) {
         reason = "The student has not yet taken nstp1 and nstp2.";
       } else if (!nstp.takenNstp2) {
@@ -494,12 +509,12 @@ export default {
       );
       const res = await query.first();
       const currentProgram = res.get("nstpId").get("programName");
-      
+
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
         var program = "";
-        if(typeof results[i].get("nstpId") !== 'undefined') {
+        if (typeof results[i].get("nstpId") !== "undefined") {
           program = results[i].get("nstpId").get("programName");
         }
         var takenNstp1 = results[i].get("takenNstp1");
@@ -518,10 +533,23 @@ export default {
             bday == studentData[x].J
           ) {
             var reason = "";
-            var nstp = { takenNstp1: takenNstp1, takenNstp2: takenNstp2, isGraduated: isGraduated, serialNum: serialNum};
-            var studentProg = { program: program, nstpProgram: nstpProgram, currentProgram: currentProgram };
+            var nstp = {
+              takenNstp1: takenNstp1,
+              takenNstp2: takenNstp2,
+              isGraduated: isGraduated,
+              serialNum: serialNum,
+            };
+            var studentProg = {
+              program: program,
+              nstpProgram: nstpProgram,
+              currentProgram: currentProgram,
+            };
             //check program
-            if (program == nstpProgram && program == currentProgram && serialNum == null) {
+            if (
+              program == nstpProgram &&
+              program == currentProgram &&
+              serialNum == null
+            ) {
               reason = this.verificationLevel(nstp, studentProg);
               if (reason == "") {
                 // student has taken the same nstp but has not finished yet
@@ -548,7 +576,8 @@ export default {
               // found the student but there are mismatch in stored info
               reason = this.verificationLevel(nstp, studentProg);
               if (reason == "")
-                reason = "The student has already graduated from the nstp program and already has a serial number.";
+                reason =
+                  "The student has already graduated from the nstp program and already has a serial number.";
               const StudentConflict = Parse.Object.extend("StudentConflict");
               const conflict = new StudentConflict();
               conflict.set("studentId", results[i].get("studentId"));
@@ -642,7 +671,10 @@ export default {
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
         );
-        conflict.set("reason", "The student has not yet been enrolled in any nstp program.");
+        conflict.set(
+          "reason",
+          "The student has not yet been enrolled in any nstp program."
+        );
         conflict.set("status", "3 of 4");
         conflict.save();
       });
@@ -666,7 +698,10 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
-      
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
+
       if (results.length > 0) {
         this.status = results[0].get("applicationId").get("status");
         this.data.program = results[0].get("nstpId").get("programName");
@@ -742,12 +777,11 @@ export default {
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
 
-      console.log(this.studentsMissing);
       this.forceRerender();
     },
     async approve() {
       let _this = this;
-      console.log(this.data.program);
+
       const date = new Date();
       const fullyear = new Date().getFullYear();
       const year = new Date().toLocaleDateString("en", { year: "2-digit" });
@@ -774,8 +808,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-      console.log(newStart);
-      console.log(newEnd);
 
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
@@ -822,50 +854,11 @@ export default {
           applicationId: this.appId,
         };
         this.$emit("sendNotification", params);
-        var range =
-          program +
-          "-" +
-          _this.hei_region_code.padStart(2, "0") +
-          "-" +
-          (newStart + "").padStart(6, "0") +
-          "-" +
-          (newEnd + "").padStart(6, "0") +
-          "-" +
-          year;
-        const emailParams = {
-          type: "Transmittal",
-          approved: true,
-          hei: {
-            name: results.get("heiId").get("name"),
-            username: results.get("heiId").get("username"),
-            email: results.get("heiId").get("email"),
-            address: results.get("heiId").get("address"),
-          },
-          date: date.toLocaleDateString("en", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          }),
-          application: {
-            dateApplied: results.get("dateApplied").toLocaleDateString("en", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }),
-            schoolYear: results.get("academicYear"),
-            snRange: range,
-            students: this.data.graduates,
-          },
-        };
-        this.sendTransmittalLetter(emailParams);
       }
     },
-    sendTransmittalLetter(emailParams) {
-      Parse.Cloud.run("sendEmailNotification", emailParams);
-    },
+
     toggleConfirmModal() {
       this.confirm = !this.confirm;
-      console.log(this.confirm);
     },
     toggleRejectModal() {
       this.reject = !this.reject;

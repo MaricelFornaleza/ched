@@ -410,7 +410,6 @@ export default {
         barangays.brgy_name.match(this.barangay)
       );
       this.brgy_code = brgy[0].brgy_code;
-      console.log(this.brgy_code);
     },
     async getHeiTypes() {
       const Hei_type = Parse.Object.extend("HeiType");
@@ -431,7 +430,9 @@ export default {
       const result = await q.first();
       // user.set();
       result.set("name", this.name);
-      result.set("email", this.email);
+      if (this.email != result.get("email")) {
+      //result.set("email", this.email);
+      }
       result.set("username", this.username);
       result.set("contactNumber", this.contact_number);
       if (this.password != null) {
@@ -449,9 +450,9 @@ export default {
       result.set("type", this.hei_type);
 
       result
-        .save
-        // { useMasterKey: true }
-        ()
+        .save(
+           { useMasterKey: true }
+        )
         .then((user) => {
           if (this.usertype == "admin") {
             router.push({

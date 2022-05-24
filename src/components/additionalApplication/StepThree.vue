@@ -197,6 +197,9 @@
           >
             Cancel
           </button>
+          <button @click="reupload()" class="btn-sm btn-default" type="submit">
+            Reupload
+          </button>
 
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
             Next
@@ -338,6 +341,21 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("open", async () => {
+      this.getStudents();
+    });
+    nstpsubscription.on("delete", async () => {
+      this.getStudents();
+    });
+
     const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
@@ -356,7 +374,6 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
-    console.log(this.status);
   },
   methods: {
     forceRerender() {
@@ -404,6 +421,7 @@ export default {
               )
               .then(() => {
                 self.pending = false;
+                self.removeFile();
                 self.$emit("setStatus", "For Approval");
                 self.status = "For Approval";
                 self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
@@ -414,6 +432,48 @@ export default {
           }
         };
       }
+    },
+       reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "2 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {console.log(error);});
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("takenNstp2", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 3);
+      this.$emit("setStatus", "3 of 4");
+      this.removeFile();
     },
     upload() {
       var validation = this.validate(this.dropzoneFile);
@@ -427,7 +487,6 @@ export default {
           try {
             self.createWorker(data, self);
           } catch (e) {
-            console.log(e);
             this.pending = false;
           }
         };
@@ -454,7 +513,8 @@ export default {
     verificationLevel(takenNstp1, takenNstp2, isGraduated) {
       var reason = "";
       if (isGraduated) {
-        reason = "The student has graduated from the same nstp program but with no serial number yet.";
+        reason =
+          "The student has graduated from the same nstp program but with no serial number yet.";
       } else if (!takenNstp1 && !takenNstp2) {
         reason = "The student has not yet taken nstp1 and nstp2.";
       } else if (!takenNstp2) {
@@ -481,7 +541,7 @@ export default {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
         var program = "";
-        if(typeof results[i].get("nstpId") !== 'undefined') {
+        if (typeof results[i].get("nstpId") !== "undefined") {
           program = results[i].get("nstpId").get("programName");
         }
         var takenNstp1 = results[i].get("takenNstp1");
@@ -501,14 +561,17 @@ export default {
           ) {
             var reason = "";
             //check program
-            if(program == "") {
+            if (program == "") {
               // student exists in db but has not yet enrolled in any nstp program.
               var nstpId = await this.getNstpId(nstpProgram);
               results[i].set(
                 "applicationId",
                 new Parse.Object("Application", { id: this.appId })
               );
-              results[i].set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+              results[i].set(
+                "nstpId",
+                new Parse.Object("Nstp", { id: nstpId })
+              );
               results[i].set("takenNstp1", true);
               results[i].set("takenNstp2", true);
               results[i].set("isGraduated", true);
@@ -545,9 +608,11 @@ export default {
             } else {
               // found the student but there are mismatch in stored info
               if (program != nstpProgram) {
-                reason = "The student already exists in the database but was enrolled with a different nstp program.";
+                reason =
+                  "The student already exists in the database but was enrolled with a different nstp program.";
               } else {
-                reason = "The student has already graduated from the nstp program and already has a serial number.";
+                reason =
+                  "The student has already graduated from the nstp program and already has a serial number.";
               }
               const StudentConflict = Parse.Object.extend("StudentConflict");
               const conflict = new StudentConflict();
@@ -569,7 +634,6 @@ export default {
       const students = studentSet.values();
       for (const student of students) {
         await self.storeStudents(student, nstpProgram);
-        console.log(student);
       }
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
@@ -654,6 +718,10 @@ export default {
 
       const results = await query.find();
 
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
+
       if (results.length > 0) {
         this.status = results[0].get("applicationId").get("status");
         this.data.program = results[0].get("nstpId").get("programName");
@@ -724,7 +792,7 @@ export default {
       this.students = studentList;
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
-      console.log(this.studentsMissing);
+
       this.forceRerender();
     },
     async approve() {
@@ -801,43 +869,6 @@ export default {
           applicationId: this.appId,
         };
         this.$emit("sendNotification", params);
-
-        var range =
-          program +
-          "-" +
-          _this.hei_region_code.padStart(2, "0") +
-          "-" +
-          (newStart + "").padStart(6, "0") +
-          "-" +
-          (newEnd + "").padStart(6, "0") +
-          "-" +
-          year;
-        const emailParams = {
-          type: "Transmittal",
-          approved: true,
-          hei: {
-            name: results.get("heiId").get("name"),
-            username: results.get("heiId").get("username"),
-            email: results.get("heiId").get("email"),
-            address: results.get("heiId").get("address"),
-          },
-          date: date.toLocaleDateString("en", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          }),
-          application: {
-            dateApplied: results.get("dateApplied").toLocaleDateString("en", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }),
-            schoolYear: results.get("academicYear"),
-            snRange: range,
-            students: this.data.graduates,
-          },
-        };
-        this.sendTransmittalLetter(emailParams);
       }
     },
     sendTransmittalLetter(emailParams) {

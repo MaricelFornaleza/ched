@@ -109,6 +109,9 @@ export default {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
           });
         _this.data.program = results[0].get("nstpId").get("programName");
       });

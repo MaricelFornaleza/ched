@@ -46,6 +46,7 @@
       </div>
       <router-view
         @complete="completeStep"
+        @incompleteStep="incompleteStep"
         @nextStep="nextStep"
         @previousStep="previousStep"
         @goToApplication="goToApplication"
@@ -143,6 +144,18 @@ export default {
       }
 
       this.saveSteps();
+    },
+    incompleteStep(currentStep, status) {
+      // console.log(currentStep);
+      for (var i in this.steps) {
+        if (this.steps[i].no == currentStep) {
+          this.steps[i].completed = false;
+          this.isCompleted = this.findStep(currentStep);
+        }
+      }
+
+      this.saveSteps();
+      this.setStatus(status);
     },
     async saveSteps() {
       const Application = Parse.Object.extend("Application");
