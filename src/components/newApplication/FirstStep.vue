@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <div
-        v-if="!isCompleted || reUpload"
+        v-if="!isCompleted"
         class="
           container
           w-full
@@ -80,6 +80,7 @@
             Cancel
           </button>
           <button
+            v-if="!isCompleted"
             @click="upload(1)"
             class="btn-sm btn-default"
             type="submit"
@@ -166,8 +167,10 @@
           >
             Cancel
           </button>
-          <button @click="addFile()" class="btn-sm btn-default" type="submit">
-            Add File
+          <button 
+            v-if="!taken"
+          @click="reupload()" class="btn-sm btn-default" type="submit">
+            Reupload
           </button>
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
             Next
@@ -257,7 +260,7 @@ export default {
       femaleNumError: 0,
       worker: undefined,
       status: null,
-      reUpload: false,
+      taken: false,
     };
   },
   props: {
@@ -284,13 +287,20 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
-    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-    const query = new Parse.Query(NstpEnrollment);
+    const Application = Parse.Object.extend("Application");
+    const query = new Parse.Query(Application);
     // query.equalTo("applicationId", this.appId);
     query.equalTo(
       "applicationId",
       new Parse.Object("Application", { id: this.appId })
     );
+    query.equalTo(
+      "status", "2 of 4"
+    );
+    query.find().then(() => {
+        this.taken = true;
+    }); 
+
     const nstpsubscription = await query.subscribe();
     nstpsubscription.on("open", async () => {
       this.getStudents();
@@ -298,6 +308,7 @@ export default {
     nstpsubscription.on("delete", async () => {
       this.getStudents();
     });
+      
   },
   methods: {
     forceRerender() {
@@ -364,7 +375,7 @@ export default {
         };
       }
     },
-    addFile() {
+    reupload() {
       
       const StudentConflict = Parse.Object.extend("StudentConflict");
       const conflict = new Parse.Query(StudentConflict);
@@ -390,7 +401,8 @@ export default {
           element.save();
         }
       });  
-      this.reUpload = true;
+      this.$emit("stepBack", 1);
+      this.$emit("setStatus", "1 of 4");
       this.removeFile();
     },
     upload(step) {

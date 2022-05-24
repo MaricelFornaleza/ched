@@ -197,6 +197,9 @@
           >
             Cancel
           </button>
+          <button @click="reupload()" class="btn-sm btn-default" type="submit">
+            Reupload
+          </button>
 
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
             Next
@@ -430,6 +433,48 @@ export default {
           }
         };
       }
+    },
+       reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "2 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {console.log(error);});
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("takenNstp2", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 3);
+      this.$emit("setStatus", "3 of 4");
+      this.removeFile();
     },
     upload() {
       var validation = this.validate(this.dropzoneFile);
