@@ -168,9 +168,12 @@
           >
             Cancel
           </button>
-          <button 
+          <button
             v-if="!taken"
-          @click="reupload()" class="btn-sm btn-default" type="submit">
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
             Reupload
           </button>
           <button @click="nextStep()" class="btn-sm btn-default" type="submit">
@@ -289,19 +292,26 @@ export default {
   },
   async created() {
     const Application = Parse.Object.extend("Application");
-    const query = new Parse.Query(Application);
+    const query2 = new Parse.Query(Application);
+    query2.equalTo("objectId", this.appId);
+
+    await query2.first().then((obj) => {
+      if (
+        obj.get("status") == "3 of 4" ||
+        obj.get("status") == "For Approval" ||
+        obj.get("status") == "Approved" ||
+        obj.get("status") == "Rejected"
+      )
+        this.taken = true;
+    });
+
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
     query.equalTo(
       "applicationId",
       new Parse.Object("Application", { id: this.appId })
     );
-    query.equalTo(
-      "status", "2 of 4"
-    );
-    query.find().then(() => {
-        this.taken = true;
-    }); 
-
     const nstpsubscription = await query.subscribe();
     nstpsubscription.on("open", async () => {
       this.getStudents();
@@ -309,7 +319,6 @@ export default {
     nstpsubscription.on("delete", async () => {
       this.getStudents();
     });
-      
   },
   methods: {
     forceRerender() {
@@ -376,7 +385,6 @@ export default {
       }
     },
     reupload() {
-      
       const StudentConflict = Parse.Object.extend("StudentConflict");
       const conflict = new Parse.Query(StudentConflict);
       conflict.equalTo("applicationId", this.appId);
@@ -386,7 +394,10 @@ export default {
             results[i].destroy();
           }
         },
-        (error) => {console.log(error);});
+        (error) => {
+          console.log(error);
+        }
+      );
 
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
@@ -398,9 +409,10 @@ export default {
         for (let index = 0; index < res.length; index++) {
           const element = res[index];
           element.set("takenNstp1", false);
+          element.unset("applicationId");
           element.save();
         }
-      });  
+      });
       this.$emit("stepBack", 1);
       this.$emit("setStatus", "1 of 4");
       this.removeFile();

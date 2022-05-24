@@ -150,6 +150,8 @@ export default {
 
   async created() {
     this.getData();
+    const user = Parse.User.current();
+    console.log(user);
 
     await this.getStudents();
     this.loading = false;
@@ -190,7 +192,7 @@ export default {
       var p1 =
         "This has reference to your application dated " +
         this.data.dateApplied +
-        ", requesting for issuance of NSTP Serial Number for the following School Year" +
+        ", requesting for issuance of NSTP Serial Number for the following School Year " +
         this.data.acadYear +
         ".";
 
