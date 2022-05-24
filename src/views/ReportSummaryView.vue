@@ -202,7 +202,10 @@
             <DownloadIcon class="h-4" />
           </button>
         </div>
-        <BarChart :chartData="testData" :options="options" />
+        <div ref="chart">
+          <BarChart :chartData="testData" :options="options" />
+        </div>
+
         <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
           <progress-bar
             label="Pending"
@@ -244,6 +247,9 @@ import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import Parse from "parse";
 import html2pdf from "html2pdf.js";
+import image from "@/assets/img/ched-logo.png";
+import { jsPDF } from "jspdf";
+
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -356,17 +362,83 @@ export default {
       var opt = {
         margin: 0.5,
         image: { type: "jpeg", quality: 1 },
-        html2canvas: { scale: 5, letterRendering: true },
+        html2canvas: { scale: 1, letterRendering: true },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
+      const doc = new jsPDF("p", "in", "letter");
+      var logo = new Image();
+      logo.src = image;
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      var filter_type = this.filter.type;
+      var filter_condition = this.filter.condition;
+      var pending =
+        this.count.pending +
+        " (" +
+        (this.count.pending / this.count.total) * 100 +
+        "%)";
+      var forApproval =
+        this.count.forApproval +
+        " (" +
+        (this.count.forApproval / this.count.total) * 100 +
+        "%)";
+      var rejected =
+        this.count.rejected +
+        " (" +
+        (this.count.rejected / this.count.total) * 100 +
+        "%)";
+      var approved =
+        this.count.approved +
+        " (" +
+        (this.count.approved / this.count.total) * 100 +
+        "%)";
 
       html2pdf()
         .set(opt)
-        .from(this.$refs.graph)
-        .toPdf()
-        .get("pdf")
-        .then(function (pdf) {
-          window.open(pdf.output("bloburl"), "_blank");
+        .from(this.$refs.chart)
+        .toImg()
+        .get("img")
+        .then(function (img) {
+          doc.addImage(logo, "png", 1, 1, 0.75, 0.75);
+          doc.setFontSize(11);
+          doc.setFont("times");
+          doc.text("Republic of the Philippines", 4.24, 1, "center");
+          doc.text("Office of the President", 4.24, 1.2, "center");
+          doc.setFont("", "", "bold");
+          doc.text("COMMISSION ON HIGHER EDUCATION", 4.24, 1.4, "center");
+          doc.setFont("", "", "normal");
+          doc.text("Regional Office V", 4.24, 1.6, "center");
+          doc.text(date, 7.5, 2.5, "right");
+          doc.setFont("", "", "bold");
+          doc.text("Serial Number Applications", 1, 3);
+          doc.setFont("", "", "normal");
+          doc.text(filter_type + ": " + filter_condition, 1, 3.2);
+          const text =
+            "*This is a system generated report from the NSTP Online Application and Issuance System.";
+
+          doc.addImage(img, "JPEG", 1, 3.5, 6.5, 4);
+          doc.setFontSize(9);
+
+          doc.text(text, 1, 7.6);
+          doc.setFontSize(11);
+
+          doc.setFont("", "", "bold");
+
+          doc.text("Pending", 2, 8.2, "center");
+          doc.text("For Approval", 3.5, 8.2, "center");
+          doc.text("Rejected", 5, 8.2, "center");
+          doc.text("Approved", 6.5, 8.2, "center");
+          doc.setFont("", "", "normal");
+
+          doc.text(pending, 2, 8.4, "center");
+          doc.text(forApproval, 3.5, 8.4, "center");
+          doc.text(rejected, 5, 8.4, "center");
+          doc.text(approved, 6.5, 8.4, "center");
+
+          window.open(doc.output("bloburl"), "_blank");
         });
     },
     sampleExport() {

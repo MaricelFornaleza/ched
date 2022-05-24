@@ -76,7 +76,7 @@
           {{ alert.msg }}
         </AlertWidget>
       </div>
-      
+
       <!-- dataTables  -->
       <div>
         <hei-data-table
@@ -300,7 +300,7 @@ export default {
       });
     });
 
-     subscription.on("update", async (object) => {
+    subscription.on("update", async (object) => {
       console.log("object updated" + object);
 
       this.count();
@@ -323,8 +323,8 @@ export default {
       const resultEmail = await emailQuery.find({ useMasterKey: true });
       if (resultEmail) {
         for (let i = 0; i < resultEmail.length; i++) {
-        const objectEmail = resultEmail[i];
-        const params = {
+          const objectEmail = resultEmail[i];
+          const params = {
             name: objectEmail.get("name"),
             email: objectEmail.get("email"),
             password: password,
@@ -340,7 +340,7 @@ export default {
           resultUpdate.set("receivedCredential", true);
           resultUpdate.save();
         }
-      }  
+      }
     });
 
     subscription.on("enter", async (object) => {
@@ -357,30 +357,30 @@ export default {
         address: object.get("address"),
       });
 
-      const emailQuery = new Parse.Query(Parse.User);
-      emailQuery.equalTo("emailVerified", true);
-      emailQuery.equalTo("receivedCredential", false);
-      const resultEmail = await emailQuery.find({ useMasterKey: true });
-      if (resultEmail) {
-        for (let i = 0; i < resultEmail.length; i++) {
-        const objectEmail = resultEmail[i];
-        const params = {
-            name: objectEmail.get("name"),
-            email: objectEmail.get("email"),
-            password: password,
-            type: "Account",
-            approved: true,
-          };
-          console.log(objectEmail.id);
-          Parse.Cloud.run("sendEmailNotification", params);
-          const updateQuery = new Parse.Query(Parse.User);
-          updateQuery.matches("objectId", objectEmail.id);
-          const resultUpdate = await updateQuery.first();
-          resultUpdate.set("password", password);
-          resultUpdate.set("receivedCredential", true);
-          resultUpdate.save();
-        }
-      }  
+      // const emailQuery = new Parse.Query(Parse.User);
+      // emailQuery.equalTo("emailVerified", true);
+      // emailQuery.equalTo("receivedCredential", false);
+      // const resultEmail = await emailQuery.find({ useMasterKey: true });
+      // if (resultEmail) {
+      //   for (let i = 0; i < resultEmail.length; i++) {
+      //   const objectEmail = resultEmail[i];
+      //   const params = {
+      //       name: objectEmail.get("name"),
+      //       email: objectEmail.get("email"),
+      //       password: password,
+      //       type: "Account",
+      //       approved: true,
+      //     };
+      //     console.log(objectEmail.id);
+      //     Parse.Cloud.run("sendEmailNotification", params);
+      //     const updateQuery = new Parse.Query(Parse.User);
+      //     updateQuery.matches("objectId", objectEmail.id);
+      //     const resultUpdate = await updateQuery.first();
+      //     resultUpdate.set("password", password);
+      //     resultUpdate.set("receivedCredential", true);
+      //     resultUpdate.save();
+      //   }
+      // }
     });
 
     subscription.on("leave", (object) => {

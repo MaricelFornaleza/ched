@@ -55,6 +55,7 @@
 
       <div class="mt-16 grid gap-10 md:grid-cols-1 xl:grid-cols-3">
         <div
+          id="document"
           ref="document"
           class="col-span-2 w-full bg-light-100 p-10 shadow-sm overflow-hidden"
         >
@@ -71,12 +72,10 @@
               <DownloadIcon @click="exportToPDF" class="h-4" />
             </button>
           </div>
+          <div v-if="testData != null" ref="chart" id="chart">
+            <BarChart :chartData="testData" :options="options" />
+          </div>
 
-          <BarChart
-            v-if="testData != null"
-            :chartData="testData"
-            :options="options"
-          />
           <div
             v-else
             class="py-20 flex flex-col justify-center w-full text-light-400"
@@ -167,6 +166,8 @@ import router from "../router";
 import html2pdf from "html2pdf.js";
 import EmptyState from "@/components/EmptyState.vue";
 import EmptyGraph from "@/assets/img/EmptyGraph.svg";
+import { jsPDF } from "jspdf";
+import image from "@/assets/img/ched-logo.png";
 
 import {
   AcademicCapIcon,
@@ -234,21 +235,78 @@ export default {
     },
   },
   methods: {
+    exportGraph() {
+      const doc = new jsPDF("p", "in", "letter");
+
+      doc.text("hello", 1, 1);
+      window.open(doc.output("bloburl"), "_blank");
+    },
     exportToPDF() {
       var opt = {
         margin: 0.5,
         image: { type: "jpeg", quality: 1 },
-        html2canvas: { scale: 5, letterRendering: true },
+        html2canvas: { scale: 1, letterRendering: true },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
+      const doc = new jsPDF("p", "in", "letter");
+      var logo = new Image();
+      logo.src = image;
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      var lts =
+        this.graduates.lts +
+        " (" +
+        (this.graduates.lts / this.graduates.total) * 100 +
+        "%)";
+      var cwts =
+        this.graduates.cwts +
+        " (" +
+        (this.graduates.cwts / this.graduates.total) * 100 +
+        "%)";
+      var acadYear = this.academicYear;
 
       html2pdf()
         .set(opt)
-        .from(this.$refs.document)
-        .toPdf()
-        .get("pdf")
-        .then(function (pdf) {
-          window.open(pdf.output("bloburl"), "_blank");
+        .from(this.$refs.chart)
+        .toImg()
+        .get("img")
+        .then(function (img) {
+          doc.addImage(logo, "png", 1, 1, 0.75, 0.75);
+          doc.setFontSize(11);
+          doc.setFont("times");
+          doc.text("Republic of the Philippines", 4.24, 1, "center");
+          doc.text("Office of the President", 4.24, 1.2, "center");
+          doc.setFont("", "", "bold");
+          doc.text("COMMISSION ON HIGHER EDUCATION", 4.24, 1.4, "center");
+          doc.setFont("", "", "normal");
+          doc.text("Regional Office V", 4.24, 1.6, "center");
+          doc.text(date, 7.5, 2.5, "right");
+          doc.setFont("", "", "bold");
+          doc.text("NSTP Graduates", 1, 3);
+          doc.setFont("", "", "normal");
+          doc.text("Academic Year " + acadYear, 1, 3.2);
+          const text =
+            "*This is a system generated report from the NSTP Online Application and Issuance System.";
+
+          doc.addImage(img, "JPEG", 1, 3.5, 6.5, 4);
+          doc.setFontSize(9);
+
+          doc.text(text, 1, 7.6);
+          doc.setFontSize(11);
+
+          doc.setFont("", "", "bold");
+
+          doc.text("CWTS Graduates", 3, 8.2, "center");
+          doc.text("LTS Graduates", 5.5, 8.2, "center");
+          doc.setFont("", "", "normal");
+
+          doc.text(cwts, 3, 8.4, "center");
+          doc.text(lts, 5.5, 8.4, "center");
+
+          window.open(doc.output("bloburl"), "_blank");
         });
     },
     async getData() {
@@ -528,7 +586,8 @@ export default {
         var index = this.recentApplications.findIndex(
           (app) => app.id == object.id
         );
-        if (index > -1) //only delete if it exists
+        if (index > -1)
+          //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });
@@ -540,7 +599,8 @@ export default {
           (app) => app.id == object.id
         );
         console.log(index);
-        if (index > -1) //only delete if it exists
+        if (index > -1)
+          //only delete if it exists
           this.recentApplications.splice(index, 1); //remove the specific object in the array
         this.countApplications();
       });
