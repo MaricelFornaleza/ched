@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <div v-else>
+      <div v-if="status == 'For Approval' || status == 'Approved'">
         <div
           v-if="finishedStudents()"
           class="container mx-auto flex flex-col items-center justify-center"
@@ -310,7 +310,7 @@ export default {
         if (typeof self.worker == "undefined") {
           self.worker = new Worker();
         }
-        self.worker.postMessage({ d: data });
+        self.worker.postMessage({ d: data, sheet: 2 });
         //can be improved by abstraction
         self.worker.onmessage = function (event) {
           // _this.table_headers = event.data.headers;
@@ -320,13 +320,13 @@ export default {
             // self.maleNum = event.data.male;
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
-            self.verifyStudents(event.data.rows, event.data.nstp);
-            self.pending = false;
-            self.$emit("complete", step);
-            self.$emit("setStatus", "For Approval");
-            self.$emit("sendEmail", "List of Graduates", "Step 3 of 5");
-
-            // this.completed = !this.completed;
+            self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
+              self.removeFile();
+              self.pending = false;
+              self.$emit("setStatus", "For Approval");
+              self.status = "For Approval";
+              self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+            });
           } else {
             // console.log("Something went wrong while parsing xlsx file!");
             self.pending = false;
@@ -369,6 +369,32 @@ export default {
       var result = await query.first();
       return result.id;
     },
+    verificationLevel(nstp, studentProg) {
+      var reason = "";
+      if (studentProg.program == "") {
+        reason = "The student has not yet been enrolled in any nstp program.";
+      } else if (studentProg.program != studentProg.nstpProgram) {
+        reason =
+          "The student already exists in the database but was enrolled with a different nstp program.";
+      } else if (studentProg.program != studentProg.currentProgram) {
+        reason =
+          "The student has a different nstp program from this application.";
+      } else if (nstp.isGraduated && nstp.serialNum) {
+        reason =
+          "The student has already graduated from the nstp program and already has a serial number.";
+      } else if (nstp.isGraduated) {
+        reason =
+          "The student has graduated from the same nstp program but with no serial number yet.";
+      } else if (!nstp.takenNstp1 && !nstp.takenNstp2) {
+        reason = "The student has not yet taken nstp1 and nstp2.";
+      } else if (!nstp.takenNstp2) {
+        reason = "The student has not yet taken nstp2.";
+      } else if (!nstp.takenNstp1) {
+        reason = "The student has not yet taken nstp1.";
+      }
+
+      return reason;
+    },
     async verifyStudents(studentData, nstpProgram) {
       //check first if student exists
       //get nstpEnrollment using the studentId, then check nstpId to get the nstpProgram
@@ -386,10 +412,21 @@ export default {
       query.include("nstpId");
       const results = await query.find();
 
+      // find the current application's nstp program
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      const res = await query.first();
+      const currentProgram = res.get("nstpId").get("programName");
+
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
-        var program = results[i].get("nstpId").get("programName");
+        var program = "";
+        if (typeof results[i].get("nstpId") !== "undefined") {
+          program = results[i].get("nstpId").get("programName");
+        }
         var takenNstp1 = results[i].get("takenNstp1");
         var takenNstp2 = results[i].get("takenNstp2");
         var serialNum = results[i].get("serialNumber");
@@ -404,21 +441,64 @@ export default {
             name.middleName == studentData[x].I &&
             bday == studentData[x].J
           ) {
+            var reason = "";
+            var nstp = {
+              takenNstp1: takenNstp1,
+              takenNstp2: takenNstp2,
+              isGraduated: isGraduated,
+              serialNum: serialNum,
+            };
+            var studentProg = {
+              program: program,
+              nstpProgram: nstpProgram,
+              currentProgram: currentProgram,
+            };
             //check program
             if (
               program == nstpProgram &&
-              takenNstp1 == true &&
-              takenNstp2 == true &&
+              program == currentProgram &&
               serialNum == null
             ) {
-              studentSet.delete(studentData[x]);
-              results[i].set("isGraduated", true);
-              await results[i].save();
+              reason = this.verificationLevel(nstp, studentProg);
+              if (reason == "") {
+                // student has taken the same nstp but has not finished yet
+                results[i].set(
+                  "applicationId",
+                  new Parse.Object("Application", { id: this.appId })
+                );
+                results[i].set("isGraduated", true);
+                await results[i].save();
+              } else {
+                // student already exists and has taken nstp
+                const StudentConflict = Parse.Object.extend("StudentConflict");
+                const conflict = new StudentConflict();
+                conflict.set("studentId", results[i].get("studentId"));
+                conflict.set(
+                  "applicationId",
+                  new Parse.Object("Application", { id: this.appId })
+                );
+                conflict.set("reason", reason);
+                conflict.set("status", "3 of 4");
+                await conflict.save();
+              }
             } else {
-              //found the student but there are mismatch in stored info
-              //delete from set since it'll still be shown because of takenNstp
-              studentSet.delete(studentData[x]);
+              // found the student but there are mismatch in stored info
+              reason = this.verificationLevel(nstp, studentProg);
+              if (reason == "")
+                reason =
+                  "The student has already graduated from the nstp program and already has a serial number.";
+              const StudentConflict = Parse.Object.extend("StudentConflict");
+              const conflict = new StudentConflict();
+              conflict.set("studentId", results[i].get("studentId"));
+              conflict.set(
+                "applicationId",
+                new Parse.Object("Application", { id: this.appId })
+              );
+              conflict.set("reason", reason);
+              conflict.set("status", "3 of 4");
+              await conflict.save();
             }
+            studentSet.delete(studentData[x]);
             break;
           }
         }
@@ -426,7 +506,7 @@ export default {
       const self = this;
       const students = studentSet.values();
       for (const student of students) {
-        await self.storeStudents(student, nstpProgram);
+        await self.storeStudents(student);
         console.log(student);
       }
       // studentSet.forEach (function(student) {
@@ -451,9 +531,9 @@ export default {
 
       await this.getStudents();
     },
-    async storeStudents(studentData, nstpProgram) {
+    async storeStudents(studentData) {
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
-      const nstpId = await this.getNstpId(nstpProgram);
+      // const nstpId = await this.getNstpId(nstpProgram);
       const heiId = await this.getHeiId();
 
       const student = new Parse.Object("Student");
@@ -485,7 +565,7 @@ export default {
           "studentId",
           new Parse.Object("Student", { id: student.id })
         );
-        nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
+        // nstpEnrollment.set("nstpId", new Parse.Object("Nstp", { id: nstpId }));
         nstpEnrollment.set(
           "applicationId",
           new Parse.Object("Application", { id: this.appId })
@@ -493,6 +573,23 @@ export default {
         // nstpEnrollment.set("takenNstp1", false);   //defaults to false when the seeder is used
         // nstpEnrollment.set("takenNstp2", false);
         nstpEnrollment.save();
+
+        const StudentConflict = Parse.Object.extend("StudentConflict");
+        const conflict = new StudentConflict();
+        conflict.set(
+          "studentId",
+          new Parse.Object("Student", { id: student.id })
+        );
+        conflict.set(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        conflict.set(
+          "reason",
+          "The student has not yet been enrolled in any nstp program."
+        );
+        conflict.set("status", "3 of 4");
+        conflict.save();
       });
     },
     async getStudents() {
@@ -513,6 +610,15 @@ export default {
       );
       query.include("studentId");
       const results = await query.find();
+      if (results.length == 0) {
+        this.$emit("incompleteStep", 3, "1 of 4");
+      }
+
+      if (results.length > 0) {
+        this.status = results[0].get("applicationId").get("status");
+        this.data.program = results[0].get("nstpId").get("programName");
+        for (let i = 0; i < results.length; i++) {
+          const object = results[i];
 
       if (results.length == 0) return;
       for (let i = 0; i < results.length; i++) {
@@ -569,6 +675,135 @@ export default {
       console.log(this.students);
       console.log(this.studentsMissing);
       this.forceRerender();
+    },
+    async approve() {
+      let _this = this;
+
+      const date = new Date();
+      const fullyear = new Date().getFullYear();
+      const year = new Date().toLocaleDateString("en", { year: "2-digit" });
+      const program = this.data.program.charAt(0);
+
+      const Application = Parse.Object.extend("Application");
+      //get the end of serial number
+      const query = new Parse.Query(Application);
+      query.include("heiId");
+
+      const results = await query.first();
+      //get serialNumber, if undefined; set startSerialNum to 1
+      //if not, set startSerialNum to the last saved endSerialNumber + 1
+      var newStart = 0;
+      var newEnd = 0;
+
+      if (results.get("serialNumber") == null) {
+        newStart = 1;
+        newEnd = this.data.graduates;
+      } else {
+        query.descending("serialNumber");
+        const serialNumber = await query.first();
+        const endSerialNumber = serialNumber.get("serialNumber").end;
+        newStart = endSerialNumber + 1;
+        newEnd = endSerialNumber + this.data.graduates;
+      }
+
+      query.equalTo("objectId", this.appId);
+      await query.first().then(function (result) {
+        result.set("dateApproved", date);
+        result.set("awardYear", fullyear.toString());
+        result.set("serialNumber", { start: newStart, end: newEnd });
+        result.save();
+      });
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const enrollment = new Parse.Query(NstpEnrollment);
+      enrollment.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      enrollment.equalTo("takenNstp1", true);
+      enrollment.equalTo("takenNstp2", true);
+      await enrollment.find().then(function (results) {
+        var start = newStart;
+        // save serial number for each student
+        for (let i = 0; i < results.length; i++) {
+          var sn =
+            program +
+            "-" +
+            _this.hei_region_code.padStart(2, "0") +
+            "-" +
+            (start + "").padStart(6, "0") +
+            "-" +
+            year;
+          results[i].set("serialNumber", sn);
+          results[i].set("isGraduated", true);
+          results[i].save();
+          start++;
+        }
+      });
+      if (Parse.User.current().get("userType") == "admin") {
+        const params = {
+          senderId: Parse.User.current().id,
+          receiverId: results.get("heiId").id,
+
+          action: "approved your",
+          output: "Serial Number Application",
+          routeName: "4thStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
+    },
+
+    toggleConfirmModal() {
+      this.confirm = !this.confirm;
+    },
+    toggleRejectModal() {
+      this.reject = !this.reject;
+    },
+    async rejectApplication(reason) {
+      const Application = Parse.Object.extend("Application");
+      const application = new Parse.Query(Application);
+      application.equalTo("objectId", this.appId);
+      const results = await application.first();
+      results.set("reason", reason);
+      results.save();
+
+      // since the application was rejected, students are not qualified
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const nstpenrollment = new Parse.Query(NstpEnrollment);
+      nstpenrollment.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      const data = await nstpenrollment.find();
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        console.log(element);
+        element.set("takenNstp1", false);
+        element.set("takenNstp2", false);
+        element.set("isGraduated", false);
+        element.save();
+      }
+
+      this.data.reason = reason;
+      this.setStatus("Rejected");
+      this.toggleRejectModal();
+    },
+    setStatus(status) {
+      this.$emit("setStatus", status);
+
+      this.getStudents();
+    },
+    confirmed() {
+      // this.pending = true;
+      this.approve().then(() => {
+        // this.pending = false;
+        this.$emit("complete", 3);
+
+        this.$emit("setStatus", "Approved");
+        this.status = "Approved";
+        this.$emit("nextStep");
+      });
     },
     removeFile() {
       this.dropzoneFile = "";

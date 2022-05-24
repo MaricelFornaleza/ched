@@ -134,13 +134,13 @@
             :key="componentKey"
             :students="students"
             :status="status"
-            fileName="List-of-Students-1stSem"
+            fileName="List-of-Students-Graduates"
             @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 
         <div
-          v-if="errorStudents()"
+          v-if="maleNumError > 0 || femaleNumError > 0 ? true : false"
           class="container mx-auto flex flex-col items-center justify-center"
         >
           <AlertWidget className="alert-warning">
@@ -410,8 +410,8 @@ export default {
           // _this.table_headers = event.data.headers;
           // self.students = event.data.rows;
           if (event.data.complete) {
-            self.maleNum = event.data.male;
-            self.femaleNum = event.data.female;
+            // self.maleNum = event.data.male;
+            // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
             self
               .verifyStudents(
@@ -419,14 +419,13 @@ export default {
                 event.data.acadYear,
                 event.data.nstp
               )
-              .then(() => (self.pending = false));
-            // self.pending = false;
-            // self.$emit("complete", step);
-            self.removeFile();
-
-            self.$emit("setStatus", "For Approval");
-            self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
-            // this.completed = !this.completed;
+              .then(() => {
+                self.pending = false;
+                self.removeFile();
+                self.$emit("setStatus", "For Approval");
+                self.status = "For Approval";
+                self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+              });
           } else {
             self.pending = false;
             alert(event.data.reason);
@@ -541,7 +540,10 @@ export default {
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
-        var program = results[i].get("nstpId").get("programName");
+        var program = "";
+        if (typeof results[i].get("nstpId") !== "undefined") {
+          program = results[i].get("nstpId").get("programName");
+        }
         var takenNstp1 = results[i].get("takenNstp1");
         var takenNstp2 = results[i].get("takenNstp2");
         var isGraduated = results[i].get("isGraduated");
@@ -559,7 +561,22 @@ export default {
           ) {
             var reason = "";
             //check program
-            if (program == nstpProgram && serialNum == null) {
+            if (program == "") {
+              // student exists in db but has not yet enrolled in any nstp program.
+              var nstpId = await this.getNstpId(nstpProgram);
+              results[i].set(
+                "applicationId",
+                new Parse.Object("Application", { id: this.appId })
+              );
+              results[i].set(
+                "nstpId",
+                new Parse.Object("Nstp", { id: nstpId })
+              );
+              results[i].set("takenNstp1", true);
+              results[i].set("takenNstp2", true);
+              results[i].set("isGraduated", true);
+              await results[i].save();
+            } else if (program == nstpProgram && serialNum == null) {
               reason = this.verificationLevel(
                 takenNstp1,
                 takenNstp2,
@@ -586,9 +603,8 @@ export default {
                 );
                 conflict.set("reason", reason);
                 conflict.set("status", "3 of 4");
-                conflict.save();
+                await conflict.save();
               }
-              studentSet.delete(studentData[x]);
             } else {
               // found the student but there are mismatch in stored info
               if (program != nstpProgram) {
@@ -607,9 +623,9 @@ export default {
               );
               conflict.set("reason", reason);
               conflict.set("status", "3 of 4");
-              conflict.save();
-              studentSet.delete(studentData[x]);
+              await conflict.save();
             }
+            studentSet.delete(studentData[x]);
             break;
           }
         }
@@ -705,11 +721,10 @@ export default {
       if (results.length == 0) {
         this.$emit("incompleteStep", 3, "1 of 4");
       }
-      this.status = results[0].get("applicationId").get("status");
-
-      this.data.program = results[0].get("nstpId").get("programName");
 
       if (results.length > 0) {
+        this.status = results[0].get("applicationId").get("status");
+        this.data.program = results[0].get("nstpId").get("programName");
         for (let i = 0; i < results.length; i++) {
           const object = results[i];
 
@@ -876,8 +891,11 @@ export default {
       // since the application was rejected, students are not qualified
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const nstpenrollment = new Parse.Query(NstpEnrollment);
-      nstpenrollment.equalTo("appId", this.appId);
-      const data = await application.find();
+      nstpenrollment.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      const data = await nstpenrollment.find();
       for (let index = 0; index < data.length; index++) {
         const element = data[index];
         element.set("takenNstp1", false);
@@ -900,6 +918,7 @@ export default {
         this.$emit("complete", 3);
 
         this.$emit("setStatus", "Approved");
+        this.status = "Approved";
         this.$emit("nextStep");
       });
     },

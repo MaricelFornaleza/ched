@@ -321,13 +321,32 @@ export default {
             }
           );
           console.log("studentList: " + studentList);
+
+          // StudentConflicts
+          const StudentConflict = Parse.Object.extend("NstpStudentConflictEnrollment");
+          const query4 = new Parse.Query(StudentConflict);
+          query4.equalTo(
+            "applicationId",
+            new Parse.Object("Application", { id: deleteParams.app_id })
+          );
+          query4.find().then(
+            (results) => {
+              for (let i = 0; i < results.length; i++) {
+                results[i].destroy();
+              }
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+          
           // Student
           const Student = Parse.Object.extend("Student");
-          const query4 = new Parse.Query(Student);
+          const query5 = new Parse.Query(Student);
 
           for (let i = 0; i < studentList.length; i++) {
             console.log("student id: " + studentList[i]);
-            query4.get(studentList[i]).then(
+            query5.get(studentList[i]).then(
               (object) => {
                 object.destroy();
               },

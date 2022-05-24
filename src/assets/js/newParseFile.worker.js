@@ -13,9 +13,11 @@ onmessage = async function (event) {
 
     /* reader.readAsArrayBuffer(file) -> data will be an ArrayBuffer */
     var workbook = XLSX.read(data, { type: 'array' });
+    // Note: The "first worksheet" is stored at workbook.Sheets[workbook.SheetNames[0]]
+    // const sheetNum = event.data.sheet;
     const ws = workbook.Sheets[workbook.SheetNames[0]];
     var rowObj = XLSX.utils.sheet_to_json(ws, { header: "A", blankrows: false });
-    this.excelData = JSON.stringify(rowObj);
+    // this.excelData = JSON.stringify(rowObj);
     // console.log(rowObj);
     /*console.log(rowObj);
     for(var i=0; i < rowObj.length; i++) {

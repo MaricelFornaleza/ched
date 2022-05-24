@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
@@ -109,7 +110,7 @@ import AlertWidget from "@/partials/AlertWidget.vue";
 import * as XLSX from "xlsx";
 import ViewStudentsDatatable from "@/partials/ViewStudentsDatatable.vue";
 import { jsPDF } from "jspdf";
-import logo from "@/assets/CHED_logo.svg";
+
 import image from "@/assets/img/ched-logo.png";
 import { DownloadIcon, PaperAirplaneIcon } from "@heroicons/vue/outline";
 export default {
@@ -137,7 +138,7 @@ export default {
       application: null,
       students: [],
       componentKey: 0,
-      logo,
+      loading: true,
     };
   },
   props: {
@@ -149,8 +150,11 @@ export default {
 
   async created() {
     this.getData();
+    const user = Parse.User.current();
+    console.log(user);
 
     await this.getStudents();
+    this.loading = false;
   },
   methods: {
     downloadTransmittal() {
@@ -188,7 +192,7 @@ export default {
       var p1 =
         "This has reference to your application dated " +
         this.data.dateApplied +
-        ", requesting for issuance of NSTP Serial Number for the following School Year" +
+        ", requesting for issuance of NSTP Serial Number for the following School Year " +
         this.data.acadYear +
         ".";
 
