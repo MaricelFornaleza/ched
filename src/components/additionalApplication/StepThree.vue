@@ -304,7 +304,7 @@ export default {
       reject: false,
       confirm: false,
       status: "",
-      laoding: false,
+      loading: false,
 
       isAdmin: false,
       data: {
