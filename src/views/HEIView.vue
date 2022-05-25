@@ -76,7 +76,7 @@
           {{ alert.msg }}
         </AlertWidget>
       </div>
-      
+
       <!-- dataTables  -->
       <div>
         <hei-data-table
@@ -300,7 +300,7 @@ export default {
       });
     });
 
-     subscription.on("update", async (object) => {
+    subscription.on("update", async (object) => {
       console.log("object updated" + object);
 
       this.count();
@@ -320,11 +320,11 @@ export default {
       const emailQuery = new Parse.Query(Parse.User);
       emailQuery.equalTo("objectId", object.id);
       await emailQuery.first({ useMasterKey: true }).then((objectEmail) => {
-      if (
-        objectEmail.get("emailVerified") == true &&
-        objectEmail.get("receivedCredential") == false
-      ){
-        const params = {
+        if (
+          objectEmail.get("emailVerified") == true &&
+          objectEmail.get("receivedCredential") == false
+        ) {
+          const params = {
             name: objectEmail.get("name"),
             email: objectEmail.get("email"),
             password: password,
@@ -333,12 +333,12 @@ export default {
           };
           console.log(objectEmail.id);
           Parse.Cloud.run("sendEmailNotification", params);
-       
+
           objectEmail.set("password", password);
           objectEmail.set("receivedCredential", true);
           objectEmail.save();
-      }
-    });
+        }
+      });
     });
 
     subscription.on("enter", async (object) => {
@@ -354,7 +354,6 @@ export default {
         email: object.get("email"),
         address: object.get("address"),
       });
- 
     });
 
     subscription.on("leave", (object) => {

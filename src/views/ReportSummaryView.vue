@@ -111,20 +111,32 @@
     </div>
     <div ref="report">
       <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
-        <advanced-widget bgColor="bg-info-light" textColor="text-info">
-          <template v-slot:icon><LibraryIcon class="h-8" /></template>
-          <template v-slot:count>{{ hei.total }}</template>
-          <template v-slot:label>Higher Education Institutions</template>
-          <template v-slot:data>
-            <data-count :dataCount="hei.countSuc" dataLabel="SUC"></data-count>
-            <data-count :dataCount="hei.countLuc" dataLabel="LUC"></data-count>
-            <data-count
-              :dataCount="hei.countPrivate"
-              dataLabel="Private"
-            ></data-count>
-            <data-count :dataCount="hei.countOgs" dataLabel="OGS"></data-count>
-          </template>
-        </advanced-widget>
+        <div ref="hei">
+          <advanced-widget bgColor="bg-info-light" textColor="text-info">
+            <template v-slot:icon><LibraryIcon class="h-8" /></template>
+            <template v-slot:count>{{ hei.total }}</template>
+            <template v-slot:label>Higher Education Institutions</template>
+            <template v-slot:data>
+              <data-count
+                :dataCount="hei.countSuc"
+                dataLabel="SUC"
+              ></data-count>
+              <data-count
+                :dataCount="hei.countLuc"
+                dataLabel="LUC"
+              ></data-count>
+              <data-count
+                :dataCount="hei.countPrivate"
+                dataLabel="Private"
+              ></data-count>
+              <data-count
+                :dataCount="hei.countOgs"
+                dataLabel="OGS"
+              ></data-count>
+            </template>
+          </advanced-widget>
+        </div>
+
         <advanced-widget bgColor="bg-error-light" textColor="text-error">
           <template v-slot:icon><UsersIcon class="h-8" /></template>
           <template v-slot:count>{{ enrollees.total }}</template>
@@ -202,7 +214,10 @@
             <DownloadIcon class="h-4" />
           </button>
         </div>
-        <BarChart :chartData="testData" :options="options" />
+        <div ref="chart">
+          <BarChart :chartData="testData" :options="options" />
+        </div>
+
         <div class="grid grid-cols-4 gap-10 py-5 px-5 lg:px-20 mt-10">
           <progress-bar
             label="Pending"
@@ -244,6 +259,9 @@ import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import Parse from "parse";
 import html2pdf from "html2pdf.js";
+import image from "@/assets/img/ched-logo.png";
+import { jsPDF } from "jspdf";
+
 import {
   AcademicCapIcon,
   LibraryIcon,
@@ -320,6 +338,7 @@ export default {
       year: null,
 
       loading: true,
+      items: [{ id: 1, name: "cel" }],
     };
   },
   async created() {
@@ -342,88 +361,178 @@ export default {
         html2canvas: { scale: 5, letterRendering: true },
         jsPDF: { unit: "in", format: "legal", orientation: "landscape" },
       };
+      const doc = new jsPDF("p", "in", "letter");
+      var logo = new Image();
+      logo.src = image;
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      var filter_type = this.filter.type;
+      var filter_condition = this.filter.condition;
+      var data = {
+        hei: {
+          total: "5",
+          suc: "1",
+          luc: "2",
+          private: "3",
+          ogs: "4",
+        },
+      };
 
       html2pdf()
         .set(opt)
-        .from(this.$refs.report)
-        .toPdf()
-        .get("pdf")
-        .then(function (pdf) {
-          window.open(pdf.output("bloburl"), "_blank");
+        .from(this.$refs.chart)
+        .toImg()
+        .get("img")
+        .then(function (img) {
+          doc.addImage(logo, "png", 1, 1, 0.75, 0.75);
+          doc.setFontSize(11);
+          doc.setFont("times");
+          doc.text("Republic of the Philippines", 4.24, 1, "center");
+          doc.text("Office of the President", 4.24, 1.2, "center");
+          doc.setFont("", "", "bold");
+          doc.text("COMMISSION ON HIGHER EDUCATION", 4.24, 1.4, "center");
+          doc.setFont("", "", "normal");
+          doc.text("Regional Office V", 4.24, 1.6, "center");
+          doc.text(date, 7.5, 2.5, "right");
+          doc.setFont("", "", "bold");
+          doc.text("Report Summary", 1, 3);
+          doc.setFont("", "", "normal");
+          doc.text(filter_type + ": " + filter_condition, 1, 3.2);
+          doc.setFont("", "", "bold");
+
+          doc.text("Higher Education Institutions", 2, 3.5);
+          doc.setFont("", "", "normal");
+
+          doc.text("SUC: " + data.hei.suc, 2, 3.7);
+          doc.text("LUC: " + data.hei.luc, 2, 3.9);
+          doc.text("Private: " + data.hei.private, 2, 4.1);
+          doc.text("OGS: " + data.hei.ogs, 2, 4.3);
+
+          doc.setFont("", "", "bold");
+
+          doc.text("Total Applications", 4.5, 3.5);
+          doc.setFont("", "", "normal");
+
+          doc.text("Pending: " + data.hei.suc, 4.5, 3.7);
+          doc.text("For Approval: " + data.hei.luc, 4.5, 3.9);
+          doc.text("Rejected:" + data.hei.private, 4.5, 4.1);
+          doc.text("Approved:" + data.hei.ogs, 4.5, 4.3);
+          doc.setFont("", "", "bold");
+          doc.text("NSTP Enrollees", 2, 4.6);
+          doc.setFont("", "", "normal");
+
+          doc.text("1st Semester: " + data.hei.suc, 2, 4.8);
+          doc.text("2nd Semester: " + data.hei.luc, 2, 5);
+
+          doc.setFont("", "", "bold");
+
+          doc.text("NSTP Graduates", 4.5, 4.6);
+          doc.setFont("", "", "normal");
+
+          doc.text("CWTS: " + data.hei.suc, 4.5, 4.8);
+          doc.text("LTS: " + data.hei.luc, 4.5, 5);
+
+          doc.setFont("", "", "bold");
+          doc.text("Serial Number Applications", 1, 5.5);
+          doc.setFont("", "", "normal");
+          doc.text(filter_type + ": " + filter_condition, 1, 5.7);
+          doc.addImage(img, "JPEG", 1, 6, 6.5, 4);
+
+          const text =
+            "*This is a system generated report from the NSTP Serial Number Online Application and Issuance System.";
+          doc.setFontSize(9);
+
+          doc.text(text, 1, 10.2);
+          window.open(doc.output("bloburl"), "_blank");
         });
     },
     exportGraphToPdf() {
       var opt = {
         margin: 0.5,
         image: { type: "jpeg", quality: 1 },
-        html2canvas: { scale: 5, letterRendering: true },
+        html2canvas: { scale: 1, letterRendering: true },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
+      const doc = new jsPDF("p", "in", "letter");
+      var logo = new Image();
+      logo.src = image;
+      const date = new Date().toLocaleDateString("en", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      var filter_type = this.filter.type;
+      var filter_condition = this.filter.condition;
+      var pending =
+        this.count.pending +
+        " (" +
+        (this.count.pending / this.count.total) * 100 +
+        "%)";
+      var forApproval =
+        this.count.forApproval +
+        " (" +
+        (this.count.forApproval / this.count.total) * 100 +
+        "%)";
+      var rejected =
+        this.count.rejected +
+        " (" +
+        (this.count.rejected / this.count.total) * 100 +
+        "%)";
+      var approved =
+        this.count.approved +
+        " (" +
+        (this.count.approved / this.count.total) * 100 +
+        "%)";
 
       html2pdf()
         .set(opt)
-        .from(this.$refs.graph)
-        .toPdf()
-        .get("pdf")
-        .then(function (pdf) {
-          window.open(pdf.output("bloburl"), "_blank");
+        .from(this.$refs.chart)
+        .toImg()
+        .get("img")
+        .then(function (img) {
+          doc.addImage(logo, "png", 1, 1, 0.75, 0.75);
+          doc.setFontSize(11);
+          doc.setFont("times");
+          doc.text("Republic of the Philippines", 4.24, 1, "center");
+          doc.text("Office of the President", 4.24, 1.2, "center");
+          doc.setFont("", "", "bold");
+          doc.text("COMMISSION ON HIGHER EDUCATION", 4.24, 1.4, "center");
+          doc.setFont("", "", "normal");
+          doc.text("Regional Office V", 4.24, 1.6, "center");
+          doc.text(date, 7.5, 2.5, "right");
+          doc.setFont("", "", "bold");
+          doc.text("Serial Number Applications", 1, 3);
+          doc.setFont("", "", "normal");
+          doc.text(filter_type + ": " + filter_condition, 1, 3.2);
+          const text =
+            "*This is a system generated report from the NSTP Serial Number Online Application and Issuance System.";
+
+          doc.addImage(img, "JPEG", 1, 3.5, 6.5, 4);
+          doc.setFontSize(9);
+
+          doc.text(text, 1, 7.6);
+          doc.setFontSize(11);
+
+          doc.setFont("", "", "bold");
+
+          doc.text("Pending", 2, 8.2, "center");
+          doc.text("For Approval", 3.5, 8.2, "center");
+          doc.text("Rejected", 5, 8.2, "center");
+          doc.text("Approved", 6.5, 8.2, "center");
+          doc.setFont("", "", "normal");
+
+          doc.text(pending, 2, 8.4, "center");
+          doc.text(forApproval, 3.5, 8.4, "center");
+          doc.text(rejected, 5, 8.4, "center");
+          doc.text(approved, 6.5, 8.4, "center");
+
+          window.open(doc.output("bloburl"), "_blank");
         });
     },
-    sampleExport() {
-      html2pdf()
-        .from(this.$refs.graph)
-        .toPdf()
-        .output("datauristring")
-        .then(function (pdfBase64) {
-          const file = new File([pdfBase64], "samplepdf.pdf", {
-            type: "application/pdf",
-          });
-          const formData = new FormData();
-          formData.append("file", file);
-          console.log(formData);
-          const parseFile = new Parse.File("sample.pdf", formData.get("file"));
-          console.log(parseFile);
-          parseFile.save().then(() => {
-            var Document = new Parse.Object("Document");
-            Document.set("documentType", "sample");
-            Document.set("filename", "samplefilename");
-            Document.set("document", parseFile);
 
-            Document.save().then(() => {
-              // get the url of the document saved in parse
-              // then set it as the href of element with id=fileurl
-              const docs = Document.get("document");
-
-              console.log("file saved!");
-              console.log(docs.url());
-            });
-          });
-        });
-    },
-    sendSampleEmail() {
-      const params = {
-        type: "Transmittal",
-        approved: true,
-        hei: {
-          name: "Bicol State College of Applied Sciences and Technology",
-          username: "BISCAST",
-          email: "maformaleza@gbox.adnu.edu.ph",
-          address: {
-            barangay: "San Juan",
-            city: "Minalabac",
-            province: "Camarines Sur",
-          },
-        },
-        date: "May 17, 2022",
-        application: {
-          dateApplied: "May 15, 2022",
-          schoolYear: "2021-2022",
-          snRange: "C-000010-000012-22",
-          students: 3,
-        },
-      };
-      Parse.Cloud.run("sendEmailNotification", params);
-    },
     setToMonth() {
       this.monthly = !this.monthly;
       this.getMonthlyData();
@@ -614,6 +723,7 @@ export default {
     async getGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
+      query.exists("applicationId");
       query.include("applicationId");
 
       const result = await query.find();

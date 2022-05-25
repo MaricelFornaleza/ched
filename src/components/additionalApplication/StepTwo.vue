@@ -37,7 +37,7 @@
         </div>
         <div
           v-else
-          class="my-20 w-full flex justify-between p-5 border border-light-300"
+          class="my-20 w-fit flex justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -51,7 +51,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -94,7 +94,7 @@
         <div
           class="
             my-20
-            w-full
+            w-fit
             flex
             items-center
             justify-between
@@ -108,17 +108,15 @@
               class="h-8"
               alt="PDF Icon by Dimitry Miroliubov"
             />
-            <a href="" id="fileurl" target="_blank" ref="file">
-              <div class="text-base">{{ filename }}</div>
-            </a>
+
+            <div class="text-base">{{ filename }}</div>
           </div>
-          <div class="flex space-x-4">
-            <button class="p-2 rounded fit-content bg-dark-100">
-              <EyeIcon class="h-4 text-light-100" />
-            </button>
-            <button class="p-2 rounded fit-content bg-error">
-              <DownloadIcon class="h-4 text-light-100" />
-            </button>
+          <div class="flex space-x-4 ml-4">
+            <a href="" id="fileurl" target="_blank" ref="file">
+              <button class="p-2 rounded fit-content bg-error">
+                <DownloadIcon class="h-4 text-light-100" />
+              </button>
+            </a>
           </div>
         </div>
 
@@ -144,7 +142,7 @@
 import DropZone from "@/partials/DropZone.vue";
 import SuccessAlert from "@/partials/SuccessAlert.vue";
 import AlertWidget from "@/partials/AlertWidget.vue";
-import { EyeIcon, DownloadIcon, XCircleIcon } from "@heroicons/vue/outline";
+import { DownloadIcon, XCircleIcon } from "@heroicons/vue/outline";
 import "jquery/dist/jquery.min.js";
 import { ref } from "vue";
 import Parse from "parse";
@@ -169,7 +167,7 @@ export default {
     SuccessAlert,
     AlertWidget,
     DropZone,
-    EyeIcon,
+
     DownloadIcon,
     XCircleIcon,
   },

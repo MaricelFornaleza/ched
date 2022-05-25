@@ -161,6 +161,10 @@ export default {
       console.log(this.students);
       // this.$forceUpdate();
     },
+    // selectedStudents() {
+    //   console.log(this.selectedStudents);
+    //   if(this.selectedStudents == '') console.log("empty");
+    // }
   },
   methods: {
     allowDelete() {
@@ -188,9 +192,10 @@ export default {
     },
     async confirmDeleteStudent() {
       await this.deleteStudents().then(() => {
-        this.$emit("getStudents");
-        this.updateDt();
+        // this.$emit("getStudents");
+        // this.updateDt();
         this.toggleDeleteModal();
+        this.selectedStudents = [];
       });
     },
     async deleteStudents() {
