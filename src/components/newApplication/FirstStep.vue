@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
       </AlertWidget>
     </div>
+
     <div v-else>
       <div
         v-if="!isCompleted"
@@ -122,7 +124,6 @@
             :appId="appId"
             :status="status"
             fileName="List-of-Students-1stSem"
-            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 
@@ -160,7 +161,7 @@
           ></StudentsDataTable>
         </div>
 
-        <div class="flex items-center justify-center space-x-5 mt-5">
+        <div v-if="isCompleted" class="flex items-center justify-center space-x-5 mt-5">
           <button
             @click="goToApplication()"
             class="btn-sm btn-default btn-outline"
@@ -265,6 +266,7 @@ export default {
       worker: undefined,
       status: null,
       taken: false,
+      loading: true,
     };
   },
   props: {
@@ -313,12 +315,23 @@ export default {
       new Parse.Object("Application", { id: this.appId })
     );
     const nstpsubscription = await query.subscribe();
-    nstpsubscription.on("open", async () => {
-      this.getStudents();
+    // nstpsubscription.on("open", async () => {
+    //   this.getStudents();
+    // });
+    nstpsubscription.on("delete", async (object) => {
+      // find
+      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      console.log(index);
+      if (index == -1) return;
+      this.students.splice(index, 1); //remove the specific object in the array
+      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+        this.femaleNum--;
+      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+        this.maleNum--;
+      }
     });
-    nstpsubscription.on("delete", async () => {
-      this.getStudents();
-    });
+    await this.getStudents();
+    this.loading = false;
   },
   methods: {
     forceRerender() {
@@ -409,7 +422,7 @@ export default {
         for (let index = 0; index < res.length; index++) {
           const element = res[index];
           element.set("takenNstp1", false);
-          element.unset("applicationId");
+          // element.unset("applicationId");
           element.save();
         }
       });

@@ -614,6 +614,7 @@ export default {
     async getGraduates() {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
+      query.exists("applicationId");
       query.include("applicationId");
 
       const result = await query.find();

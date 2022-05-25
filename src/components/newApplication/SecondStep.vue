@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
@@ -121,7 +122,6 @@
             :students="students"
             :status="status"
             fileName="List-of-Students-2ndSem"
-            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 
@@ -267,6 +267,7 @@ export default {
       worker: undefined,
       status: null,
       taken: false,
+      loading: true,
     };
   },
   props: { isCompleted: Boolean, appId: String, allow: Boolean },
@@ -309,12 +310,23 @@ export default {
       new Parse.Object("Application", { id: this.appId })
     );
     const nstpsubscription = await query.subscribe();
-    nstpsubscription.on("open", async () => {
-      this.getStudents();
+    // nstpsubscription.on("open", async () => {
+    //   this.getStudents();
+    // });
+    nstpsubscription.on("delete", async (object) => {
+      // find
+      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      console.log(index);
+      if (index == -1) return;
+      this.students.splice(index, 1); //remove the specific object in the array
+      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+        this.femaleNum--;
+      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+        this.maleNum--;
+      }
     });
-    nstpsubscription.on("delete", async () => {
-      this.getStudents();
-    });
+    await this.getStudents();
+    this.loading = false;
   },
   methods: {
     forceRerender() {

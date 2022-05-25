@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
@@ -102,7 +103,7 @@
         </div>
       </div>
 
-      <div v-if="status == 'For Approval' || status == 'Approved'">
+      <div v-else-if="status == 'For Approval' || status == 'Approved'">
         <div
           v-if="finishedStudents()"
           class="container mx-auto flex flex-col items-center justify-center"
@@ -134,7 +135,6 @@
             :students="students"
             :status="status"
             fileName="List-of-Students-Graduates"
-            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 
@@ -305,6 +305,7 @@ export default {
       confirm: false,
       reject: false,
       status: "",
+      loading: true,
 
       isAdmin: false,
       data: {
@@ -350,12 +351,22 @@ export default {
       new Parse.Object("Application", { id: this.appId })
     );
     const nstpsubscription = await query2.subscribe();
-    nstpsubscription.on("open", async () => {
-      this.getStudents();
+    // nstpsubscription.on("open", async () => {
+    //   this.getStudents();
+    // });
+    nstpsubscription.on("delete", async (object) => {
+      // find
+      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      console.log(index);
+      if (index == -1) return;
+      this.students.splice(index, 1); //remove the specific object in the array
+      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+        this.femaleNum--;
+      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+        this.maleNum--;
+      }
     });
-    nstpsubscription.on("delete", async () => {
-      this.getStudents();
-    });
+    // await this.getStudents();
 
     // if(this.isCompleted)
     const Application = Parse.Object.extend("Application");
@@ -377,6 +388,7 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
+    this.loading = false;
   },
   methods: {
     forceRerender() {
@@ -871,6 +883,23 @@ export default {
       results.set("reason", reason);
       results.save();
 
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
       // since the application was rejected, students are not qualified
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const nstpenrollment = new Parse.Query(NstpEnrollment);
@@ -881,11 +910,34 @@ export default {
       const data = await nstpenrollment.find();
       for (let index = 0; index < data.length; index++) {
         const element = data[index];
-        console.log(element);
+        // console.log(element);
+        element.unset("nstpId");
+        // element.unset("applicationId");
         element.set("takenNstp1", false);
         element.set("takenNstp2", false);
         element.set("isGraduated", false);
         element.save();
+
+        const StudentConflict = Parse.Object.extend("StudentConflict");
+        const conflict1 = new StudentConflict();
+        conflict1.set("studentId", element.get("studentId"));
+        conflict1.set(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        conflict1.set("reason", "The nstp application was rejected.");
+        conflict1.set("status", "1 of 4");
+        conflict1.save();
+
+        const conflict2 = new StudentConflict();
+        conflict2.set("studentId", element.get("studentId"));
+        conflict2.set(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        conflict2.set("reason", "The nstp application was rejected.");
+        conflict2.set("status", "2 of 4");
+        conflict2.save();
       }
 
       this.data.reason = reason;
