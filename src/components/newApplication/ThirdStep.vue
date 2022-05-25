@@ -177,6 +177,14 @@
         >
           <button class="btn-sm btn-default btn-outline">Back</button>
           <button
+            v-if="!taken"
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Reupload
+          </button>
+          <button
             @click="toggleRejectModal()"
             class="btn-sm btn-default bg-error text-light-100 border-0"
           >
@@ -307,6 +315,7 @@ export default {
         program: null,
         graduates: null,
       },
+      taken: false,
     };
   },
   props: {
@@ -337,6 +346,18 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const Application = Parse.Object.extend("Application");
+    const reuploadQuery = new Parse.Query(Application);
+    reuploadQuery.equalTo("objectId", this.appId);
+
+    await reuploadQuery.first().then((obj) => {
+      if (
+        obj.get("status") == "Approved" ||
+        obj.get("status") == "Rejected"
+      )
+        this.taken = true;
+    });
+
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     const query2 = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
@@ -352,7 +373,7 @@ export default {
       this.getStudents();
     });
     // if(this.isCompleted)
-    const Application = Parse.Object.extend("Application");
+  
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
     const self = this;
@@ -423,6 +444,51 @@ export default {
           }
         };
       }
+    },
+    reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "3 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("isGraduated", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 3);
+      this.$emit("setStatus", "3 of 4");
+      this.removeFile();
     },
     upload() {
       var validation = this.validate(this.dropzoneFile);
