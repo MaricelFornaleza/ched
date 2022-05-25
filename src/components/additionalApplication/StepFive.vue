@@ -18,7 +18,7 @@
           grid
           xl:grid-cols-2
           w-full
-          xl:w-1/2 xl:divide-x
+          xl:w-8/12 xl:divide-x
           divide-light-300
           space-y-2
           mx-auto
@@ -53,7 +53,19 @@
           </div>
         </div>
       </div>
-      <div class="my-5 w-full flex justify-between p-5 border border-light-300">
+      <div
+        v-if="admin"
+        class="
+          mx-auto
+          my-5
+          w-full
+          xl:w-8/12
+          flex
+          justify-between
+          p-5
+          border border-light-300
+        "
+      >
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center space-x-5">
             <img
@@ -142,6 +154,7 @@ export default {
       students: [],
       componentKey: 0,
       loading: true,
+      admin: false,
     };
   },
   props: {
@@ -154,6 +167,10 @@ export default {
   async created() {
     this.getData();
     await this.getStudents();
+    const user = Parse.User.current();
+    if (user.get("userType") == "admin") {
+      this.admin = true;
+    }
     this.loading = false;
   },
   methods: {
