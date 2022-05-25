@@ -52,7 +52,7 @@
 
         <div
           v-else
-          class="my-20 flex w-full justify-between p-5 border border-light-300"
+          class="my-20 flex w-fit justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -66,7 +66,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -910,6 +910,7 @@ export default {
       const data = await nstpenrollment.find();
       for (let index = 0; index < data.length; index++) {
         const element = data[index];
+        element.unset("nstpId");
         element.set("takenNstp1", false);
         element.set("takenNstp2", false);
         element.set("isGraduated", false);

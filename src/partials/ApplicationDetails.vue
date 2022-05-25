@@ -92,9 +92,10 @@ export default {
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       query.equalTo("applicationId", application);
+      query.exists("applicationId");
       query.include("applicationId");
       query.include("nstpId");
-
+      console.log(await query.count());
       await query.find().then(function (results) {
         _this.data.status = results[0].get("applicationId").get("status");
         _this.data.reason = results[0].get("applicationId").get("reason");
