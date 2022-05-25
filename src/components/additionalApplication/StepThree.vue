@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading" class="text-center">Loading...</div>
+  <div v-else>
     <div v-if="!allow" class="w-fit mx-auto">
       <AlertWidget className="alert-warning">
         Please complete the previous steps.
@@ -51,7 +52,7 @@
 
         <div
           v-else
-          class="my-20 flex w-full justify-between p-5 border border-light-300"
+          class="my-20 flex w-fit justify-between p-5 border border-light-300"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex items-center space-x-5">
@@ -65,7 +66,7 @@
 
             <XCircleIcon
               @click="removeFile()"
-              class="h-5 text-error cursor-pointer"
+              class="ml-5 h-5 text-error cursor-pointer"
               title="Remove File"
             />
           </div>
@@ -103,7 +104,7 @@
         </div>
       </div>
 
-      <div v-else>
+      <div v-else-if="status == 'For Approval' || status == 'Approved'">
         <div
           v-if="finishedStudents()"
           class="container mx-auto flex flex-col items-center justify-center"
@@ -135,7 +136,6 @@
             :students="students"
             :status="status"
             fileName="List-of-Students-Graduates"
-            @getStudents="getStudents"
           ></StudentsDataTable>
         </div>
 
@@ -312,6 +312,7 @@ export default {
       reject: false,
       confirm: false,
       status: "",
+      laoding: false,
 
       isAdmin: false,
       data: {
@@ -355,10 +356,7 @@ export default {
     reuploadQuery.equalTo("objectId", this.appId);
 
     await reuploadQuery.first().then((obj) => {
-      if (
-        obj.get("status") == "Approved" ||
-        obj.get("status") == "Rejected"
-      )
+      if (obj.get("status") == "Approved" || obj.get("status") == "Rejected")
         this.taken = true;
     });
 
@@ -370,13 +368,24 @@ export default {
       new Parse.Object("Application", { id: this.appId })
     );
     const nstpsubscription = await query2.subscribe();
-    nstpsubscription.on("open", async () => {
-      this.getStudents();
-      
+    // nstpsubscription.on("open", async () => {
+    //   this.getStudents();
+    // });
+    nstpsubscription.on("delete", async (object) => {
+      // find
+      var index = this.students.findIndex(
+        (student) => student.id == object.get("studentId").id
+      );
+      console.log(index);
+      if (index == -1) return;
+      this.students.splice(index, 1); //remove the specific object in the array
+      if (object.get("studentId").get("gender").toUpperCase() == "F") {
+        this.femaleNum--;
+      } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
+        this.maleNum--;
+      }
     });
-    nstpsubscription.on("delete", async () => {
-      this.getStudents();
-    });
+    // await this.getStudents();
 
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
@@ -385,7 +394,7 @@ export default {
     await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
-      
+
       if (
         results.get("status") == "For Approval" ||
         results.get("status") == "Approved"
@@ -397,6 +406,7 @@ export default {
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
     }
+    this.loading = false;
   },
   methods: {
     forceRerender() {
@@ -456,7 +466,7 @@ export default {
         };
       }
     },
-      reupload() {
+    reupload() {
       this.maleNum = 0;
       this.femaleNum = 0;
       this.maleNumError = 0;
@@ -479,7 +489,6 @@ export default {
           console.log(error);
         }
       );
-
 
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
@@ -923,6 +932,7 @@ export default {
       const data = await nstpenrollment.find();
       for (let index = 0; index < data.length; index++) {
         const element = data[index];
+        element.unset("nstpId");
         element.set("takenNstp1", false);
         element.set("takenNstp2", false);
         element.set("isGraduated", false);

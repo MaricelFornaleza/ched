@@ -38,7 +38,7 @@
       </div>
       <div
         v-else
-        class="my-20 w-full flex justify-between p-5 border border-light-300"
+        class="my-20 w-fit flex justify-between p-5 border border-light-300"
       >
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center space-x-5">
@@ -52,7 +52,7 @@
 
           <XCircleIcon
             @click="removeFile()"
-            class="h-5 text-error cursor-pointer"
+            class="ml-5 h-5 text-error cursor-pointer"
             title="Remove File"
           />
         </div>
@@ -87,7 +87,7 @@
       <div
         class="
           my-20
-          w-full
+          w-fit
           flex
           justify-between
           items-center
@@ -105,7 +105,7 @@
             <div class="text-base">{{ filename }}</div></a
           >
         </div>
-        <div class="flex space-x-4">
+        <div class="flex space-x-4 ml-5">
           <button class="p-2 rounded fit-content bg-dark-100">
             <EyeIcon class="h-4 text-light-100" />
           </button>
