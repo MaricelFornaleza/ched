@@ -177,6 +177,14 @@
         >
           <button class="btn-sm btn-default btn-outline">Back</button>
           <button
+            v-if="!taken"
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Reupload
+          </button>
+          <button
             @click="toggleRejectModal()"
             class="btn-sm btn-default bg-error text-light-100 border-0"
           >
@@ -279,13 +287,10 @@ import ModalWidget from "@/partials/ModalWidget.vue";
 import ApplicationModal from "@/partials/ApplicationModal.vue";
 import RejectModal from "@/partials/RejectModal.vue";
 import ApplicationDetails from "@/partials/ApplicationDetails.vue";
-
 import { XCircleIcon } from "@heroicons/vue/outline";
-
 import { ref } from "vue";
 import Worker from "@/assets/js/newParseFile.worker.js";
 import Parse from "parse";
-
 export default {
   // inheritAttrs: false,
   data() {
@@ -305,15 +310,14 @@ export default {
       confirm: false,
       reject: false,
       status: "",
-
       isAdmin: false,
       data: {
         program: null,
         graduates: null,
       },
+      taken: false,
     };
   },
-
   props: {
     isCompleted: Boolean,
     appId: String,
@@ -342,6 +346,18 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const Application = Parse.Object.extend("Application");
+    const reuploadQuery = new Parse.Query(Application);
+    reuploadQuery.equalTo("objectId", this.appId);
+
+    await reuploadQuery.first().then((obj) => {
+      if (
+        obj.get("status") == "Approved" ||
+        obj.get("status") == "Rejected"
+      )
+        this.taken = true;
+    });
+
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     const query2 = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
@@ -356,12 +372,10 @@ export default {
     nstpsubscription.on("delete", async () => {
       this.getStudents();
     });
-
     // if(this.isCompleted)
-    const Application = Parse.Object.extend("Application");
+  
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
-
     const self = this;
     await query.first().then(function (results) {
       // each of results will only have the selected fields available.
@@ -372,7 +386,6 @@ export default {
       )
         self.getStudents();
     });
-
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
@@ -432,6 +445,51 @@ export default {
         };
       }
     },
+    reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
+
+      //delete studentconflict and set takenNstp2 to false
+      const StudentConflict = Parse.Object.extend("StudentConflict");
+      const conflict = new Parse.Query(StudentConflict);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      conflict.equalTo("status", "3 of 4");
+      conflict.find().then(
+        (results) => {
+          for (let i = 0; i < results.length; i++) {
+            results[i].destroy();
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+      const query = new Parse.Query(NstpEnrollment);
+      query.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
+      query.find().then((res) => {
+        for (let index = 0; index < res.length; index++) {
+          const element = res[index];
+          element.set("isGraduated", false);
+          element.save();
+        }
+      });
+
+      this.$emit("stepBack", 3);
+      this.$emit("setStatus", "3 of 4");
+      this.removeFile();
+    },
     upload() {
       var validation = this.validate(this.dropzoneFile);
       if (validation) {
@@ -487,7 +545,6 @@ export default {
       } else if (!nstp.takenNstp1) {
         reason = "The student has not yet taken nstp1.";
       }
-
       return reason;
     },
     async verifyStudents(studentData, nstpProgram) {
@@ -501,7 +558,6 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
-
       // find the current application's nstp program
       query.equalTo(
         "applicationId",
@@ -509,7 +565,6 @@ export default {
       );
       const res = await query.first();
       const currentProgram = res.get("nstpId").get("programName");
-
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
@@ -521,7 +576,6 @@ export default {
         var takenNstp2 = results[i].get("takenNstp2");
         var isGraduated = results[i].get("isGraduated");
         var serialNum = results[i].get("serialNumber");
-
         for (let x = 0; x < studentData.length; x++) {
           //check student's name and bday
           //PROBLEM: THIS LOOPS OVER ALL THE STUDENTS AND COMPARES ALL OF THEM
@@ -603,11 +657,9 @@ export default {
       // studentSet.forEach (function(student) {
       //   self.storeStudents(student, null , nstpProgram);
       // });
-
       if (Parse.User.current().get("userType") == "hei") {
         const params = {
           senderId: Parse.User.current().id,
-
           action: "uploaded a ",
           output: "List of Graduates",
           routeName: "3rdStep",
@@ -621,7 +673,6 @@ export default {
       const nstpEnrollment = new Parse.Object("NstpEnrollment");
       // const nstpId = await this.getNstpId(nstpProgram);
       const heiId = await this.getHeiId();
-
       const student = new Parse.Object("Student");
       student.set("name", {
         lastName: studentData.F,
@@ -644,7 +695,6 @@ export default {
         programName: studentData.S,
       });
       student.set("heiId", heiId);
-
       await student.save().then((student) => {
         // this.forceRerender(); //solution to updating DOM of child component
         nstpEnrollment.set(
@@ -660,7 +710,6 @@ export default {
         nstpEnrollment.set("takenNstp2", false);
         nstpEnrollment.set("isGraduated", false);
         nstpEnrollment.save();
-
         const StudentConflict = Parse.Object.extend("StudentConflict");
         const conflict = new StudentConflict();
         conflict.set(
@@ -687,7 +736,6 @@ export default {
       this.maleNum = 0;
       this.femaleNumError = 0;
       this.maleNumError = 0;
-
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
       // query.equalTo("applicationId", this.appId);
@@ -701,13 +749,11 @@ export default {
       if (results.length == 0) {
         this.$emit("incompleteStep", 3, "1 of 4");
       }
-
       if (results.length > 0) {
         this.status = results[0].get("applicationId").get("status");
         this.data.program = results[0].get("nstpId").get("programName");
         for (let i = 0; i < results.length; i++) {
           const object = results[i];
-
           if (
             object.get("takenNstp1") == true &&
             object.get("takenNstp2") == true &&
@@ -737,7 +783,6 @@ export default {
           }
         }
       }
-
       const StudentConflict = Parse.Object.extend("StudentConflict");
       const conflict = new Parse.Query(StudentConflict);
       conflict.equalTo(
@@ -772,32 +817,26 @@ export default {
           this.maleNumError++;
         }
       }
-
       this.students = studentList;
       this.studentsMissing = studentErrorList;
       this.data.graduates = studentList.length;
-
       this.forceRerender();
     },
     async approve() {
       let _this = this;
-
       const date = new Date();
       const fullyear = new Date().getFullYear();
       const year = new Date().toLocaleDateString("en", { year: "2-digit" });
       const program = this.data.program.charAt(0);
-
       const Application = Parse.Object.extend("Application");
       //get the end of serial number
       const query = new Parse.Query(Application);
       query.include("heiId");
-
       const results = await query.first();
       //get serialNumber, if undefined; set startSerialNum to 1
       //if not, set startSerialNum to the last saved endSerialNumber + 1
       var newStart = 0;
       var newEnd = 0;
-
       if (results.get("serialNumber") == null) {
         newStart = 1;
         newEnd = this.data.graduates;
@@ -808,7 +847,6 @@ export default {
         newStart = endSerialNumber + 1;
         newEnd = endSerialNumber + this.data.graduates;
       }
-
       query.equalTo("objectId", this.appId);
       await query.first().then(function (result) {
         result.set("dateApproved", date);
@@ -816,7 +854,6 @@ export default {
         result.set("serialNumber", { start: newStart, end: newEnd });
         result.save();
       });
-
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const enrollment = new Parse.Query(NstpEnrollment);
       enrollment.equalTo(
@@ -847,7 +884,6 @@ export default {
         const params = {
           senderId: Parse.User.current().id,
           receiverId: results.get("heiId").id,
-
           action: "approved your",
           output: "Serial Number Application",
           routeName: "4thStep",
@@ -856,7 +892,6 @@ export default {
         this.$emit("sendNotification", params);
       }
     },
-
     toggleConfirmModal() {
       this.confirm = !this.confirm;
     },
@@ -870,7 +905,6 @@ export default {
       const results = await application.first();
       results.set("reason", reason);
       results.save();
-
       // since the application was rejected, students are not qualified
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const nstpenrollment = new Parse.Query(NstpEnrollment);
@@ -887,14 +921,23 @@ export default {
         element.set("isGraduated", false);
         element.save();
       }
-
       this.data.reason = reason;
       this.setStatus("Rejected");
       this.toggleRejectModal();
+      if (Parse.User.current().get("userType") == "admin") {
+        const params = {
+          senderId: Parse.User.current().id,
+          receiverId: results.get("heiId").id,
+          action: "rejected your",
+          output: "Serial Number Application",
+          routeName: "4thStep",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
     },
     setStatus(status) {
       this.$emit("setStatus", status);
-
       this.getStudents();
     },
     confirmed() {
@@ -902,7 +945,6 @@ export default {
       this.approve().then(() => {
         // this.pending = false;
         this.$emit("complete", 3);
-
         this.$emit("setStatus", "Approved");
         this.status = "Approved";
         this.$emit("nextStep");
@@ -913,7 +955,6 @@ export default {
     },
     nextStep() {
       this.worker = undefined;
-
       this.$emit("nextStep");
     },
     goToApplication() {

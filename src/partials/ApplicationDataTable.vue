@@ -300,6 +300,23 @@ export default {
             }
           );
 
+          const Notification = Parse.Object.extend("Notification");
+          const notifQuery = new Parse.Query(Notification);
+          notifQuery.equalTo(
+            "applicationId",
+            new Parse.Object("Application", { id: deleteParams.app_id })
+          );
+          notifQuery.equalTo("routeName", "1stStep");
+          notifQuery.first().then(
+            (object) => {
+              object.destroy();
+              console.log("notif deleted");
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+
           // NstpEnrollment
           const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
           const query3 = new Parse.Query(NstpEnrollment);
