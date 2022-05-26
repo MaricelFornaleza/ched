@@ -167,6 +167,7 @@
             newId="datatable2"
             :key="componentKey"
             :students="studentsMissing"
+            :showError="true"
             fileName="List-of-Students-Missing"
           ></StudentsDataTable>
         </div>
