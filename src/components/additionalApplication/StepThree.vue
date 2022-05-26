@@ -942,6 +942,17 @@ export default {
       this.data.reason = reason;
       this.setStatus("Rejected");
       this.toggleRejectModal();
+      if (Parse.User.current().get("userType") == "admin") {
+        const params = {
+          senderId: Parse.User.current().id,
+          receiverId: results.get("heiId").id,
+          action: "rejected your",
+          output: "Serial Number Application",
+          routeName: "Step4",
+          applicationId: this.appId,
+        };
+        this.$emit("sendNotification", params);
+      }
     },
     setStatus(status) {
       this.$emit("setStatus", status);
