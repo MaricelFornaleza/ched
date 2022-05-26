@@ -259,12 +259,12 @@ export default {
       var lts =
         this.graduates.lts +
         " (" +
-        (this.graduates.lts / this.graduates.total) * 100 +
+        ((this.graduates.lts / this.graduates.total) * 100).toFixed(2) +
         "%)";
       var cwts =
         this.graduates.cwts +
         " (" +
-        (this.graduates.cwts / this.graduates.total) * 100 +
+        ((this.graduates.cwts / this.graduates.total) * 100).toFixed(2) +
         "%)";
       var acadYear = this.academicYear;
 
@@ -289,7 +289,7 @@ export default {
           doc.setFont("", "", "normal");
           doc.text("Academic Year " + acadYear, 1, 3.2);
           const text =
-            "*This is a system generated report from the NSTP Online Application and Issuance System.";
+            "*This is a system generated report from the NSTP Serial Number Online Application and Issuance System.";
 
           doc.addImage(img, "JPEG", 1, 3.5, 6.5, 4);
           doc.setFontSize(9);

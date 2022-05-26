@@ -318,12 +318,12 @@ export default {
       };
 
       const emailQuery = new Parse.Query(Parse.User);
-      emailQuery.equalTo("emailVerified", true);
-      emailQuery.equalTo("receivedCredential", false);
-      const resultEmail = await emailQuery.find({ useMasterKey: true });
-      if (resultEmail) {
-        for (let i = 0; i < resultEmail.length; i++) {
-          const objectEmail = resultEmail[i];
+      emailQuery.equalTo("objectId", object.id);
+      await emailQuery.first({ useMasterKey: true }).then((objectEmail) => {
+        if (
+          objectEmail.get("emailVerified") == true &&
+          objectEmail.get("receivedCredential") == false
+        ) {
           const params = {
             name: objectEmail.get("name"),
             email: objectEmail.get("email"),
@@ -333,14 +333,12 @@ export default {
           };
           console.log(objectEmail.id);
           Parse.Cloud.run("sendEmailNotification", params);
-          const updateQuery = new Parse.Query(Parse.User);
-          updateQuery.matches("objectId", objectEmail.id);
-          const resultUpdate = await updateQuery.first();
-          resultUpdate.set("password", password);
-          resultUpdate.set("receivedCredential", true);
-          resultUpdate.save();
+
+          objectEmail.set("password", password);
+          objectEmail.set("receivedCredential", true);
+          objectEmail.save();
         }
-      }
+      });
     });
 
     subscription.on("enter", async (object) => {
@@ -356,31 +354,6 @@ export default {
         email: object.get("email"),
         address: object.get("address"),
       });
-
-      // const emailQuery = new Parse.Query(Parse.User);
-      // emailQuery.equalTo("emailVerified", true);
-      // emailQuery.equalTo("receivedCredential", false);
-      // const resultEmail = await emailQuery.find({ useMasterKey: true });
-      // if (resultEmail) {
-      //   for (let i = 0; i < resultEmail.length; i++) {
-      //   const objectEmail = resultEmail[i];
-      //   const params = {
-      //       name: objectEmail.get("name"),
-      //       email: objectEmail.get("email"),
-      //       password: password,
-      //       type: "Account",
-      //       approved: true,
-      //     };
-      //     console.log(objectEmail.id);
-      //     Parse.Cloud.run("sendEmailNotification", params);
-      //     const updateQuery = new Parse.Query(Parse.User);
-      //     updateQuery.matches("objectId", objectEmail.id);
-      //     const resultUpdate = await updateQuery.first();
-      //     resultUpdate.set("password", password);
-      //     resultUpdate.set("receivedCredential", true);
-      //     resultUpdate.save();
-      //   }
-      // }
     });
 
     subscription.on("leave", (object) => {

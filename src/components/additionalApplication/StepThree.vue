@@ -178,6 +178,14 @@
         >
           <button class="btn-sm btn-default btn-outline">Back</button>
           <button
+            v-if="!taken"
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Reupload
+          </button>
+          <button
             @click="toggleRejectModal()"
             class="btn-sm btn-default bg-error text-light-100 border-0"
           >
@@ -312,6 +320,7 @@ export default {
         program: null,
         graduates: null,
       },
+      taken: false,
     };
   },
 
@@ -343,6 +352,15 @@ export default {
     return { dropzoneFile, drop, selectedFile };
   },
   async created() {
+    const Application = Parse.Object.extend("Application");
+    const reuploadQuery = new Parse.Query(Application);
+    reuploadQuery.equalTo("objectId", this.appId);
+
+    await reuploadQuery.first().then((obj) => {
+      if (obj.get("status") == "Approved" || obj.get("status") == "Rejected")
+        this.taken = true;
+    });
+
     const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
     const query2 = new Parse.Query(NstpEnrollment);
     // query.equalTo("applicationId", this.appId);
@@ -356,19 +374,20 @@ export default {
     // });
     nstpsubscription.on("delete", async (object) => {
       // find
-      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      var index = this.students.findIndex(
+        (student) => student.id == object.get("studentId").id
+      );
       console.log(index);
       if (index == -1) return;
       this.students.splice(index, 1); //remove the specific object in the array
-      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+      if (object.get("studentId").get("gender").toUpperCase() == "F") {
         this.femaleNum--;
-      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+      } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
     });
     // await this.getStudents();
 
-    const Application = Parse.Object.extend("Application");
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
 
@@ -376,12 +395,14 @@ export default {
     await query.first().then(function (results) {
       // each of results will only have the selected fields available.
       self.status = results.get("status");
+
       if (
         results.get("status") == "For Approval" ||
         results.get("status") == "Approved"
       )
         self.getStudents();
     });
+
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
@@ -446,7 +467,7 @@ export default {
         };
       }
     },
-       reupload() {
+    reupload() {
       this.maleNum = 0;
       this.femaleNum = 0;
       this.maleNumError = 0;
@@ -455,20 +476,20 @@ export default {
       this.studentsMissing = [];
 
       //delete studentconflict and set takenNstp2 to false
-      const StudentConflict = Parse.Object.extend("StudentConflict");
-      const conflict = new Parse.Query(StudentConflict);
-      conflict.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
-      conflict.equalTo("status", "2 of 4");
-      conflict.find().then(
+      const Application = Parse.Object.extend("Application");
+      const appQuery = new Parse.Query(Application);
+      appQuery.equalTo("objectId", this.appId);
+
+      appQuery.first().then(
         (results) => {
-          for (let i = 0; i < results.length; i++) {
-            results[i].destroy();
-          }
+          results.set("status", "3 of 4");
+          results.save();
+          this.status = results.get("status");
         },
-        (error) => {console.log(error);});
+        (error) => {
+          console.log(error);
+        }
+      );
 
       const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
       const query = new Parse.Query(NstpEnrollment);
@@ -479,7 +500,7 @@ export default {
       query.find().then((res) => {
         for (let index = 0; index < res.length; index++) {
           const element = res[index];
-          element.set("takenNstp2", false);
+          element.set("isGraduated", false);
           element.save();
         }
       });
@@ -737,6 +758,7 @@ export default {
 
       if (results.length > 0) {
         this.status = results[0].get("applicationId").get("status");
+
         this.data.program = results[0].get("nstpId").get("programName");
         for (let i = 0; i < results.length; i++) {
           const object = results[i];

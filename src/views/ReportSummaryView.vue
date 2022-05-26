@@ -442,7 +442,7 @@ export default {
           doc.addImage(img, "JPEG", 1, 6, 6.5, 4);
 
           const text =
-            "*This is a system generated report from the NSTP Online Application and Issuance System.";
+            "*This is a system generated report from the NSTP Serial Number Online Application and Issuance System.";
           doc.setFontSize(9);
 
           doc.text(text, 1, 10.2);
@@ -508,7 +508,7 @@ export default {
           doc.setFont("", "", "normal");
           doc.text(filter_type + ": " + filter_condition, 1, 3.2);
           const text =
-            "*This is a system generated report from the NSTP Online Application and Issuance System.";
+            "*This is a system generated report from the NSTP Serial Number Online Application and Issuance System.";
 
           doc.addImage(img, "JPEG", 1, 3.5, 6.5, 4);
           doc.setFontSize(9);

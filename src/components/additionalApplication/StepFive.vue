@@ -276,10 +276,17 @@ export default {
           students: this.data.graduates,
         },
       };
-      Parse.Cloud.run("sendEmailNotification", emailParams);
+      Parse.Cloud.run("sendEmailNotification", emailParams).then((res) => {
+        console.log(res);
+      });
     },
     forceRerender() {
       this.componentKey += 1;
+    },
+    hello() {
+      Parse.Cloud.run("asyncFunction").then((res) => {
+        console.log(res);
+      });
     },
     variant(stats) {
       if (stats == "Approved") {
