@@ -384,6 +384,7 @@ export default {
       } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
+      await this.getStudents();
     });
     // await this.getStudents();
 

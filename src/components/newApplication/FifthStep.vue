@@ -53,6 +53,11 @@
           </div>
         </div>
       </div>
+      <div class="w-fit mx-auto">
+        <AlertWidget v-if="display_msg" className="alert-success">
+          The Transmittal letter will be sent shortly.
+        </AlertWidget>
+      </div>
       <div
         v-if="admin"
         class="
@@ -152,6 +157,7 @@ export default {
       componentKey: 0,
       loading: true,
       admin: false,
+      display_msg: false,
     };
   },
   props: {
@@ -274,7 +280,9 @@ export default {
           students: this.data.graduates,
         },
       };
-      Parse.Cloud.run("sendEmailNotification", emailParams);
+      Parse.Cloud.run("sendEmailNotification", emailParams).then(() => {
+        this.display_msg = true;
+      });
     },
     forceRerender() {
       this.componentKey += 1;

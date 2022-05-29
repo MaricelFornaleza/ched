@@ -371,15 +371,10 @@ export default {
       });
       var filter_type = this.filter.type;
       var filter_condition = this.filter.condition;
-      var data = {
-        hei: {
-          total: "5",
-          suc: "1",
-          luc: "2",
-          private: "3",
-          ogs: "4",
-        },
-      };
+      var hei = this.hei;
+      var applications = this.applications;
+      var enrollees = this.enrollees;
+      var graduates = this.graduates;
 
       html2pdf()
         .set(opt)
@@ -406,34 +401,34 @@ export default {
           doc.text("Higher Education Institutions", 2, 3.5);
           doc.setFont("", "", "normal");
 
-          doc.text("SUC: " + data.hei.suc, 2, 3.7);
-          doc.text("LUC: " + data.hei.luc, 2, 3.9);
-          doc.text("Private: " + data.hei.private, 2, 4.1);
-          doc.text("OGS: " + data.hei.ogs, 2, 4.3);
+          doc.text("SUC: " + hei.countSuc, 2, 3.7);
+          doc.text("LUC: " + hei.countLuc, 2, 3.9);
+          doc.text("Private: " + hei.countPrivate, 2, 4.1);
+          doc.text("OGS: " + hei.countOgs, 2, 4.3);
 
           doc.setFont("", "", "bold");
 
           doc.text("Total Applications", 4.5, 3.5);
           doc.setFont("", "", "normal");
 
-          doc.text("Pending: " + data.hei.suc, 4.5, 3.7);
-          doc.text("For Approval: " + data.hei.luc, 4.5, 3.9);
-          doc.text("Rejected:" + data.hei.private, 4.5, 4.1);
-          doc.text("Approved:" + data.hei.ogs, 4.5, 4.3);
+          doc.text("Pending: " + applications.pending, 4.5, 3.7);
+          doc.text("For Approval: " + applications.forApproval, 4.5, 3.9);
+          doc.text("Rejected:" + applications.rejected, 4.5, 4.1);
+          doc.text("Approved:" + applications.approved, 4.5, 4.3);
           doc.setFont("", "", "bold");
           doc.text("NSTP Enrollees", 2, 4.6);
           doc.setFont("", "", "normal");
 
-          doc.text("1st Semester: " + data.hei.suc, 2, 4.8);
-          doc.text("2nd Semester: " + data.hei.luc, 2, 5);
+          doc.text("1st Semester: " + enrollees.first, 2, 4.8);
+          doc.text("2nd Semester: " + enrollees.second, 2, 5);
 
           doc.setFont("", "", "bold");
 
           doc.text("NSTP Graduates", 4.5, 4.6);
           doc.setFont("", "", "normal");
 
-          doc.text("CWTS: " + data.hei.suc, 4.5, 4.8);
-          doc.text("LTS: " + data.hei.luc, 4.5, 5);
+          doc.text("CWTS: " + graduates.cwts, 4.5, 4.8);
+          doc.text("LTS: " + graduates.lts, 4.5, 5);
 
           doc.setFont("", "", "bold");
           doc.text("Serial Number Applications", 1, 5.5);

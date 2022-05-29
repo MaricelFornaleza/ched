@@ -205,6 +205,14 @@
           >
             Cancel
           </button>
+          <button
+            v-if="!taken"
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Reupload
+          </button>
 
           <button
             v-if="finishedStudents()"
@@ -381,6 +389,7 @@ export default {
       } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
+      await this.getStudents();
     });
     // await this.getStudents();
 
