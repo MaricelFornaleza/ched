@@ -123,6 +123,7 @@
             :students="students"
             :appId="appId"
             :status="status"
+            currentStep="1"
             fileName="List-of-Students-1stSem"
           ></StudentsDataTable>
         </div>
@@ -314,11 +315,12 @@ export default {
       "applicationId",
       new Parse.Object("Application", { id: this.appId })
     );
+    query.equalTo("takenNstp1", true);
     const nstpsubscription = await query.subscribe();
     // nstpsubscription.on("open", async () => {
     //   this.getStudents();
     // });
-    nstpsubscription.on("delete", async (object) => {
+    nstpsubscription.on("leave", async (object) => {
       // find
       var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
       console.log(index);
@@ -329,6 +331,31 @@ export default {
       } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
+      if(this.femaleNum == 0 && this.maleNum == 0) {
+        this.students = [];
+        this.studentsMissing = [];
+        this.femaleNumError = 0;
+        this.maleNumError = 0;
+        this.removeFile();
+        const StudentConflict = Parse.Object.extend("StudentConflict");
+        const conflict = new Parse.Query(StudentConflict);
+        conflict.equalTo(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        await conflict.find().then(
+          (results) => {
+            for (let i = 0; i < results.length; i++) {
+              results[i].destroy();
+            }
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        this.$emit("incompleteStep", 1, "1 of 4");
+      }
+      console.log(this.students);
     });
     await this.getStudents();
     this.loading = false;
@@ -400,7 +427,10 @@ export default {
     reupload() {
       const StudentConflict = Parse.Object.extend("StudentConflict");
       const conflict = new Parse.Query(StudentConflict);
-      conflict.equalTo("applicationId", this.appId);
+      conflict.equalTo(
+        "applicationId",
+        new Parse.Object("Application", { id: this.appId })
+      );
       conflict.find().then(
         (results) => {
           for (let i = 0; i < results.length; i++) {
@@ -426,8 +456,7 @@ export default {
           element.save();
         }
       });
-      this.$emit("stepBack", 1);
-      this.$emit("setStatus", "1 of 4");
+      this.$emit("incompleteStep", 1, "1 of 4");
       this.removeFile();
     },
     upload(step) {

@@ -166,13 +166,17 @@ export default {
       // console.log(currentStep);
       for (var i in this.steps) {
         if (this.steps[i].no == currentStep) {
-          this.steps[i].completed = false;
+          // this.steps[i].completed = false;
+          const temp = this.steps[i];
+          temp.completed = false;
+          this.steps.splice(i, 1, temp);
           this.isCompleted = this.findStep(currentStep);
         }
       }
-
+      this.checkActive(currentStep);
       this.saveSteps();
       this.setStatus(status);
+      // this.previousStep();
     },
     async saveSteps() {
       const Application = Parse.Object.extend("Application");
