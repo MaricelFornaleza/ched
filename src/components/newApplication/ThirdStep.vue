@@ -206,6 +206,14 @@
           >
             Cancel
           </button>
+          <button
+            v-if="!taken"
+            @click="reupload()"
+            class="btn-sm btn-default"
+            type="submit"
+          >
+            Reupload
+          </button>
 
           <button
             v-if="finishedStudents()"

@@ -53,8 +53,7 @@
             </td>
             <td class="px-6 py-4 text-sm text-left text-gray-500">
               <div class="text-sm text-gray-900">
-                {{ hei.address.barangay }},
-                {{ hei.address.city }} &nbsp;
+                {{ hei.address.barangay }}, {{ hei.address.city }} &nbsp;
               </div>
               <div class="text-xs text-gray-900">
                 {{ hei.address.province }}, {{ hei.address.regionName }}
@@ -151,7 +150,7 @@ export default {
       var sheet1 = XLSX.utils.table_to_sheet(
         document.getElementById("dataTable")
       );
-      
+
       for (const i in sheet1) {
         if (typeof sheet1[i] != "object") continue;
         let cell = XLSX.utils.decode_cell(i);
@@ -159,28 +158,28 @@ export default {
         sheet1[i].s = {
           border: {
             right: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             left: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             top: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             bottom: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
           },
           alignment: {
             vertical: "center",
             horizontal: "center",
-            wrapText: '1', // any truthy value here
+            wrapText: "1", // any truthy value here
           },
-        }
+        };
 
         if (cell.r == 0) {
           // first row
@@ -189,7 +188,7 @@ export default {
           };
         }
       }
-      
+
       sheet1["!cols"] = [
         { wch: 15 },
         { wch: 25 },
@@ -201,10 +200,7 @@ export default {
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "List-of-Heis_" + currentDate + ".xlsx";
       XLSX.writeFile(workbook, filename);
-      this.displayMsg(
-        "success",
-        "The List of Higher Education Institutions was successfully downloaded."
-      );
+      this.displayMsg("success", "Your download will begin in a moment.");
     },
     displayMsg(status, msg) {
       this.$emit("displayAlert", status, msg);

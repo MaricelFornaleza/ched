@@ -28,10 +28,7 @@
           @change="selectedFile"
           fileType="application/pdf"
         >
-          <span class="body-m">
-            Must be .pdf file using this
-            <button class="font-bold underline">template</button>.
-          </span>
+          <span class="body-m"> Must be .pdf file. </span>
         </drop-zone>
 
         <!-- <span class="text-xs font-bold">File: {{ dropzoneFile.name }}</span> -->

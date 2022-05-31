@@ -208,7 +208,7 @@ export default {
       console.log("app subscription opened");
       // can get the list here
       var data = [];
-      const results = await query.find();
+      const results = await query.find({ useMasterKey: true });
 
       for (let i = 0; i < results.length; i++) {
         const object = results[i];
@@ -252,7 +252,7 @@ export default {
           application_type: object.get("applicationType"),
           program: prog,
           no_of_graduates: countGrads,
-          submittedBy: object.get("submittedBy").get("username"),
+          submittedBy: object.get("submittedBy"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -281,7 +281,7 @@ export default {
           application_type: object.get("applicationType"),
           program: nstp.prog,
           no_of_graduates: nstp.gradCount,
-          submittedBy: object.get("submittedBy").get("username"),
+          submittedBy: object.get("submittedBy"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -329,7 +329,7 @@ export default {
           application_type: object.get("applicationType"),
           program: nstp.prog,
           no_of_graduates: nstp.gradCount,
-          submittedBy: object.get("submittedBy").get("username"),
+          submittedBy: object.get("submittedBy"),
           date_applied: object.get("dateApplied").toLocaleDateString("en", {
             weekday: "long",
             year: "numeric",
@@ -537,7 +537,7 @@ export default {
         application.set("steps", this.newSteps);
         application.set("applicationType", "New Application");
         application.set("heiId", new Parse.User({ id: hei }));
-        application.set("submittedBy", new Parse.User({ id: user.id }));
+        application.set("submittedBy", user.get("username"));
 
         application.save().then(
           (application) => {
@@ -576,7 +576,7 @@ export default {
         application.set("steps", this.additionalSteps);
         application.set("applicationType", "For Additional Graduates");
         application.set("heiId", new Parse.User({ id: hei }));
-        application.set("submittedBy", new Parse.User({ id: user.id }));
+        application.set("submittedBy", user.get("username"));
 
         application.save().then(
           (application) => {
