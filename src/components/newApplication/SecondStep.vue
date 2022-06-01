@@ -315,15 +315,18 @@ export default {
     // });
     nstpsubscription.on("delete", async (object) => {
       // find
-      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      var index = this.students.findIndex(
+        (student) => student.id == object.get("studentId").id
+      );
       console.log(index);
       if (index == -1) return;
       this.students.splice(index, 1); //remove the specific object in the array
-      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+      if (object.get("studentId").get("gender").toUpperCase() == "F") {
         this.femaleNum--;
-      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+      } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
+      await this.getStudents();
     });
     await this.getStudents();
     this.loading = false;

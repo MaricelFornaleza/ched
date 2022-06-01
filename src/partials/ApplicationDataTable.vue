@@ -340,7 +340,9 @@ export default {
           console.log("studentList: " + studentList);
 
           // StudentConflicts
-          const StudentConflict = Parse.Object.extend("NstpStudentConflictEnrollment");
+          const StudentConflict = Parse.Object.extend(
+            "NstpStudentConflictEnrollment"
+          );
           const query4 = new Parse.Query(StudentConflict);
           query4.equalTo(
             "applicationId",
@@ -356,7 +358,7 @@ export default {
               console.log(error);
             }
           );
-          
+
           // Student
           const Student = Parse.Object.extend("Student");
           const query5 = new Parse.Query(Student);
@@ -479,33 +481,33 @@ export default {
         sheet1[i].s = {
           border: {
             right: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             left: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             top: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             bottom: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
           },
           alignment: {
             horizontal: "center",
           },
-        }
+        };
 
         if (cell.c == 0) {
           sheet1[i].s.alignment = {
             horizontal: "left",
           };
         }
-        
+
         if (cell.r == 0) {
           // first row
           sheet1[i].s.font = {
@@ -518,18 +520,21 @@ export default {
       }
 
       sheet1["!cols"] = [
-        { wch: 45 },{ wch: 15 },{ wch: 15 },{ wch: 15 },
-        { wch: 15 },{ wch: 20 },{ wch: 15 },{ wch: 10 },
+        { wch: 45 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 10 },
       ];
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
       var filename = "List-of-Applications_" + currentDate + ".xlsx";
       // XLSX.writeFileXLSX(workbook, filename);
       XLSX.writeFile(workbook, filename);
-      this.displayMsg(
-        "success",
-        "The List of Applications was successfully downloaded."
-      );
+      this.displayMsg("success", "Your download will begin in a moment.");
     },
     displayMsg(status, msg) {
       this.$emit("displayAlert", status, msg);

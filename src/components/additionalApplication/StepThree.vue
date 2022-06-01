@@ -312,7 +312,7 @@ export default {
       reject: false,
       confirm: false,
       status: "",
-      laoding: false,
+      loading: false,
 
       isAdmin: false,
       data: {
@@ -384,6 +384,7 @@ export default {
       } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
+      await this.getStudents();
     });
     // await this.getStudents();
 

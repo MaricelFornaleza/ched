@@ -115,33 +115,33 @@ export default {
         sheet1[i].s = {
           border: {
             right: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             left: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             top: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             bottom: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
           },
           alignment: {
             horizontal: "center",
           },
-        }
+        };
 
         if (cell.c == 0) {
           sheet1[i].s.alignment = {
             horizontal: "left",
           };
         }
-        
+
         if (cell.r == 0) {
           // first row
           sheet1[i].s.font = {
@@ -152,7 +152,7 @@ export default {
           };
         }
       }
-      
+
       sheet1["!cols"] = [
         { wch: 15 },
         { wch: 15 },
@@ -162,13 +162,9 @@ export default {
       ];
 
       XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-      var filename =
-        "List-of-SerialNumbers_" + currentDate + ".xlsx";
+      var filename = "List-of-SerialNumbers_" + currentDate + ".xlsx";
       XLSX.writeFile(workbook, filename);
-      this.displayMsg(
-        "success",
-        "The List of Serial Numbers was successfully downloaded."
-      );
+      this.displayMsg("success", "Your download will begin in a moment.");
     },
     displayMsg(status, msg) {
       this.$emit("displayAlert", status, msg);

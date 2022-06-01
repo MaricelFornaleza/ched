@@ -53,6 +53,12 @@
           </div>
         </div>
       </div>
+      <div class="w-fit mx-auto">
+        <AlertWidget v-if="display_msg" className="alert-success">
+          The Transmittal letter will be sent shortly.
+        </AlertWidget>
+      </div>
+
       <div
         v-if="admin"
         class="
@@ -155,6 +161,7 @@ export default {
       componentKey: 0,
       loading: true,
       admin: false,
+      display_msg: false,
     };
   },
   props: {
@@ -174,6 +181,9 @@ export default {
     this.loading = false;
   },
   methods: {
+    displayAlert() {
+      this.display_msg = true;
+    },
     downloadTransmittal() {
       // Default export is a4 paper, portrait, using millimeters for units
       const doc = new jsPDF("p", "in", "letter");
@@ -276,18 +286,14 @@ export default {
           students: this.data.graduates,
         },
       };
-      Parse.Cloud.run("sendEmailNotification", emailParams).then((res) => {
-        console.log(res);
+      Parse.Cloud.run("sendEmailNotification", emailParams).then(() => {
+        this.display_msg = true;
       });
     },
     forceRerender() {
       this.componentKey += 1;
     },
-    hello() {
-      Parse.Cloud.run("asyncFunction").then((res) => {
-        console.log(res);
-      });
-    },
+
     variant(stats) {
       if (stats == "Approved") {
         return "badge-success";
