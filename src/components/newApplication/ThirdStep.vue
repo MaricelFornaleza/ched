@@ -469,11 +469,14 @@ export default {
             // self.femaleNum = event.data.female;
             // self.total = self.maleNum + self.femaleNum;
             self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
-              self.removeFile();
               self.pending = false;
-              self.$emit("setStatus", "For Approval");
-              self.status = "For Approval";
-              self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+
+              if(self.maleNum > 0 && self.femaleNum > 0) {
+                self.removeFile();
+                self.$emit("setStatus", "For Approval");
+                self.status = "For Approval";
+                self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+              }
             });
           } else {
             // console.log("Something went wrong while parsing xlsx file!");

@@ -9,7 +9,7 @@
 
     <div v-else>
       <div
-        v-if="!isCompleted"
+        v-if="!isCompleted && !finishedStudents() && !errorStudents()"
         class="
           container
           w-full
@@ -163,7 +163,7 @@
         </div>
 
         <div
-          v-if="isCompleted"
+          v-if="isCompleted || finishedStudents() || errorStudents()"
           class="flex items-center justify-center space-x-5 mt-5"
         >
           <button
@@ -181,7 +181,9 @@
           >
             Reupload
           </button>
-          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+          <button v-if="finishedStudents()"
+            @click="nextStep()" class="btn-sm btn-default" type="submit"
+          >
             Next
           </button>
         </div>
@@ -412,14 +414,17 @@ export default {
               )
               .then(() => {
                 self.pending = false;
-                self.removeFile();
-                self.$emit("complete", step);
-                self.$emit("setStatus", "2 of 4");
-                self.$emit(
-                  "sendEmail",
-                  "List of Enrollment for the 1st Semester",
-                  "Step 1 of 4"
-                );
+                
+                if(self.maleNum > 0 && self.femaleNum > 0) {
+                  self.removeFile();
+                  self.$emit("complete", step);
+                  self.$emit("setStatus", "2 of 4");
+                  self.$emit(
+                    "sendEmail",
+                    "List of Enrollment for the 1st Semester",
+                    "Step 1 of 4"
+                  );
+                }
               });
           } else {
             //console.log("Something went wrong while parsing xlsx file!");
@@ -430,6 +435,12 @@ export default {
       }
     },
     reupload() {
+      this.maleNum = 0;
+      this.femaleNum = 0;
+      this.maleNumError = 0;
+      this.femaleNumError = 0;
+      this.students = [];
+      this.studentsMissing = [];
       const StudentConflict = Parse.Object.extend("StudentConflict");
       const conflict = new Parse.Query(StudentConflict);
       conflict.equalTo(

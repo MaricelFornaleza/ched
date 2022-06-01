@@ -443,14 +443,17 @@ export default {
             // self.total = self.maleNum + self.femaleNum;
             self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
               self.pending = false;
-              self.removeFile();
-              self.$emit("complete", step);
-              self.$emit("setStatus", "3 of 4");
-              self.$emit(
-                "sendEmail",
-                "List of Enrollment for the 2nd Semester",
-                "Step 2 of 4"
-              );
+              
+              if(self.maleNum > 0 && self.femaleNum > 0) {
+                self.removeFile();
+                self.$emit("complete", step);
+                self.$emit("setStatus", "3 of 4");
+                self.$emit(
+                  "sendEmail",
+                  "List of Enrollment for the 2nd Semester",
+                  "Step 2 of 4"
+                );
+              }
             });
 
             // this.completed = !this.completed;

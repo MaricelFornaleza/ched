@@ -155,12 +155,16 @@ export default {
       // console.log(currentStep);
       for (var i in this.steps) {
         if (this.steps[i].no == currentStep) {
-          this.steps[i].completed = true;
+          // this.steps[i].completed = true;
+          const temp = this.steps[i];
+          temp.completed = true;
+          this.steps.splice(i, 1, temp);
           this.isCompleted = this.findStep(currentStep);
         }
       }
 
       this.saveSteps();
+      this.checkActive(currentStep);
     },
     incompleteStep(currentStep, status) {
       // console.log(currentStep);

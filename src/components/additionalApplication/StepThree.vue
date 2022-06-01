@@ -479,10 +479,13 @@ export default {
               )
               .then(() => {
                 self.pending = false;
-                self.removeFile();
-                self.$emit("setStatus", "For Approval");
-                self.status = "For Approval";
-                self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+                
+                if(self.maleNum > 0 && self.femaleNum > 0) {
+                  self.removeFile();
+                  self.$emit("setStatus", "For Approval");
+                  self.status = "For Approval";
+                  self.$emit("sendEmail", "List of Graduates", "Step 3 of 4");
+                }
               });
           } else {
             self.pending = false;

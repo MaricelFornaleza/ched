@@ -358,7 +358,11 @@ export default {
   },
   methods: {
     goToHei() {
-      this.$router.push({ name: "hei" });
+      if(Parse.User.current().get("userType") == "admin") {
+        this.$router.push({ name: "hei" });
+      } else {
+        this.$router.back();
+      }
     },
     handleProvince(e) {
       this.regionName = e.target.selectedOptions[0].text;
