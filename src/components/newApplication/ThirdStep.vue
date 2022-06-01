@@ -185,13 +185,13 @@
           >
             Reupload
           </button>
-          <button
+          <button v-if="finishedStudents()"
             @click="toggleRejectModal()"
             class="btn-sm btn-default bg-error text-light-100 border-0"
           >
             Reject
           </button>
-          <button
+          <button v-if="finishedStudents()"
             @click="toggleConfirmModal()"
             class="btn-sm btn-default bg-success text-light-100 border-0"
           >

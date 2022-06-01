@@ -8,7 +8,7 @@
     </div>
     <div v-else>
       <div
-        v-if="!isCompleted"
+        v-if="!isCompleted && !finishedStudents() && !errorStudents()"
         class="
           container
           w-full
@@ -180,7 +180,9 @@
             Reupload
           </button>
 
-          <button @click="nextStep()" class="btn-sm btn-default" type="submit">
+          <button v-if="finishedStudents()"
+            @click="nextStep()" class="btn-sm btn-default" type="submit"
+          >
             Next
           </button>
         </div>
@@ -443,7 +445,7 @@ export default {
             // self.total = self.maleNum + self.femaleNum;
             self.verifyStudents(event.data.rows, event.data.nstp).then(() => {
               self.pending = false;
-              
+
               if(self.maleNum > 0 && self.femaleNum > 0) {
                 self.removeFile();
                 self.$emit("complete", step);
