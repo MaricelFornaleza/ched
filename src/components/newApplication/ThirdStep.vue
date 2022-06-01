@@ -109,7 +109,7 @@
           class="container mx-auto flex flex-col items-center justify-center"
         >
           <SuccessAlert className="alert-success">
-            The list for the 2nd semester was successfully uploaded. An
+            The list of graduates was successfully uploaded. An
             Acknowledgement letter was sent to the email address.
           </SuccessAlert>
           <ApplicationDetails :appId="appId" />
@@ -134,6 +134,7 @@
             :key="componentKey"
             :students="students"
             :status="status"
+            currentStep="3"
             fileName="List-of-Students-Graduates"
           ></StudentsDataTable>
         </div>
@@ -357,44 +358,6 @@ export default {
   },
   async created() {
     const Application = Parse.Object.extend("Application");
-    const reuploadQuery = new Parse.Query(Application);
-    reuploadQuery.equalTo("objectId", this.appId);
-
-    await reuploadQuery.first().then((obj) => {
-      if (obj.get("status") == "Approved" || obj.get("status") == "Rejected")
-        this.taken = true;
-    });
-
-    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
-    const query2 = new Parse.Query(NstpEnrollment);
-    // query.equalTo("applicationId", this.appId);
-    query2.equalTo(
-      "applicationId",
-      new Parse.Object("Application", { id: this.appId })
-    );
-    const nstpsubscription = await query2.subscribe();
-    // nstpsubscription.on("open", async () => {
-    //   this.getStudents();
-    // });
-    nstpsubscription.on("delete", async (object) => {
-      // find
-      var index = this.students.findIndex(
-        (student) => student.id == object.get("studentId").id
-      );
-      console.log(index);
-      if (index == -1) return;
-      this.students.splice(index, 1); //remove the specific object in the array
-      if (object.get("studentId").get("gender").toUpperCase() == "F") {
-        this.femaleNum--;
-      } else if (object.get("studentId").get("gender").toUpperCase() == "M") {
-        this.maleNum--;
-      }
-      await this.getStudents();
-    });
-    // await this.getStudents();
-
-    // if(this.isCompleted)
-
     const query = new Parse.Query(Application);
     query.equalTo("objectId", this.appId);
     const self = this;
@@ -404,9 +367,66 @@ export default {
       if (
         results.get("status") == "For Approval" ||
         results.get("status") == "Approved"
-      )
-        self.getStudents();
+      ) {
+        self.getStudents();  
+      } else if (results.get("status") == "Approved" || results.get("status") == "Rejected") {
+        this.taken = true;
+      }
     });
+
+    const NstpEnrollment = Parse.Object.extend("NstpEnrollment");
+    const query2 = new Parse.Query(NstpEnrollment);
+    // query.equalTo("applicationId", this.appId);
+    query2.equalTo(
+      "applicationId",
+      new Parse.Object("Application", { id: this.appId })
+    );
+    query2.equalTo("takenNstp1", true);
+    query2.equalTo("takenNstp2", true);
+    query2.equalTo("isGraduated", true);
+    const nstpsubscription = await query2.subscribe();
+    nstpsubscription.on("leave", async (object) => {
+      // find
+      var index = this.students.findIndex((student) => student.id == object.get("studentId").id);
+      console.log(index);
+      if (index == -1) return;
+      this.students.splice(index, 1); //remove the specific object in the array
+      if(object.get("studentId").get("gender").toUpperCase() == "F") {
+        this.femaleNum--;
+      } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
+        this.maleNum--;
+      }
+<<<<<<< HEAD
+      await this.getStudents();
+=======
+      if(this.femaleNum == 0 && this.maleNum == 0) {
+        this.students = [];
+        this.studentsMissing = [];
+        this.femaleNumError = 0;
+        this.maleNumError = 0;
+        this.removeFile();
+        const StudentConflict = Parse.Object.extend("StudentConflict");
+        const conflict = new Parse.Query(StudentConflict);
+        conflict.equalTo(
+          "applicationId",
+          new Parse.Object("Application", { id: this.appId })
+        );
+        await conflict.find().then(
+          (results) => {
+            for (let i = 0; i < results.length; i++) {
+              results[i].destroy();
+            }
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        this.$emit("incompleteStep", 3, "3 of 4");
+      }
+      console.log(this.students);
+>>>>>>> bcb9b9a5d9d2e038eeda98f19dca535c895de3a7
+    });
+    
     const user = Parse.User.current();
     if (user.get("userType") == "admin") {
       this.isAdmin = true;
@@ -508,9 +528,10 @@ export default {
         }
       });
 
-      this.$emit("stepBack", 3);
-      this.$emit("setStatus", "3 of 4");
+      this.$emit("incompleteStep", 3, "3 of 4");
       this.removeFile();
+      this.status = "3 of 4";
+      this.taken = false;
     },
     upload() {
       var validation = this.validate(this.dropzoneFile);

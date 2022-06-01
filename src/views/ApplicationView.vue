@@ -192,6 +192,7 @@ export default {
     const Applications = Parse.Object.extend("Application");
     const query = new Parse.Query(Applications);
     query.include("heiId");
+    query.include("submittedBy");
     query.descending("dateApplied");
     if (usertype == "hei") {
       query.equalTo("heiId", new Parse.Object("_User", { id: user.id }));

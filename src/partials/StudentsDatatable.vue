@@ -94,7 +94,9 @@
               <td class="px-6 py-4">{{ student.program.programName }}</td>
               <td class="px-6 py-4">{{ student.emailAddress }}</td>
               <td class="px-6 py-4">{{ student.contactNumber }}</td>
-              <td v-if="showError" class="px-6 py-4 text-left">{{ student.reason }}</td>
+              <td v-if="showError" class="px-6 py-4 text-left">
+                {{ student.reason }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -146,6 +148,7 @@ export default {
     status: String,
     showError: Boolean,
     appId: String,
+    currentStep: String,
   },
   async created() {
     this.updateDt();
@@ -211,7 +214,23 @@ export default {
           "studentId",
           new Parse.Object("Student", { id: studentId })
         );
-        await query1.first().then(
+        await query1.first().then((result) => {
+          console.log(this.currentStep);
+          if(this.currentStep == "1") {
+            result.set("takenNstp1", false);
+          } else if(this.currentStep == "2") {
+            result.set("takenNstp2", false);
+          } else if(this.currentStep == "3") {
+            result.set("isGraduated", false);
+          } else if(this.currentStep == "additional") {
+            result.set("takenNstp1", false);
+            result.set("takenNstp2", false);
+            result.set("isGraduated", false);
+          } 
+          result.save();
+        });
+        
+        /*await query1.first().then(
           (object) => {
             console.log(object);
             object.destroy().then(async (student) => {
@@ -229,7 +248,7 @@ export default {
           (error) => {
             console.log(error);
           }
-        );
+        );*/
       }
     },
     updateDt() {
@@ -270,26 +289,26 @@ export default {
         sheet1[i].s = {
           border: {
             right: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             left: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             top: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
             bottom: {
-                style: "thin",
-                color: "000000"
+              style: "thin",
+              color: "000000",
             },
           },
           alignment: {
             horizontal: "center",
           },
-        }
+        };
 
         if (cell.c == 0) {
           sheet1[i].s.alignment = {
@@ -305,7 +324,7 @@ export default {
           sheet1[i].s.alignment = {
             vertical: "center",
             horizontal: "center",
-            wrapText: '1', // any truthy value here
+            wrapText: "1", // any truthy value here
           };
         }
       }
