@@ -396,9 +396,7 @@ export default {
       } else if(object.get("studentId").get("gender").toUpperCase() == "M") {
         this.maleNum--;
       }
-<<<<<<< HEAD
-      await this.getStudents();
-=======
+
       if(this.femaleNum == 0 && this.maleNum == 0) {
         this.students = [];
         this.studentsMissing = [];
@@ -424,7 +422,7 @@ export default {
         this.$emit("incompleteStep", 3, "3 of 4");
       }
       console.log(this.students);
->>>>>>> bcb9b9a5d9d2e038eeda98f19dca535c895de3a7
+
     });
     
     const user = Parse.User.current();
