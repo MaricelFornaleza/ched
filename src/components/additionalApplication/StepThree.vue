@@ -584,9 +584,6 @@ export default {
       } else if (studentProg.program != studentProg.nstpProgram) {
         reason =
           "The student already exists in the database but was enrolled with a different nstp program.";
-      } else if (studentProg.program != studentProg.currentProgram) {
-        reason =
-          "The student has a different nstp program from this application.";
       } else if (nstp.isGraduated && nstp.serialNum) {
         reason =
           "The student has already graduated from the nstp program and already has a serial number.";
@@ -608,13 +605,7 @@ export default {
       query.include("studentId");
       query.include("nstpId");
       const results = await query.find();
-      // find the current application's nstp program
-      query.equalTo(
-        "applicationId",
-        new Parse.Object("Application", { id: this.appId })
-      );
-      const res = await query.first();
-      const currentProgram = res.get("nstpId").get("programName");
+      
       for (let i = 0; i < results.length; i++) {
         var name = results[i].get("studentId").get("name");
         var bday = results[i].get("studentId").get("birthdate");
@@ -643,7 +634,6 @@ export default {
             var studentProg = {
               program: program,
               nstpProgram: nstpProgram,
-              currentProgram: currentProgram,
             };
             //check program
             if (program == "") {
